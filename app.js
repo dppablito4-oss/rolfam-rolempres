@@ -327,6 +327,8 @@ function selectProfile(name, avatarSrc, accentColor) {
         // Init scroll reveal
         initScrollReveal();
         renderAllMath();
+        // Init Netflix-style video previews
+        initCardPreviews();
     }, 800);
 }
 
@@ -348,6 +350,7 @@ function slideCarousel(rowId, direction) {
 
 // ── Slide Modal ───────────────────────────────────────────────────────────────
 function openSlideModal(slideId) {
+    stopAllPreviews();
     const data = SLIDES_DATA[slideId];
     if (!data) return;
 
@@ -397,6 +400,7 @@ function closeSlideModal(e) {
 
 // ── Presenter Mode ────────────────────────────────────────────────────────────
 function startPresenterMode() {
+    stopAllPreviews();
     presenterIndex = 0;
     renderPresenterSlide();
     document.getElementById('presenter-overlay').classList.add('active');
@@ -836,6 +840,163 @@ window.exportSolutionsToPDF = () => {
     setTimeout(() => window.print(), 400);
 };
 
+// ── Card Video Previews (Netflix-style hover) ─────────────────────────────────
+
+/**
+ * Map of YouTube video IDs per card to the channel name for the badge.
+ * Cards that don't have a data-yt-id attribute are skipped automatically.
+ */
+const YT_CHANNEL_NAMES = {
+    'R3L08T3T19A': 'Profe Alex',
+    'F0J5G1cK_98': 'Profe Alex',
+    'kYJ5oQ6jGk8': 'Profe Alex',
+    'LhK9T85_Ym4': 'Profe Alex',
+    'CN4n6Tfc5WI': 'Susi Profe',
+    '9g0nJ6v-J1g': 'JulioProfe',
+    'W-Lq3jB-iYg': 'El Traductor',
+    'R9n94N5-t9Q': 'JulioProfe',
+    'F3q3U0e3yA0': 'JulioProfe',
+    'Lp0-mCBMj6I': 'Academia Vonex',
+    '3-zV0s-P8eA': 'Ricardo Collantes',
+    'R9K1wS_nJ1o': 'Ricardo Collantes'
+};
+
+let _previewTimers = {};
+let _autoKillTimers = {};
+
+/**
+ * Stops all active video previews and destroys their iframes.
+ */
+function stopAllPreviews() {
+    // Cancel all pending hover timers
+    Object.values(_previewTimers).forEach(t => clearTimeout(t));
+    _previewTimers = {};
+
+    // Cancel all auto-kill timers
+    Object.values(_autoKillTimers).forEach(t => clearTimeout(t));
+    _autoKillTimers = {};
+
+    // Remove all active preview iframes and badges
+    document.querySelectorAll('.card-video-container').forEach(el => {
+        // Setting src to '' stops audio immediately before removal
+        const iframe = el.querySelector('iframe');
+        if (iframe) iframe.src = '';
+        el.remove();
+    });
+    document.querySelectorAll('.card-video-badge').forEach(el => el.remove());
+}
+
+/**
+ * Initialises Netflix-style hover preview on every .slide-card that has
+ * a data-yt-id attribute.
+ */
+function initCardPreviews() {
+    document.querySelectorAll('.slide-card[data-yt-id]').forEach(card => {
+        const ytId    = card.dataset.ytId;
+        const ytStart = parseInt(card.dataset.ytStart || '0', 10);
+        const cardKey = ytId + '_' + Math.random();
+
+        // ── mouseenter: schedule preview after 600 ms (like Netflix)
+        card.addEventListener('mouseenter', () => {
+            // Clear any previous timer for this card
+            if (_previewTimers[cardKey]) {
+                clearTimeout(_previewTimers[cardKey]);
+            }
+
+            _previewTimers[cardKey] = setTimeout(() => {
+                // Don't start if presenter overlay or slide modal is open
+                if (
+                    document.getElementById('presenter-overlay').classList.contains('active') ||
+                    document.getElementById('slide-modal').classList.contains('open')
+                ) return;
+
+                // Remove any existing preview on this card first
+                _destroyCardPreview(card);
+
+                // Build the iframe
+                const container = document.createElement('div');
+                container.className = 'card-video-container';
+
+                const src = [
+                    `https://www.youtube.com/embed/${ytId}`,
+                    `?autoplay=1`,
+                    `&mute=0`,
+                    `&controls=0`,
+                    `&modestbranding=1`,
+                    `&rel=0`,
+                    `&fs=0`,
+                    `&iv_load_policy=3`,
+                    `&disablekb=1`,
+                    `&start=${ytStart}`,
+                    `&enablejsapi=0`,
+                    `&playsinline=1`
+                ].join('');
+
+                const iframe = document.createElement('iframe');
+                iframe.src = src;
+                iframe.title = 'Vista previa de video';
+                iframe.allow = 'autoplay; encrypted-media';
+                iframe.setAttribute('allowfullscreen', '');
+
+                container.appendChild(iframe);
+
+                // Channel badge
+                const badge = document.createElement('div');
+                badge.className = 'card-video-badge';
+                badge.textContent = YT_CHANNEL_NAMES[ytId] || 'YouTube';
+
+                // Inject into the thumb (first child of card)
+                const thumb = card.querySelector('.slide-card-thumb');
+                if (!thumb) return;
+                thumb.appendChild(container);
+                thumb.appendChild(badge);
+
+                // Fade in after a tick
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        container.classList.add('visible');
+                        badge.classList.add('visible');
+                    });
+                });
+
+                // Auto-kill after 15 seconds to save resources
+                _autoKillTimers[cardKey] = setTimeout(() => {
+                    _destroyCardPreview(card);
+                }, 15000);
+
+            }, 600);
+        });
+
+        // ── mouseleave: cancel timer and destroy preview immediately
+        card.addEventListener('mouseleave', () => {
+            if (_previewTimers[cardKey]) {
+                clearTimeout(_previewTimers[cardKey]);
+                delete _previewTimers[cardKey];
+            }
+            if (_autoKillTimers[cardKey]) {
+                clearTimeout(_autoKillTimers[cardKey]);
+                delete _autoKillTimers[cardKey];
+            }
+            _destroyCardPreview(card);
+        });
+    });
+}
+
+/** Remove the video preview from a single card, stopping audio first. */
+function _destroyCardPreview(card) {
+    const thumb = card.querySelector('.slide-card-thumb');
+    if (!thumb) return;
+
+    const container = thumb.querySelector('.card-video-container');
+    if (container) {
+        const iframe = container.querySelector('iframe');
+        if (iframe) iframe.src = ''; // stops audio immediately
+        container.remove();
+    }
+    const badge = thumb.querySelector('.card-video-badge');
+    if (badge) badge.remove();
+}
+
 // ── Global Bindings ───────────────────────────────────────────────────────────
 window.generateAIProblem = generateAIProblem;
 window.toggleAISolution = toggleAISolution;
@@ -850,6 +1011,10 @@ window.presenterNext = presenterNext;
 window.presenterPrev = presenterPrev;
 window.slideCarousel = slideCarousel;
 window.showToast = showToast;
+window.stopAllPreviews = stopAllPreviews;
+window.initCardPreviews = initCardPreviews;
+window.openQRModal = openQRModal;
+window.closeQRModal = closeQRModal;
 
 // ── Init on DOM Ready ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {

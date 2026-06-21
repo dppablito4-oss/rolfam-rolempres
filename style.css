@@ -716,6 +716,51 @@ body {
 .row-theme-green  .slide-card-thumb-inner { background: linear-gradient(135deg, #002014 0%, #001a10 100%); }
 .row-theme-amber  .slide-card-thumb-inner { background: linear-gradient(135deg, #2d1a00 0%, #1a1000 100%); }
 
+/* ── Netflix-style Video Preview Overlay ─────────────────────────────────── */
+.card-video-container {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+    background: #000;
+}
+.card-video-container.visible { opacity: 1; }
+.card-video-container iframe {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
+    transform: translate(-50%, -50%) scale(1.35);
+    border: none;
+    pointer-events: none;
+}
+
+/* Channel badge shown during preview */
+.card-video-badge {
+    position: absolute;
+    bottom: 8px; left: 8px;
+    background: rgba(0,0,0,0.78);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.8s;
+}
+.card-video-badge.visible { opacity: 1; }
+.card-video-badge::before { content: '▶ '; color: var(--color-accent); font-size: 0.55rem; }
+
+
 /* ══════════════════════════════════════════════════════════════════════════ */
 /* 5. PANEL DE CONTENIDO (Diapositiva expandida)                              */
 /* ══════════════════════════════════════════════════════════════════════════ */
