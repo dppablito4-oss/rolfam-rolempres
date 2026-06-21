@@ -287,14 +287,26 @@ body {
     overflow: hidden;
 }
 
+.hero-video-bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    min-width: 100%; min-height: 100%;
+    width: auto; height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0.65;
+}
+
 .hero-bg {
     position: absolute;
     inset: 0;
     background:
         linear-gradient(to right, rgba(20,20,20,0.95) 35%, transparent 80%),
         linear-gradient(to top, rgba(20,20,20,1) 0%, rgba(20,20,20,0.2) 40%),
-        linear-gradient(135deg, #0d0221 0%, #1a0030 30%, #1a0505 70%, #0d0d0d 100%);
+        linear-gradient(135deg, rgba(13,2,33,0.5) 0%, rgba(26,0,48,0.5) 30%, rgba(26,5,5,0.5) 70%, rgba(13,13,13,0.5) 100%);
     overflow: hidden;
+    z-index: 1;
 }
 
 /* Animated math symbols floating in the background */
