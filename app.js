@@ -908,32 +908,9 @@ function initCardPreviews() {
                 // Remove any existing preview on this card first
                 _destroyCardPreview(card);
 
-                // Build the iframe
+                // Build the container
                 const container = document.createElement('div');
                 container.className = 'card-video-container';
-
-                const src = [
-                    `https://www.youtube.com/embed/${ytId}`,
-                    `?autoplay=1`,
-                    `&mute=1`,
-                    `&controls=0`,
-                    `&modestbranding=1`,
-                    `&rel=0`,
-                    `&fs=0`,
-                    `&iv_load_policy=3`,
-                    `&disablekb=1`,
-                    `&start=${ytStart}`,
-                    `&enablejsapi=0`,
-                    `&playsinline=1`
-                ].join('');
-
-                const iframe = document.createElement('iframe');
-                iframe.src = src;
-                iframe.title = 'Vista previa de video';
-                iframe.allow = 'autoplay; encrypted-media';
-                iframe.setAttribute('allowfullscreen', '');
-
-                container.appendChild(iframe);
 
                 // Channel badge
                 const badge = document.createElement('div');
@@ -946,13 +923,74 @@ function initCardPreviews() {
                 thumb.appendChild(container);
                 thumb.appendChild(badge);
 
-                // Fade in after a tick
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
+                let isUsingLocalVideo = true;
+
+                // Try to load local video first
+                const video = document.createElement('video');
+                video.muted = true;
+                video.autoplay = true;
+                video.loop = true;
+                video.playsInline = true;
+                video.src = `assets/videos/${ytId}.mp4`;
+                video.style.width = '100%';
+                video.style.height = '100%';
+                video.style.objectFit = 'cover';
+                video.style.pointerEvents = 'none';
+
+                video.addEventListener('loadedmetadata', () => {
+                    if (ytStart > 0) {
+                        video.currentTime = ytStart;
+                    }
+                });
+
+                video.addEventListener('canplay', () => {
+                    if (isUsingLocalVideo) {
+                        // Local video is loaded and ready! Show it.
                         container.classList.add('visible');
                         badge.classList.add('visible');
+                    }
+                });
+
+                video.addEventListener('error', () => {
+                    if (!isUsingLocalVideo) return;
+                    isUsingLocalVideo = false;
+                    video.remove();
+
+                    // Fallback to YouTube iframe
+                    const src = [
+                        `https://www.youtube.com/embed/${ytId}`,
+                        `?autoplay=1`,
+                        `&mute=1`,
+                        `&controls=0`,
+                        `&modestbranding=1`,
+                        `&rel=0`,
+                        `&fs=0`,
+                        `&iv_load_policy=3`,
+                        `&disablekb=1`,
+                        `&start=${ytStart}`,
+                        `&enablejsapi=0`,
+                        `&playsinline=1`
+                    ].join('');
+
+                    const iframe = document.createElement('iframe');
+                    iframe.src = src;
+                    iframe.title = 'Vista previa de video';
+                    iframe.allow = 'autoplay; encrypted-media';
+                    iframe.setAttribute('allowfullscreen', '');
+
+                    container.appendChild(iframe);
+
+                    // Fade in YouTube iframe after a short delay
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            container.classList.add('visible');
+                            badge.classList.add('visible');
+                        });
                     });
                 });
+
+                // Append the video element initially to see if it loads
+                container.appendChild(video);
 
                 // Auto-kill after 15 seconds to save resources
                 _autoKillTimers[cardKey] = setTimeout(() => {
@@ -986,6 +1024,16 @@ function _destroyCardPreview(card) {
     if (container) {
         const iframe = container.querySelector('iframe');
         if (iframe) iframe.src = ''; // stops audio immediately
+        
+        const video = container.querySelector('video');
+        if (video) {
+            video.pause();
+            video.src = '';
+            try {
+                video.load();
+            } catch(e) {}
+        }
+        
         container.remove();
     }
     const badge = thumb.querySelector('.card-video-badge');
