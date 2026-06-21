@@ -500,6 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!document.getElementById('btn-exit-presenter')) {
             const backBtn = document.createElement('button');
             backBtn.id = 'btn-exit-presenter';
+            backBtn.setAttribute('aria-label', 'Volver al modo de lectura web continuo');
             backBtn.className = 'ml-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-4 py-2.5 rounded-full text-xs font-bold transition-all';
             backBtn.innerHTML = '<i class="fa-solid fa-house mr-1.5"></i> Volver a Web';
             backBtn.onclick = () => {

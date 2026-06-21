@@ -1,21 +1,53 @@
 /* ESTILOS PREMIUM PARA DIAPOSITIVAS INTERACTIVAS - MODO WEB PROFESIONAL */
 
 :root {
-    /* Color Palette (HSL Tailored - Tesseract Colors) */
-    --bg-main: 222 47% 6%;       /* Very Dark Blue-Slate */
-    --bg-slide: 223 47% 10%;     /* Card Slate background */
-    --bg-card: 217 33% 14%;      /* Slate-800 translucent */
+    /* --- 8pt Spacing Grid System Tokens --- */
+    --space-1: 4px;   /* 0.25rem - Extra small */
+    --space-2: 8px;   /* 0.5rem - Small (8px base) */
+    --space-3: 12px;  /* 0.75rem - Small-medium */
+    --space-4: 16px;  /* 1rem - Medium */
+    --space-6: 24px;  /* 1.5rem - Medium-large */
+    --space-8: 32px;  /* 2rem - Large */
+    --space-12: 48px; /* 3rem - Extra large */
+    --space-16: 64px; /* 4rem - Hero spacing */
     
-    --accent-emerald: 150 84% 53%; /* Emerald 500 */
-    --accent-emerald-glow: 150 84% 53% / 0.15;
-    --accent-sky: 199 89% 48%;     /* Sky 500 */
-    --accent-sky-glow: 199 89% 48% / 0.15;
-    --accent-rose: 347 87% 60%;    /* Rose 500 */
+    /* --- Color Palette Design Tokens (HSL Mode) --- */
+    /* 1. Main Background and Panels */
+    --color-bg-main: 222 47% 6%;         /* Very Dark Blue-Slate */
+    --color-bg-slide: 223 47% 10%;       /* Card Slate background */
+    --color-bg-card: 217 33% 14%;        /* Slate-800 translucent */
     
-    --text-primary: 210 40% 98%;   /* Slate-50 */
-    --text-secondary: 215 20% 75%; /* Slate-300 */
-    --text-muted: 218 12% 55%;     /* Slate-500 */
-    --border-color: rgba(6, 182, 212, 0.15); /* Glowing cyan border */
+    /* 2. Accent Color */
+    --color-accent: 199 89% 48%;         /* Sky 500 */
+    --color-accent-glow: 199 89% 48% / 0.15;
+    
+    /* 3. Semantic Colors */
+    --color-success: 150 84% 53%;        /* Emerald 500 (Success) */
+    --color-success-glow: 150 84% 53% / 0.15;
+    --color-info: 199 89% 48%;           /* Sky 500 (Info) */
+    --color-info-glow: 199 89% 48% / 0.15;
+    --color-warning: 38 92% 50%;         /* Amber 500 (Warning) */
+    --color-danger: 347 87% 60%;         /* Rose 500 (Danger) */
+    
+    /* 4. Neutral Colors (Texts & Borders) */
+    --color-text-primary: 210 40% 98%;   /* Slate-50 */
+    --color-text-secondary: 215 20% 75%; /* Slate-300 */
+    --color-text-muted: 218 16% 70%;     /* Slate-400 (Contrast adjusted to WCAG AA >= 4.5:1) */
+    --color-border-glow: rgba(6, 182, 212, 0.15); /* Glowing cyan border */
+
+    /* --- Backward Compatibility Mappings --- */
+    --bg-main: var(--color-bg-main);
+    --bg-slide: var(--color-bg-slide);
+    --bg-card: var(--color-bg-card);
+    --accent-emerald: var(--color-success);
+    --accent-emerald-glow: var(--color-success-glow);
+    --accent-sky: var(--color-info);
+    --accent-sky-glow: var(--color-info-glow);
+    --accent-rose: var(--color-danger);
+    --text-primary: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --border-color: var(--color-border-glow);
     
     /* Font Families */
     --font-heading: 'Poppins', sans-serif;
@@ -83,7 +115,7 @@ body.scroll-mode .presentation-viewport {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 120px 20px 80px 20px;
+    padding: 120px var(--space-4) 80px var(--space-4);
 }
 
 body.scroll-mode .slide-wrapper {
@@ -91,7 +123,7 @@ body.scroll-mode .slide-wrapper {
     max-width: var(--slide-width);
     display: flex;
     flex-direction: column;
-    gap: 80px;
+    gap: var(--space-16);
     transform: none !important;
 }
 
@@ -108,7 +140,7 @@ body.scroll-mode .slide-container {
     display: flex !important;
     flex-direction: column;
     justify-content: flex-start;
-    padding: 60px 80px;
+    padding: var(--space-12) var(--space-16);
     opacity: 1;
     pointer-events: auto;
     transform: none;
@@ -119,7 +151,7 @@ body.scroll-mode .slide-container {
     position: relative;
     height: 1px;
     width: 100%;
-    margin: 20px 0;
+    margin: var(--space-6) 0;
 }
 
 /* ── Estilos de Impresión / Exportación a PDF desde Consola ───────────────── */
@@ -409,7 +441,7 @@ h1, h2, h3, h4 {
 
 .tiled-content {
     display: flex;
-    gap: 24px;
+    gap: var(--space-6);
     width: 100%;
 }
 
@@ -419,7 +451,7 @@ h1, h2, h3, h4 {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: var(--space-4);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
@@ -428,9 +460,9 @@ h1, h2, h3, h4 {
     background: rgba(30, 41, 59, 0.25);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-radius: 16px;
+    border-radius: var(--space-4);
     border: 1px solid var(--border-color);
-    padding: 24px;
+    padding: var(--space-6);
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -448,7 +480,7 @@ h1, h2, h3, h4 {
 .tile .icon {
     font-size: 42px;
     color: #00f0ff;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
     transition: transform 0.3s ease, filter 0.3s ease;
 }
 
@@ -461,9 +493,9 @@ h1, h2, h3, h4 {
 .math-box {
     background: rgba(15, 23, 42, 0.8);
     border-left: 5px solid #00f0ff;
-    padding: 20px 24px;
-    border-radius: 12px;
-    margin: 15px 0;
+    padding: var(--space-4) var(--space-6);
+    border-radius: var(--space-3);
+    margin: var(--space-4) 0;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
     border-top: 1px solid rgba(255, 255, 255, 0.03);
     border-right: 1px solid rgba(255, 255, 255, 0.03);
@@ -474,9 +506,9 @@ h1, h2, h3, h4 {
     background: rgba(0, 240, 255, 0.03);
     border: 1px solid rgba(0, 240, 255, 0.15);
     border-left: 4px solid #00f0ff;
-    padding: 16px;
-    border-radius: 8px;
-    margin: 12px 0;
+    padding: var(--space-4);
+    border-radius: var(--space-2);
+    margin: var(--space-3) 0;
 }
 
 /* PASO PILL */
@@ -487,7 +519,7 @@ h1, h2, h3, h4 {
     padding: 4px 14px;
     border-radius: 20px;
     font-weight: 700;
-    margin-right: 12px;
+    margin-right: var(--space-3);
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -496,7 +528,7 @@ h1, h2, h3, h4 {
 
 /* CONTENEDOR DE IMAGEN CON MARCO ELEGANTE */
 .image-wrapper {
-    border-radius: 16px;
+    border-radius: var(--space-4);
     overflow: hidden;
     height: 380px;
     position: relative;
@@ -532,11 +564,11 @@ h1, h2, h3, h4 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 10px 20px;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(0, 240, 255, 0.05));
     border: 1px solid #00f0ff;
-    border-radius: 8px;
+    border-radius: var(--space-2);
     color: #00f0ff;
     font-weight: 600;
     font-size: 0.85rem;
@@ -631,4 +663,14 @@ h1, h2, h3, h4 {
     background-position: right 12px center;
     background-size: 16px;
     padding-right: 36px;
+}
+
+/* MEJORAS DE ENFOQUE ACCESIBLE (KEYBOARD A11Y FOCUS RINGS) */
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #00f0ff !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.25) !important;
 }

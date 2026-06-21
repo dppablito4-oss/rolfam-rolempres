@@ -37,7 +37,7 @@
 <div id="virtual-laser" class="fixed w-5 h-5 bg-[#ff0055] rounded-full pointer-events-none opacity-0 z-[9999] transition-opacity duration-300 -translate-x-1/2 -translate-y-1/2 shadow-[0_0_25px_10px_rgba(255,0,85,0.6)]"></div>
 
 <!-- NAV BAR ESTILO PORTFOLIO MIBITACORA -->
-<header class="fixed top-4 left-4 right-4 z-50 flex items-center justify-between bg-slate-900/75 backdrop-blur-md border border-slate-700/50 rounded-full px-6 py-3 shadow-xl">
+<header role="banner" class="fixed top-4 left-4 right-4 z-50 flex items-center justify-between bg-slate-900/75 backdrop-blur-md border border-slate-700/50 rounded-full px-6 py-3 shadow-xl">
     <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-gradient-to-tr from-cyan-400 to-emerald-400 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/25">
             <i class="fa-solid fa-square-root-variable text-slate-950 font-bold"></i>
@@ -45,7 +45,7 @@
         <span class="font-bold text-sm tracking-wider uppercase text-slate-100 font-sans">Ecuaciones<span class="text-cyan-400">.io</span></span>
     </div>
     
-    <nav class="hidden md:flex items-center gap-6">
+    <nav aria-label="Navegación principal de diapositivas" class="hidden md:flex items-center gap-6">
         <a href="#slide1" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Inicio</a>
         <a href="#slide2" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Fundamento</a>
         <a href="#slide3" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Pasos</a>
@@ -56,14 +56,14 @@
     </nav>
     
     <div class="flex items-center gap-3">
-        <button id="btn-toggle-presenter" class="text-xs font-bold px-4 py-2 rounded-full border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 active:scale-95 transition-all">
+        <button id="btn-toggle-presenter" aria-label="Cambiar a modo presentación de pantalla completa" class="text-xs font-bold px-4 py-2 rounded-full border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 active:scale-95 transition-all">
             <i class="fa-solid fa-expand mr-1.5"></i> Presentar
         </button>
     </div>
 </header>
-
+ 
 <!-- VIEWPORT DE PRESENTACIÓN CON AUTO-ESCALA -->
-<div class="presentation-viewport">
+<div role="main" aria-label="Visualizador de diapositivas" class="presentation-viewport">
     <div class="slide-wrapper">
 
         <!-- Diapositiva 1: Portada / Hero -->
@@ -379,32 +379,32 @@
                             </h3>
                             <div class="grid grid-cols-2 gap-3 mb-4">
                                 <div>
-                                    <label class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Dificultad</label>
-                                    <select id="select-diff" class="w-full select-premium bg-slate-950 border border-slate-700/80 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                                    <label for="select-diff" class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Dificultad</label>
+                                    <select id="select-diff" aria-label="Seleccionar dificultad del problema" class="w-full select-premium bg-slate-950 border border-slate-700/80 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
                                         <option value="Básico">Básico (Fácil)</option>
                                         <option value="Intermedio">Intermedio (Medio)</option>
                                         <option value="Avanzado">Avanzado (Complejo)</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Contexto</label>
-                                    <select id="select-topic" class="w-full select-premium bg-slate-950 border border-slate-700/80 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                                    <label for="select-topic" class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Contexto</label>
+                                    <select id="select-topic" aria-label="Seleccionar tema o contexto del problema" class="w-full select-premium bg-slate-950 border border-slate-700/80 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
                                         <option value="Edades">Edades y Tiempo</option>
                                         <option value="Geometría">Geometría Plana</option>
                                     </select>
                                 </div>
                             </div>
                             
-                            <div id="ai-problem-output" class="bg-slate-950/80 p-3 rounded border border-slate-800 text-xs overflow-y-auto h-[170px] text-slate-300 leading-relaxed font-sans">
+                            <div id="ai-problem-output" role="status" aria-live="polite" class="bg-slate-950/80 p-3 rounded border border-slate-800 text-xs overflow-y-auto h-[170px] text-slate-300 leading-relaxed font-sans">
                                 Haz clic en el botón de abajo para generar un desafío matemático en tiempo real...
                             </div>
                         </div>
 
                         <div class="flex gap-2 mt-3">
-                            <button onclick="generateAIProblem()" id="btn-generate-ai" class="flex-1 btn-cyber btn-cyber-emerald font-bold text-xs py-2.5 px-4 rounded flex items-center justify-center gap-2 shadow-md">
+                            <button onclick="generateAIProblem()" id="btn-generate-ai" aria-label="Generar nuevo desafío matemático usando Inteligencia Artificial" class="flex-1 btn-cyber btn-cyber-emerald font-bold text-xs py-2.5 px-4 rounded flex items-center justify-center gap-2 shadow-md">
                                 <i class="fa-solid fa-sparkles"></i> Generar Problema ✨
                             </button>
-                            <button onclick="toggleAISolution()" id="btn-reveal-solution" class="btn-cyber text-slate-200 font-semibold text-xs py-2.5 px-3 rounded flex items-center justify-center gap-1" disabled>
+                            <button onclick="toggleAISolution()" id="btn-reveal-solution" aria-label="Revelar la solución paso a paso del problema actual" class="btn-cyber text-slate-200 font-semibold text-xs py-2.5 px-3 rounded flex items-center justify-center gap-1" disabled>
                                 <i class="fa-solid fa-eye"></i> Revelar Solución
                             </button>
                         </div>
@@ -417,15 +417,16 @@
                                 <i class="fa-solid fa-wand-magic-sparkles text-slate-300"></i> Traductor a Lenguaje Formal
                             </h3>
                             <p class="text-xs text-slate-400 mb-2">Ingresa cualquier problema verbal y el motor IA lo estructurará bajo los <strong>5 Pasos de Oro</strong>:</p>
-                            <textarea id="user-problem-input" rows="3" placeholder="Ejemplo: El largo de una piscina excede al doble del ancho en 5 metros. Si el perímetro es de 70 metros, halla sus dimensiones..." class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-sans resize-none"></textarea>
+                            <label for="user-problem-input" class="sr-only">Problema escrito a resolver</label>
+                            <textarea id="user-problem-input" aria-label="Problema escrito a resolver por la inteligencia artificial" rows="3" placeholder="Ejemplo: El largo de una piscina excede al doble del ancho en 5 metros. Si el perímetro es de 70 metros, halla sus dimensiones..." class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-sans resize-none"></textarea>
                             
-                            <div id="ai-analysis-output" class="bg-slate-950/80 p-3 mt-3 rounded border border-slate-800 text-xs overflow-y-auto h-[150px] text-slate-300 leading-relaxed font-sans">
+                            <div id="ai-analysis-output" role="status" aria-live="polite" class="bg-slate-950/80 p-3 mt-3 rounded border border-slate-800 text-xs overflow-y-auto h-[150px] text-slate-300 leading-relaxed font-sans">
                                 Las ecuaciones resultantes y el análisis de los 5 pasos se mostrarán aquí...
                             </div>
                         </div>
 
                         <div class="mt-3 flex justify-end">
-                            <button onclick="analyzeUserProblem()" id="btn-analyze-ai" class="btn-cyber font-bold text-xs py-2.5 px-6 rounded flex items-center gap-2 shadow-md">
+                            <button onclick="analyzeUserProblem()" id="btn-analyze-ai" aria-label="Analizar y resolver el problema ingresado en el cuadro de texto" class="btn-cyber font-bold text-xs py-2.5 px-6 rounded flex items-center gap-2 shadow-md">
                                 <i class="fa-solid fa-brain"></i> Resolver con IA ✨
                             </button>
                         </div>
@@ -494,14 +495,14 @@
 </div>
 
 <!-- BARRA DE CONTROL DE PRESENTACIÓN (Oculta por defecto en modo Scroll) -->
-<div id="presenter-bar" style="display: none;">
-    <button onclick="prevSlide()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-2.5 rounded-full text-sm font-semibold transition-all"><i class="fa-solid fa-chevron-left mr-2"></i> Anterior</button>
+<div id="presenter-bar" role="toolbar" aria-label="Controles de la presentación" style="display: none;">
+    <button onclick="prevSlide()" aria-label="Ir a la diapositiva anterior" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-2.5 rounded-full text-sm font-semibold transition-all"><i class="fa-solid fa-chevron-left mr-2"></i> Anterior</button>
     <span class="text-sm font-bold text-slate-400" id="slide-indicator">1 / 14</span>
-    <button onclick="nextSlide()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-2.5 rounded-full text-sm font-semibold transition-all">Siguiente <i class="fa-solid fa-chevron-right mr-2"></i></button>
+    <button onclick="nextSlide()" aria-label="Ir a la siguiente diapositiva" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-2.5 rounded-full text-sm font-semibold transition-all">Siguiente <i class="fa-solid fa-chevron-right mr-2"></i></button>
 </div>
 
 <!-- CONTENEDOR DE NOTIFICACIONES TOAST -->
-<div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+<div id="toast-container" role="status" aria-live="polite" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
 
 <!-- Lógica de la aplicación -->
 <script src="app.js"></script>
