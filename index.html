@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planteo de Ecuaciones - Clase Magistral</title>
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Poppins y Lato -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@400;700&family=Fira+Code&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- KaTeX para renderizado de ecuaciones matemáticas premium -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <!-- Supabase JS Client para la integración remota Realtime -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Hoja de estilos personalizada -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="scroll-mode">
+
+<!-- EFECTOS AMBIENTALES NEON -->
+<div class="ambient-light"></div>
+<div class="ambient-light-2"></div>
+
+<!-- PUNTERO LÁSER VIRTUAL (GPU y Supabase Realtime) -->
+<div id="virtual-laser" class="fixed w-5 h-5 bg-[#ff0055] rounded-full pointer-events-none opacity-0 z-[9999] transition-opacity duration-300 -translate-x-1/2 -translate-y-1/2 shadow-[0_0_25px_10px_rgba(255,0,85,0.6)]"></div>
+
+<!-- NAV BAR ESTILO PORTFOLIO MIBITACORA -->
+<header class="fixed top-4 left-4 right-4 z-50 flex items-center justify-between bg-slate-900/75 backdrop-blur-md border border-slate-700/50 rounded-full px-6 py-3 shadow-xl">
+    <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-gradient-to-tr from-cyan-400 to-emerald-400 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/25">
+            <i class="fa-solid fa-square-root-variable text-slate-950 font-bold"></i>
+        </div>
+        <span class="font-bold text-sm tracking-wider uppercase text-slate-100 font-sans">Ecuaciones<span class="text-cyan-400">.io</span></span>
+    </div>
+    
+    <nav class="hidden md:flex items-center gap-6">
+        <a href="#slide1" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Inicio</a>
+        <a href="#slide2" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Fundamento</a>
+        <a href="#slide3" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Pasos</a>
+        <a href="#slide4" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Diccionario</a>
+        <a href="#slide5" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Ejemplos</a>
+        <a href="#slide-gemini" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Taller IA</a>
+        <a href="#slide14" class="text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-colors uppercase tracking-wider">Q&A</a>
+    </nav>
+    
+    <div class="flex items-center gap-3">
+        <button id="btn-toggle-presenter" class="text-xs font-bold px-4 py-2 rounded-full border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 active:scale-95 transition-all">
+            <i class="fa-solid fa-expand mr-1.5"></i> Presentar
+        </button>
+    </div>
+</header>
+
+<!-- VIEWPORT DE PRESENTACIÓN CON AUTO-ESCALA -->
+<div class="presentation-viewport">
+    <div class="slide-wrapper">
+
+        <!-- Diapositiva 1: Portada / Hero -->
+        <div class="slide-container active" id="slide1">
+            <div class="title-layout">
+                <h1 class="text-7xl font-extrabold tracking-tight mb-2">El Arte de <span class="accent-text">Plantear</span> Ecuaciones</h1>
+                <p class="subtitle">Traducir el lenguaje común al lenguaje universal de las matemáticas</p>
+                
+                <div class="mt-12 flex justify-center gap-4">
+                    <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-5 py-2.5 rounded-full font-semibold text-sm">Clase Magistral</span>
+                    <span class="bg-sky-500/10 text-sky-400 border border-sky-500/20 px-5 py-2.5 rounded-full font-semibold text-sm">Escuela Profesional de Matemática y Física</span>
+                </div>
+                
+                <div class="mt-12 flex flex-col items-center gap-4">
+                    <button onclick="document.getElementById('slide2').scrollIntoView({behavior: 'smooth'})" class="btn-cyber font-bold text-xs px-6 py-3 rounded-full flex items-center gap-2">
+                        Explorar Contenido <i class="fa-solid fa-arrow-down animate-bounce"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 2: ¿Qué es el planteo? -->
+        <div class="slide-container reveal" id="slide2">
+            <h2 class="slide-title"><i class="fa-solid fa-graduation-cap"></i> ¿Qué significa "Plantear"?</h2>
+            <div class="content-area">
+                <div class="two-column">
+                    <div>
+                        <p class="text-xl text-slate-300 mb-6">Plantear una ecuación es un riguroso proceso de <strong>traducción lingüística y conceptual</strong>.</p>
+                        <div class="math-box my-6 text-center">
+                            <span class="text-slate-500 text-xs tracking-wider uppercase block mb-1">Entrada</span>
+                            <span class="text-2xl font-bold text-slate-100">Lenguaje Verbal (Mundo Real)</span> <br>
+                            <i class="fa-solid fa-arrow-down-long text-cyan-400 my-4 text-2xl animate-pulse"></i> <br>
+                            <span class="text-slate-500 text-xs tracking-wider uppercase block mb-1">Salida</span>
+                            <span class="text-2xl font-bold text-cyan-400">Lenguaje Formal (Ecuación)</span>
+                        </div>
+                        <p class="text-slate-400">Es la base fundamental del modelado de sistemas físicos, económicos y astronómicos.</p>
+                    </div>
+                    <div class="image-wrapper">
+                        <img src="assets/math_logic_concept.png" alt="Lógica Matemática">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 3: Los 5 Pasos de Oro -->
+        <div class="slide-container reveal" id="slide3">
+            <h2 class="slide-title"><i class="fa-solid fa-list-check"></i> Los 5 Pasos de Oro para el Éxito</h2>
+            <div class="content-area">
+                <div class="tiled-content mb-6">
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-200">1. Identificar</h3>
+                        <p class="text-sm text-slate-400">Aislar y definir claramente las variables o incógnitas del sistema.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-language"></i></div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-200">2. Traducir</h3>
+                        <p class="text-sm text-slate-400">Mapear los conectores lógicos de cantidad a operadores algebraicos.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-200">3. Igualar</h3>
+                        <p class="text-sm text-slate-400">Establecer el punto de balance o igualdad de la ecuación física.</p>
+                    </div>
+                </div>
+                <div class="tiled-content">
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-ruler-combined"></i></div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-200">4. Coherencia</h3>
+                        <p class="text-sm text-slate-400">Asegurar homogeneidad dimensional de todos los términos (unidades).</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-check-double"></i></div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-200">5. Comprobar</h3>
+                        <p class="text-sm text-slate-400">Validar la consistencia lógica del resultado en el contexto original.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 4: Diccionario Matemático -->
+        <div class="slide-container reveal" id="slide4">
+            <h2 class="slide-title"><i class="fa-solid fa-book-atlas"></i> Diccionario de Traducción Rápida</h2>
+            <div class="content-area">
+                <div class="overflow-hidden border border-slate-700/60 rounded-xl bg-slate-900/60 backdrop-blur-md">
+                    <table class="min-w-full divide-y divide-slate-700/60">
+                        <thead class="bg-slate-950">
+                            <tr>
+                                <th class="px-6 py-4 text-left font-semibold text-cyan-400 text-sm">Término Verbal Común</th>
+                                <th class="px-6 py-4 text-left font-semibold text-cyan-400 text-sm">Operador Matemático Asociado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700/40 bg-slate-900/20">
+                            <tr>
+                                <td class="px-6 py-4 text-slate-300 text-sm">"El doble de un valor", "El triple de un valor"</td>
+                                <td class="px-6 py-4 font-mono text-cyan-400">$2x$ / $3x$</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-slate-300 text-sm">"Aumentado en", "Disminuido en", "Excede a"</td>
+                                <td class="px-6 py-4 font-mono text-cyan-400">$+k$ / $-k$ / $A - B = k$</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-slate-300 text-sm">"Tres números consecutivos"</td>
+                                <td class="px-6 py-4 font-mono text-cyan-400">$x, x+1, x+2$</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-slate-300 text-sm">"Es equivalente a", "Representa", "Nos da"</td>
+                                <td class="px-6 py-4 font-mono text-cyan-400">$=$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 5: Ejemplo 1 - Números Consecutivos -->
+        <div class="slide-container reveal" id="slide5">
+            <h2 class="slide-title"><i class="fa-solid fa-terminal"></i> Ejemplo 1: La Suma de Consecutivos</h2>
+            <div class="content-area">
+                <h3 class="text-2xl font-semibold text-slate-200 mb-6">Problema: La suma de tres números consecutivos es 72. Hallar los números.</h3>
+                <div class="math-box space-y-4">
+                    <p class="text-lg"><span class="step-pill">1. Planteo</span> 
+                        $$x + (x+1) + (x+2) = 72$$
+                    </p>
+                    <p class="text-lg"><span class="step-pill">2. Operación</span> 
+                        $$3x + 3 = 72 \Rightarrow 3x = 69 \Rightarrow x = 23$$
+                    </p>
+                </div>
+                <p class="font-bold text-xl text-emerald-400 mt-6"><i class="fa-solid fa-square-check mr-2"></i> Solución: Los números enteros consecutivos son 23, 24 y 25.</p>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 6: Ejemplo 2 - Doble Aumentado -->
+        <div class="slide-container reveal" id="slide6">
+            <h2 class="slide-title"><i class="fa-solid fa-terminal"></i> Ejemplo 2: Operadores Combinados</h2>
+            <div class="content-area">
+                <div class="two-column">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-slate-200 mb-6">Problema: El doble de un número aumentado en 5 es igual a 21.</h3>
+                        <div class="math-box space-y-4">
+                            <p class="text-lg"><span class="step-pill">Ecuación</span> $$2x + 5 = 21$$</p>
+                            <p class="text-lg"><span class="step-pill">Solución</span> $$2x = 16 \Rightarrow x = 8$$</p>
+                        </div>
+                        <p class="text-sm text-slate-400 mt-6 leading-relaxed">Un error común de los estudiantes es interpretar el enunciado como $2(x+5)$, lo cual alteraría el resultado final.</p>
+                    </div>
+                    <div class="image-wrapper">
+                        <img src="assets/math_problem_solving.png" alt="Planteamiento de Problemas">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 7: Ejemplo 3 - Problemas de Edades -->
+        <div class="slide-container reveal" id="slide7">
+            <h2 class="slide-title"><i class="fa-solid fa-clock"></i> Ejemplo 3: Línea del Tiempo (Edades)</h2>
+            <div class="content-area">
+                <p class="text-xl mb-6"><strong>Problema:</strong> La edad de Ana es el triple de la de su hijo. Dentro de 10 años será el doble. ¿Qué edad tiene cada uno?</p>
+                <div class="tiled-content my-4">
+                    <div class="tile">
+                        <span class="text-xs uppercase text-slate-500 font-bold mb-2 tracking-wider">Estado Actual (Presente)</span>
+                        <p class="font-bold text-slate-200 text-lg">Hijo: $x$</p>
+                        <p class="font-bold text-slate-200 text-lg">Ana: $3x$</p>
+                    </div>
+                    <div class="tile">
+                        <span class="text-xs uppercase text-slate-500 font-bold mb-2 tracking-wider">Estado Futuro (+10 años)</span>
+                        <p class="font-bold text-slate-200 text-lg">Hijo: $x + 10$</p>
+                        <p class="font-bold text-slate-200 text-lg">Ana: $3x + 10$</p>
+                    </div>
+                </div>
+                <div class="math-box">
+                    <p class="text-lg"><span class="step-pill">Igualdad</span> $$3x + 10 = 2(x + 10) \Rightarrow 3x + 10 = 2x + 20 \Rightarrow x = 10$$</p>
+                </div>
+                <p class="font-bold text-emerald-400 text-center text-lg mt-4"><i class="fa-solid fa-square-check mr-2"></i> Resultado: Ana tiene 30 años; su hijo tiene 10 años.</p>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 8: Ejemplo 4 - Modelado Geométrico -->
+        <div class="slide-container reveal" id="slide8">
+            <h2 class="slide-title"><i class="fa-solid fa-draw-polygon"></i> Ejemplo 4: Modelado Geométrico</h2>
+            <div class="content-area">
+                <div class="two-column">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Enunciado</h3>
+                        <p class="text-slate-300 mb-4">En un rectángulo, el largo es 4 cm mayor que el ancho y su perímetro es 32 cm. Hallar sus dimensiones.</p>
+                        <div class="math-box space-y-2">
+                            <p>Ancho: $x$</p>
+                            <p>Largo: $x + 4$</p>
+                            <p>Perímetro: $$2(x) + 2(x + 4) = 32$$</p>
+                        </div>
+                    </div>
+                    <div class="tile py-8">
+                        <h3 class="text-xl font-bold mb-4">Cálculo Analítico</h3>
+                        <p class="text-xl mb-2">$$2x + 2x + 8 = 32$$</p>
+                        <p class="text-xl mb-4">$$4x = 24 \Rightarrow x = 6$$</p>
+                        <div class="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 font-bold text-center w-full">
+                            Ancho = 6 cm <br> Largo = 10 cm
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 9: Ejemplo 5 - Reparto de Cantidades -->
+        <div class="slide-container reveal" id="slide9">
+            <h2 class="slide-title"><i class="fa-solid fa-scale-unbalanced"></i> Ejemplo 5: Reparto de Cantidades</h2>
+            <div class="content-area">
+                <p class="text-xl mb-6"><strong>Problema:</strong> Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro.</p>
+                <div class="two-column mt-4">
+                    <div class="tile py-6">
+                        <h3 class="text-xl font-bold mb-4">Variables</h3>
+                        <p class="text-slate-300 text-lg mb-2">Niño A: $x$</p>
+                        <p class="text-slate-300 text-lg mb-4">Niño B: $x + 10$</p>
+                        <div class="math-box w-full text-center">
+                            $$x + (x + 10) = 50$$
+                        </div>
+                    </div>
+                    <div class="tile py-6">
+                        <h3 class="text-xl font-bold mb-4">Resolución</h3>
+                        <p class="text-lg">$$2x + 10 = 50$$</p>
+                        <p class="text-lg">$$2x = 40 \Rightarrow x = 20$$</p>
+                        <div class="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 font-bold text-center w-full">
+                            Niño A = 20 caramelos <br> Niño B = 30 caramelos
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 10: Ejemplo 6 - Ejercicio de Nivel Avanzado (Edades) -->
+        <div class="slide-container reveal" id="slide10">
+            <h2 class="slide-title"><i class="fa-solid fa-star"></i> Ejemplo 6: <span class="accent-text">Reto UNI I</span> - Edades en el Tiempo</h2>
+            <div class="content-area">
+                <p class="text-sm mb-4"><strong>Problema (UNI):</strong> La edad de A hace $a$ años era a la de B como 5 es a 4. Dentro de $b$ años sus edades estarán en la relación de 7 a 6. Si actualmente la suma de sus edades es 46 años y la diferencia de sus edades es de 4 años, calcule $a+b$.</p>
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="step-box p-5 bg-slate-900/60 rounded-xl border border-slate-700/60 backdrop-blur-sm">
+                        <p class="font-bold text-slate-200 text-sm mb-2">1. Invariante Temporal:</p>
+                        <p class="text-xs text-slate-400 leading-relaxed mb-3">La diferencia de edades nunca cambia en el tiempo. Resolvemos el sistema en el presente:</p>
+                        <p class="font-mono text-sky-400 text-center text-sm">$$A - B = 4 \quad \land \quad A + B = 46$$</p>
+                        <p class="text-sm font-bold text-emerald-400 text-center mt-3">A = 25 años, B = 21 años</p>
+                    </div>
+                    <div class="step-box p-5 bg-slate-900/60 rounded-xl border border-slate-700/60 backdrop-blur-sm">
+                        <p class="font-bold text-slate-200 text-sm mb-2">2. Razones Temporales:</p>
+                        <p class="text-xs text-slate-400 mb-2"><strong>Pasado ($-a$ años):</strong> $$\frac{25-a}{21-a} = \frac{5}{4} \Rightarrow a=5$$</p>
+                        <p class="text-xs text-slate-400"><strong>Futuro ($+b$ años):</strong> $$\frac{25+b}{21+b} = \frac{7}{6} \Rightarrow b=3$$</p>
+                    </div>
+                </div>
+                <div class="formula-box mt-4 text-center">
+                    <span class="text-lg font-bold text-slate-200">Resultado: $$a + b = 5 + 3 = 8$$</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 11: Ejemplo 7 - Ejercicio de Nivel Avanzado (Diofántico) -->
+        <div class="slide-container reveal" id="slide11">
+            <h2 class="slide-title"><i class="fa-solid fa-star"></i> Ejemplo 7: <span class="accent-text">Reto UNI II</span> - Modelado Diofántico</h2>
+            <div class="content-area">
+                <p class="text-sm mb-4"><strong>Problema (UNI):</strong> Un distribuidor adquirió textos de Física a $30 y de Química a $20. Si gastó exactamente $500 y los textos de Química exceden al doble de Física, determina la cantidad máxima de textos de Química.</p>
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="step-box p-5 bg-slate-900/60 rounded-xl border border-slate-700/60 backdrop-blur-sm">
+                        <p class="font-bold text-slate-200 text-sm mb-2">1. Ecuación Diofántica Lineal ($x, y \in \mathbb{Z}^+$):</p>
+                        <p class="font-mono text-sky-400 text-center my-3">$$30x + 20y = 500 \Rightarrow 3x + 2y = 50$$</p>
+                        <p class="text-xs text-slate-400 leading-relaxed">$$y = 25 - 1.5x$$. Como $y$ es entero positivo, $x$ debe ser par: $x = 2k$.</p>
+                    </div>
+                    <div class="step-box p-5 bg-slate-900/60 rounded-xl border border-slate-700/60 backdrop-blur-sm">
+                        <p class="font-bold text-slate-200 text-sm mb-2">2. Evaluación bajo restricción ($y > 2x$):</p>
+                        <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+                            <li>Si $x=2 \Rightarrow y=22$ (Cumple: $22 > 4$)</li>
+                            <li>Si $x=4 \Rightarrow y=19$ (Cumple: $19 > 8$)</li>
+                            <li>Si $x=6 \Rightarrow y=16$ (Cumple: $16 > 12$)</li>
+                            <li>Si $x=8 \Rightarrow y=13$ (No cumple: $13 \ngtr 16$)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="formula-box mt-4 text-center">
+                    <span class="text-lg font-bold text-slate-200">Respuesta: La cantidad máxima de libros de Química es $22$.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 12: Taller Inteligente de Ecuaciones (AI/Supabase) -->
+        <div class="slide-container reveal" id="slide-gemini">
+            <h2 class="slide-title"><i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> ✨ Taller Inteligente de Ecuaciones</h2>
+            <div class="content-area">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full items-start overflow-hidden">
+                    
+                    <!-- PANEL IZQUIERDO: GENERADOR -->
+                    <div class="lg:col-span-5 bg-slate-900/70 border border-slate-700/60 p-5 rounded-xl flex flex-col justify-between h-[410px]">
+                        <div>
+                            <h3 class="text-lg font-semibold text-emerald-400 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-dice text-slate-300"></i> Generar Desafío IA
+                            </h3>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Dificultad</label>
+                                    <select id="select-diff" class="w-full select-premium bg-slate-950 border border-slate-700/80 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                                        <option value="Básico">Básico (Fácil)</option>
+                                        <option value="Intermedio">Intermedio (Medio)</option>
+                                        <option value="Avanzado">Avanzado (Complejo)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Contexto</label>
+                                    <select id="select-topic" class="w-full select-premium bg-slate-950 border border-slate-700/80 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                                        <option value="Edades">Edades y Tiempo</option>
+                                        <option value="Geometría">Geometría Plana</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="ai-problem-output" class="bg-slate-950/80 p-3 rounded border border-slate-800 text-xs overflow-y-auto h-[170px] text-slate-300 leading-relaxed font-sans">
+                                Haz clic en el botón de abajo para generar un desafío matemático en tiempo real...
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="generateAIProblem()" id="btn-generate-ai" class="flex-1 btn-cyber btn-cyber-emerald font-bold text-xs py-2.5 px-4 rounded flex items-center justify-center gap-2 shadow-md">
+                                <i class="fa-solid fa-sparkles"></i> Generar Problema ✨
+                            </button>
+                            <button onclick="toggleAISolution()" id="btn-reveal-solution" class="btn-cyber text-slate-200 font-semibold text-xs py-2.5 px-3 rounded flex items-center justify-center gap-1" disabled>
+                                <i class="fa-solid fa-eye"></i> Revelar Solución
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PANEL DERECHO: ANALIZADOR -->
+                    <div class="lg:col-span-7 bg-slate-900/70 border border-slate-700/60 p-5 rounded-xl flex flex-col justify-between h-[410px]">
+                        <div>
+                            <h3 class="text-lg font-semibold text-sky-400 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles text-slate-300"></i> Traductor a Lenguaje Formal
+                            </h3>
+                            <p class="text-xs text-slate-400 mb-2">Ingresa cualquier problema verbal y el motor IA lo estructurará bajo los <strong>5 Pasos de Oro</strong>:</p>
+                            <textarea id="user-problem-input" rows="3" placeholder="Ejemplo: El largo de una piscina excede al doble del ancho en 5 metros. Si el perímetro es de 70 metros, halla sus dimensiones..." class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-sans resize-none"></textarea>
+                            
+                            <div id="ai-analysis-output" class="bg-slate-950/80 p-3 mt-3 rounded border border-slate-800 text-xs overflow-y-auto h-[150px] text-slate-300 leading-relaxed font-sans">
+                                Las ecuaciones resultantes y el análisis de los 5 pasos se mostrarán aquí...
+                            </div>
+                        </div>
+
+                        <div class="mt-3 flex justify-end">
+                            <button onclick="analyzeUserProblem()" id="btn-analyze-ai" class="btn-cyber font-bold text-xs py-2.5 px-6 rounded flex items-center gap-2 shadow-md">
+                                <i class="fa-solid fa-brain"></i> Resolver con IA ✨
+                            </button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 13: Errores Comunes -->
+        <div class="slide-container reveal" id="slide12">
+            <h2 class="slide-title"><i class="fa-solid fa-circle-xmark text-rose-500"></i> ¡Cuidado! Evita estos errores</h2>
+            <div class="content-area">
+                <div class="tiled-content">
+                    <div class="tile" style="border: 1px solid rgba(239, 68, 68, 0.4);">
+                        <div class="icon text-rose-500"><i class="fa-solid fa-circle-xmark"></i></div>
+                        <h3 class="text-xl font-semibold mb-2">Olvidar Paréntesis</h3>
+                        <p class="text-sm">Al multiplicar el "doble de la suma", el multiplicador afecta a todos los términos dentro.</p>
+                    </div>
+                    <div class="tile" style="border: 1px solid rgba(239, 68, 68, 0.4);">
+                        <div class="icon text-rose-500"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <h3 class="text-xl font-semibold mb-2">Mezclar Unidades</h3>
+                        <p class="text-sm">No operes minutos con horas o metros con centímetros sin antes hacer la conversión.</p>
+                    </div>
+                    <div class="tile" style="border: 1px solid rgba(239, 68, 68, 0.4);">
+                        <div class="icon text-rose-500"><i class="fa-solid fa-face-monocle"></i></div>
+                        <h3 class="text-xl font-semibold mb-2">Resultados Absurdos</h3>
+                        <p class="text-sm">Si el cálculo de una edad da fraccionario o negativo, revisa el planteamiento original.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 14: Resumen Final -->
+        <div class="slide-container reveal" id="slide13">
+            <h2 class="slide-title"><i class="fa-solid fa-check-double text-emerald-400"></i> En Resumen...</h2>
+            <div class="content-area">
+                <ul class="space-y-6 text-xl">
+                    <li class="flex items-center gap-4"><i class="fa-solid fa-check text-emerald-400 text-2xl"></i> Lee el problema al menos 3 veces antes de estructurar variables.</li>
+                    <li class="flex items-center gap-4"><i class="fa-solid fa-check text-emerald-400 text-2xl"></i> Traduce palabra por palabra metódicamente al lenguaje formal.</li>
+                    <li class="flex items-center gap-4"><i class="fa-solid fa-check text-emerald-400 text-2xl"></i> Conserva el orden en cada una de las operaciones algebraicas.</li>
+                    <li class="flex items-center gap-4"><i class="fa-solid fa-check text-emerald-400 text-2xl"></i> Comprueba siempre el valor obtenido con el enunciado original.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section-separator"></div>
+
+        <!-- Diapositiva 15: Q&A -->
+        <div class="slide-container reveal" id="slide14">
+            <div class="title-layout">
+                <div class="flex items-center justify-center w-[130px] h-[130px] mx-auto mb-[25px] rounded-full bg-gradient-to-tr from-cyan-500 to-emerald-500 shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-comments text-5xl text-slate-950"></i>
+                </div>
+                <h1 class="text-5xl font-extrabold mb-2">¿Dudas o Preguntas?</h1>
+                <p class="subtitle mb-6">¡Gracias por participar en esta sesión!</p>
+                <p class="font-bold text-cyan-400 text-xl">"Las matemáticas son la música de la razón".</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- BARRA DE CONTROL DE PRESENTACIÓN (Oculta por defecto en modo Scroll) -->
+<div id="presenter-bar" style="display: none;">
+    <button onclick="prevSlide()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-2.5 rounded-full text-sm font-semibold transition-all"><i class="fa-solid fa-chevron-left mr-2"></i> Anterior</button>
+    <span class="text-sm font-bold text-slate-400" id="slide-indicator">1 / 14</span>
+    <button onclick="nextSlide()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-2.5 rounded-full text-sm font-semibold transition-all">Siguiente <i class="fa-solid fa-chevron-right mr-2"></i></button>
+</div>
+
+<!-- CONTENEDOR DE NOTIFICACIONES TOAST -->
+<div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
+<!-- Lógica de la aplicación -->
+<script src="app.js"></script>
+
+</body>
+</html>

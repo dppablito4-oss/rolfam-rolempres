@@ -1,0 +1,634 @@
+/* ESTILOS PREMIUM PARA DIAPOSITIVAS INTERACTIVAS - MODO WEB PROFESIONAL */
+
+:root {
+    /* Color Palette (HSL Tailored - Tesseract Colors) */
+    --bg-main: 222 47% 6%;       /* Very Dark Blue-Slate */
+    --bg-slide: 223 47% 10%;     /* Card Slate background */
+    --bg-card: 217 33% 14%;      /* Slate-800 translucent */
+    
+    --accent-emerald: 150 84% 53%; /* Emerald 500 */
+    --accent-emerald-glow: 150 84% 53% / 0.15;
+    --accent-sky: 199 89% 48%;     /* Sky 500 */
+    --accent-sky-glow: 199 89% 48% / 0.15;
+    --accent-rose: 347 87% 60%;    /* Rose 500 */
+    
+    --text-primary: 210 40% 98%;   /* Slate-50 */
+    --text-secondary: 215 20% 75%; /* Slate-300 */
+    --text-muted: 218 12% 55%;     /* Slate-500 */
+    --border-color: rgba(6, 182, 212, 0.15); /* Glowing cyan border */
+    
+    /* Font Families */
+    --font-heading: 'Poppins', sans-serif;
+    --font-body: 'Lato', sans-serif;
+    --font-mono: 'Fira Code', monospace;
+    
+    /* Dimensions */
+    --slide-width: 1280px;
+    --slide-height: 700px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(6, 182, 212, 0.3) transparent;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: hsl(var(--bg-main));
+    font-family: var(--font-body);
+    color: hsl(var(--text-primary));
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Fondo decorativo con rejilla futurista (Space Grid) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      linear-gradient(rgba(6, 182, 212, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(6, 182, 212, 0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+
+/* Efecto de ruido analógico muy sutil */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ENTORNO CONTINUO (DEFAULT - MODO WEB PROFESIONAL) */
+body.scroll-mode {
+    overflow-y: auto;
+}
+
+body.scroll-mode .presentation-viewport {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 120px 20px 80px 20px;
+}
+
+body.scroll-mode .slide-wrapper {
+    width: 100%;
+    max-width: var(--slide-width);
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+    transform: none !important;
+}
+
+body.scroll-mode .slide-container {
+    position: relative;
+    width: 100%;
+    min-height: var(--slide-height);
+    background-color: hsl(var(--bg-slide) / 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+    display: flex !important;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 60px 80px;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+}
+
+/* SEPARADOR BRILLANTE (TESSERACT LINE) */
+.section-separator {
+    position: relative;
+    height: 1px;
+    width: 100%;
+    margin: 20px 0;
+}
+
+/* ── Estilos de Impresión / Exportación a PDF desde Consola ───────────────── */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 1.5cm;
+    }
+    
+    body {
+        background: white !important;
+        color: #0f172a !important;
+    }
+    
+    body::before, body::after, .ambient-light, .ambient-light-2, #virtual-laser {
+        display: none !important;
+    }
+    
+    /* Ocultar elementos interactivos de navegación */
+    header, #presenter-bar, .btn-cyber, select, label, .section-separator {
+        display: none !important;
+    }
+    
+    .presentation-viewport {
+        height: auto !important;
+        padding: 0 !important;
+        background: none !important;
+        display: block !important;
+    }
+    
+    .slide-wrapper {
+        max-width: 100% !important;
+        transform: none !important;
+        gap: 0 !important;
+        display: block !important;
+    }
+    
+    /* Adaptar contenedores de diapositivas para impresión vertical continua */
+    .slide-container {
+        position: relative !important;
+        min-height: auto !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: none !important;
+        padding: 20px 0 !important;
+        page-break-inside: avoid;
+        display: flex !important;
+        margin-bottom: 30px !important;
+        border-bottom: 1px dashed #cbd5e1 !important;
+    }
+    
+    h1, h2, h3, h4, p, li, td, th {
+        color: #0f172a !important;
+    }
+    
+    .slide-title {
+        font-size: 24px !important;
+        border-bottom: 2px solid #0f766e !important;
+        margin-bottom: 15px !important;
+        color: #0f766e !important;
+    }
+    
+    .slide-title i {
+        color: #0f766e !important;
+        filter: none !important;
+    }
+    
+    .math-box {
+        background: #f8fafc !important;
+        border-left: 5px solid #0f766e !important;
+        border-top: 1px solid #e2e8f0 !important;
+        border-right: 1px solid #e2e8f0 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        box-shadow: none !important;
+        color: #0f172a !important;
+    }
+    
+    .formula-box {
+        background: #f0fdfa !important;
+        border: 1px solid #ccfbf1 !important;
+        border-left: 4px solid #0f766e !important;
+    }
+    
+    .step-pill {
+        background: #0f766e !important;
+        color: white !important;
+        box-shadow: none !important;
+    }
+    
+    .tile {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: none !important;
+    }
+    
+    .tile .icon {
+        color: #0f766e !important;
+    }
+    
+    .image-wrapper {
+        height: 250px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: none !important;
+    }
+    
+    .accent-text {
+        color: #0f766e !important;
+        -webkit-text-fill-color: initial !important;
+        background: none !important;
+    }
+    
+    .katex, math {
+        color: #0f766e !important;
+    }
+}
+
+.section-separator::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(6, 182, 212, 0.4) 50%, transparent 100%);
+}
+
+.section-separator::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(6, 182, 212, 0.15) 50%, transparent 100%);
+    filter: blur(4px);
+}
+
+/* EFECTO DE REVELADO CON SCROLL (SCROLL REVEAL) */
+.reveal {
+    opacity: 0;
+    transform: translateY(35px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* MODO PRESENTADOR CLÁSICO (POWERPOINT COMPATIBILITY) */
+body.presenter-mode {
+    height: 100vh;
+    overflow: hidden;
+}
+
+body.presenter-mode .presentation-viewport {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    background: radial-gradient(circle at 50% 50%, hsl(223, 40% ,13%) 0%, hsl(var(--bg-main)) 100%);
+}
+
+body.presenter-mode .slide-wrapper {
+    width: var(--slide-width);
+    height: var(--slide-height);
+    position: relative;
+    transform-origin: center center;
+    transition: transform 0.2s ease-out;
+}
+
+body.presenter-mode .slide-container {
+    width: 100%;
+    height: 100%;
+    background-color: hsl(var(--bg-slide));
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 50px 70px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.96) translateY(12px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1;
+}
+
+body.presenter-mode .slide-container.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1) translateY(0);
+    z-index: 10;
+}
+
+/* GRADIENTES Y DECORACIONES DE FONDO */
+.slide-container::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: 
+        radial-gradient(circle at 15% 20%, hsl(var(--accent-sky) / 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, hsl(var(--accent-emerald) / 0.05) 0%, transparent 40%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.slide-container > * {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+/* TEXTOS Y TIPOGRAFÍA */
+h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: hsl(var(--text-primary));
+}
+
+.accent-text {
+    background: linear-gradient(135deg, #00f0ff 0%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.15));
+}
+
+.slide-title {
+    font-size: 38px;
+    padding-bottom: 12px;
+    margin-bottom: 25px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(to right, #00f0ff 0%, transparent 100%) 1;
+}
+
+.slide-title i {
+    filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4));
+    color: #00f0ff;
+}
+
+.subtitle {
+    font-size: 22px;
+    color: hsl(var(--text-secondary));
+    margin-top: 15px;
+    font-weight: 400;
+}
+
+.content-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+
+/* PORTADA HERO */
+.title-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+}
+
+/* GRID LAYOUTS */
+.two-column {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+    width: 100%;
+    align-items: center;
+}
+
+.tiled-content {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+}
+
+/* CONTENEDORES GLASSMORPHIC */
+.glass-panel {
+    background: rgba(10, 15, 30, 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.tile {
+    flex: 1;
+    background: rgba(30, 41, 59, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    padding: 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tile:hover {
+    border-color: #00f0ff;
+    box-shadow: 0 15px 30px -10px rgba(0, 240, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.tile .icon {
+    font-size: 42px;
+    color: #00f0ff;
+    margin-bottom: 16px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.tile:hover .icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(0,240,255,0.5));
+}
+
+/* CAJA DE EXPLICACIÓN MATEMÁTICA */
+.math-box {
+    background: rgba(15, 23, 42, 0.8);
+    border-left: 5px solid #00f0ff;
+    padding: 20px 24px;
+    border-radius: 12px;
+    margin: 15px 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    border-right: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.formula-box {
+    background: rgba(0, 240, 255, 0.03);
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    border-left: 4px solid #00f0ff;
+    padding: 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+
+/* PASO PILL */
+.step-pill {
+    display: inline-block;
+    background: linear-gradient(135deg, #00f0ff 0%, #10b981 100%);
+    color: #030712;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    margin-right: 12px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0, 240, 255, 0.3);
+}
+
+/* CONTENEDOR DE IMAGEN CON MARCO ELEGANTE */
+.image-wrapper {
+    border-radius: 16px;
+    overflow: hidden;
+    height: 380px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.image-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 60%, rgba(15, 23, 42, 0.8) 100%);
+    pointer-events: none;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.75;
+    transition: transform 0.5s ease;
+}
+
+.image-wrapper:hover img {
+    transform: scale(1.05);
+}
+
+/* CYBERPUNK BUTTONS DESDE PABLITOEXPO */
+.btn-cyber {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(0, 240, 255, 0.05));
+    border: 1px solid #00f0ff;
+    border-radius: 8px;
+    color: #00f0ff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-cyber::before {
+    content: '';
+    position: absolute;
+    top: 0; 
+    left: -100%;
+    width: 100%; 
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,240,255,0.15), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-cyber:hover {
+    background: rgba(0, 240, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    color: #ffffff;
+}
+
+.btn-cyber:hover::before {
+    left: 100%;
+}
+
+.btn-cyber-emerald {
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.btn-cyber-emerald:hover {
+    background: rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    color: #ffffff;
+}
+
+/* EFECTOS AMBIENTALES DE FONDO */
+.ambient-light {
+    position: fixed;
+    top: -10vw;
+    left: -10vw;
+    width: 50vw;
+    height: 50vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.05) 0%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.ambient-light-2 {
+    position: fixed;
+    bottom: -10vw;
+    right: -10vw;
+    width: 50vw;
+    height: 50vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.04) 0%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ANIMACIONES */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* NOTIFICACIONES TOAST */
+#toast-container {
+    pointer-events: none;
+}
+#toast-container > * {
+    pointer-events: auto;
+}
+
+/* AJUSTES ADICIONALES PARA MÓDULO GEMINI/SUPABASE */
+.select-premium {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310b981'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 36px;
+}
