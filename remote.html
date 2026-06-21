@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mando Remoto — ECUACIONES.io</title>
+    <meta name="description" content="Control remoto para la presentación de Planteo de Ecuaciones">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --red: #e50914;
+            --bg: #0f0f0f;
+            --card: #1a1a1a;
+            --border: rgba(255,255,255,0.1);
+            --text: #ffffff;
+            --muted: #b3b3b3;
+            --green: #46d369;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* ── Header ─────────────────────────────────────────────── */
+        header {
+            padding: 18px 20px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .logo {
+            font-size: 1.15rem; font-weight: 800;
+            color: var(--red); letter-spacing: -0.5px;
+        }
+        .logo span { color: #fff; }
+        .status-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #555;
+            transition: background 0.4s;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+        }
+        .status-dot.connected { background: var(--green); box-shadow: 0 0 8px rgba(70,211,105,0.5); }
+        .status-dot.connecting { background: #f59e0b; animation: blink 1s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+        /* ── Status Banner ──────────────────────────────────────── */
+        #status-banner {
+            text-align: center;
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            padding: 8px 16px;
+            color: var(--muted);
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+        }
+        #status-banner.ok { color: var(--green); }
+        #status-banner.error { color: var(--red); }
+
+        /* ── Trackpad ───────────────────────────────────────────── */
+        .trackpad-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 20px 10px;
+            gap: 14px;
+        }
+
+        .trackpad-label {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--muted);
+        }
+
+        #trackpad {
+            width: 100%;
+            max-width: 340px;
+            aspect-ratio: 4 / 3;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            position: relative;
+            cursor: crosshair;
+            touch-action: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+        }
+        #trackpad::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(229,9,20,0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        #trackpad.active {
+            border-color: rgba(229,9,20,0.6);
+            box-shadow: 0 0 24px rgba(229,9,20,0.2), inset 0 0 40px rgba(229,9,20,0.03);
+        }
+        .trackpad-hint {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 8px; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .trackpad-hint i { font-size: 2rem; color: rgba(255,255,255,0.08); }
+        .trackpad-hint p { font-size: 0.7rem; color: rgba(255,255,255,0.12); letter-spacing: 1px; }
+        #trackpad.active .trackpad-hint { opacity: 0; }
+
+        /* Laser cursor dot on trackpad */
+        #laser-cursor {
+            position: absolute;
+            width: 18px; height: 18px;
+            background: var(--red);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 16px 6px rgba(229,9,20,0.6);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            top: 50%; left: 50%;
+        }
+        #trackpad.active #laser-cursor { opacity: 1; }
+
+        /* ── Nav Buttons ────────────────────────────────────────── */
+        .nav-section {
+            padding: 0 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px;
+            padding: 18px 12px;
+            border: none; border-radius: 14px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem; font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s, opacity 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: 0.3px;
+        }
+        .btn:active { transform: scale(0.94); }
+
+        .btn-prev {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-next {
+            background: var(--text);
+            color: #000;
+        }
+        .btn-start {
+            background: var(--red);
+            color: var(--text);
+            grid-column: 1 / -1;
+        }
+        .btn-exit {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            grid-column: 1 / -1;
+            padding: 12px;
+            font-size: 0.78rem;
+        }
+
+        .btn:hover { opacity: 0.88; }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* Ripple effect */
+        .btn { position: relative; overflow: hidden; }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            background: rgba(255,255,255,0.25);
+            animation: rippleAnim 0.5s linear;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+        /* ── Footer ─────────────────────────────────────────────── */
+        footer {
+            text-align: center;
+            padding: 12px;
+            font-size: 0.6rem; color: rgba(255,255,255,0.15);
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">ECUACIONES<span>.io</span></div>
+    <div id="status-dot" class="status-dot connecting" title="Estado de conexión"></div>
+</header>
+
+<div id="status-banner">Conectando al servidor...</div>
+
+<div class="trackpad-section">
+    <span class="trackpad-label"><i class="fa-solid fa-crosshairs" style="margin-right:6px;"></i>Área del Puntero Láser</span>
+    <div id="trackpad">
+        <div class="trackpad-hint">
+            <i class="fa-regular fa-hand-pointer"></i>
+            <p>Desliza el dedo aquí</p>
+        </div>
+        <div id="laser-cursor"></div>
+    </div>
+    <span style="font-size:0.62rem;color:rgba(255,255,255,0.2);letter-spacing:1px;">ARRASTRAR = MOVER PUNTERO</span>
+</div>
+
+<div class="nav-section">
+    <div class="nav-row">
+        <button class="btn btn-prev" id="btn-prev" onclick="sendNav('prev')">
+            <i class="fa-solid fa-chevron-left"></i> Anterior
+        </button>
+        <button class="btn btn-next" id="btn-next" onclick="sendNav('next')">
+            Siguiente <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+    <div class="nav-row">
+        <button class="btn btn-start" id="btn-start" onclick="sendCommand('start-presentation')">
+            <i class="fa-solid fa-play"></i> Iniciar Presentación
+        </button>
+    </div>
+    <div class="nav-row">
+        <button class="btn btn-exit" id="btn-exit" onclick="sendCommand('exit-presentation')">
+            <i class="fa-solid fa-compress"></i> Salir del Modo Presentación
+        </button>
+    </div>
+</div>
+
+<footer>ECUACIONES.io · Mando Remoto · Supabase Realtime</footer>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://dyuadrzdrphzywbnxnhz.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_rCwOvgVa1kGlO5PFAa8tRg_E1KIWKWX';
+const CHANNEL_NAME  = 'presentation-planteo-ecuaciones';
+
+// ── Init Supabase channel ────────────────────────────────────────────────────
+const client  = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const channel = client.channel(CHANNEL_NAME);
+
+const statusDot    = document.getElementById('status-dot');
+const statusBanner = document.getElementById('status-banner');
+
+channel.subscribe((status) => {
+    if (status === 'SUBSCRIBED') {
+        statusDot.className = 'status-dot connected';
+        statusBanner.textContent = '✅ Conectado — listo para controlar';
+        statusBanner.className = 'ok';
+    } else if (status === 'CHANNEL_ERROR') {
+        statusDot.className = 'status-dot';
+        statusBanner.textContent = '❌ Error de conexión';
+        statusBanner.className = 'error';
+    } else {
+        statusDot.className = 'status-dot connecting';
+        statusBanner.textContent = 'Conectando...';
+        statusBanner.className = '';
+    }
+});
+
+// ── Navigation commands ──────────────────────────────────────────────────────
+function sendNav(direction) {
+    channel.send({ type: 'broadcast', event: 'navigate', payload: { direction } });
+    rippleEffect(direction === 'next' ? document.getElementById('btn-next') : document.getElementById('btn-prev'));
+}
+
+function sendCommand(event) {
+    channel.send({ type: 'broadcast', event, payload: {} });
+    const btn = event === 'start-presentation' ? document.getElementById('btn-start') : document.getElementById('btn-exit');
+    rippleEffect(btn);
+}
+
+// ── Laser Trackpad ───────────────────────────────────────────────────────────
+const trackpad    = document.getElementById('trackpad');
+const laserCursor = document.getElementById('laser-cursor');
+let lastTouch = null;
+let throttleTimer = null;
+const THROTTLE_MS = 30; // ~33fps max send rate
+
+function handleTrackpadMove(clientX, clientY) {
+    const rect = trackpad.getBoundingClientRect();
+    // Clamp position within trackpad
+    const relX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    const relY = Math.max(0, Math.min(clientY - rect.top, rect.height));
+
+    // Move local cursor dot
+    laserCursor.style.left  = relX + 'px';
+    laserCursor.style.top   = relY + 'px';
+
+    if (lastTouch && throttleTimer === null) {
+        throttleTimer = setTimeout(() => { throttleTimer = null; }, THROTTLE_MS);
+        const dx = (clientX - lastTouch.x) / rect.width;
+        const dy = (clientY - lastTouch.y) / rect.height;
+        if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
+            channel.send({ type: 'broadcast', event: 'laser-move', payload: { dx, dy } });
+        }
+    }
+    lastTouch = { x: clientX, y: clientY };
+}
+
+// Touch events
+trackpad.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    trackpad.classList.add('active');
+    const t = e.touches[0];
+    lastTouch = { x: t.clientX, y: t.clientY };
+}, { passive: false });
+
+trackpad.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    handleTrackpadMove(t.clientX, t.clientY);
+}, { passive: false });
+
+trackpad.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    trackpad.classList.remove('active');
+    lastTouch = null;
+}, { passive: false });
+
+// Mouse events (for testing on desktop)
+trackpad.addEventListener('mousedown', (e) => {
+    trackpad.classList.add('active');
+    lastTouch = { x: e.clientX, y: e.clientY };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+});
+
+function onMouseMove(e) {
+    handleTrackpadMove(e.clientX, e.clientY);
+}
+function onMouseUp() {
+    trackpad.classList.remove('active');
+    lastTouch = null;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+}
+
+// ── Ripple Effect ────────────────────────────────────────────────────────────
+function rippleEffect(btn) {
+    if (!btn) return;
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    const size = Math.max(btn.offsetWidth, btn.offsetHeight);
+    ripple.style.width  = ripple.style.height = size + 'px';
+    ripple.style.left   = (btn.offsetWidth / 2  - size / 2) + 'px';
+    ripple.style.top    = (btn.offsetHeight / 2 - size / 2) + 'px';
+    btn.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+}
+</script>
+</body>
+</html>

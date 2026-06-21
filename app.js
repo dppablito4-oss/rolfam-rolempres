@@ -700,7 +700,7 @@ class AIService {
     }
 }
 
-// ── Supabase Realtime (Virtual Laser Pointer) ─────────────────────────────────
+// ── Supabase Realtime (Virtual Laser Pointer + Remote Commands) ──────────────────────
 function initRealtimeUplink() {
     if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey || !window.supabase) return;
 
@@ -726,8 +726,16 @@ function initRealtimeUplink() {
                 else presenterPrev();
             }
         })
+        .on('broadcast', { event: 'start-presentation' }, () => {
+            startPresenterMode();
+            showToast('▶️ Presentación iniciada desde el mando remoto', 'success');
+        })
+        .on('broadcast', { event: 'exit-presentation' }, () => {
+            exitPresenterMode();
+            showToast('⏹️ Presentación detenida desde el mando remoto', 'info');
+        })
         .subscribe((status) => {
-            if (status === 'SUBSCRIBED') showToast('🔗 Uplink remoto conectado', 'success');
+            if (status === 'SUBSCRIBED') showToast('🔗 Mando remoto listo', 'success');
         });
 }
 
@@ -797,6 +805,30 @@ async function analyzeUserProblem() {
         btn.disabled = false;
     }
 }
+
+// ── QR Modal ──────────────────────────────────────────────────────────────────
+function openQRModal() {
+    const base = window.location.origin + window.location.pathname.replace(/[^\/]*$/, '');
+    const remoteURL = base + 'remote.html';
+    const encoded = encodeURIComponent(remoteURL);
+    const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=141414&bgcolor=ffffff&data=${encoded}`;
+
+    document.getElementById('qr-img').src = qrAPI;
+    document.getElementById('qr-url-text').textContent = remoteURL;
+    document.getElementById('qr-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeQRModal() {
+    document.getElementById('qr-modal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('qr-modal').classList.contains('open')) {
+        closeQRModal();
+    }
+});
 
 // ── PDF Export ────────────────────────────────────────────────────────────────
 window.exportSolutionsToPDF = () => {

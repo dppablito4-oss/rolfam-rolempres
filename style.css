@@ -1168,17 +1168,142 @@ textarea:focus-visible {
     box-shadow: 0 0 25px 10px rgba(229, 9, 20, 0.6);
 }
 
-/* Smooth reveal animation */
+/* Scroll Reveal — staggered entry per row */
 .reveal {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
+    transform: translateY(48px);
+    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .reveal.visible {
     opacity: 1;
     transform: translateY(0);
 }
+/* Staggered delay for child elements inside a revealed section */
+.reveal.visible .slide-card:nth-child(1) { transition-delay: 0.04s; }
+.reveal.visible .slide-card:nth-child(2) { transition-delay: 0.10s; }
+.reveal.visible .slide-card:nth-child(3) { transition-delay: 0.16s; }
+.reveal.visible .slide-card:nth-child(4) { transition-delay: 0.22s; }
+.reveal.visible .slide-card:nth-child(5) { transition-delay: 0.28s; }
+.slide-card {
+    /* ensure child cards start invisible until parent reveals */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.55s cubic-bezier(0.16,1,0.3,1),
+                transform 0.55s cubic-bezier(0.16,1,0.3,1),
+                scale 0.3s ease, z-index 0s;
+}
+.reveal.visible .slide-card { opacity: 1; transform: translateY(0); }
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* REMOTE CONTROL BUTTON & QR MODAL                                           */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+.btn-remote {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(229,9,20,0.15);
+    border: 1px solid rgba(229,9,20,0.4);
+    color: var(--color-accent);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    position: relative;
+}
+.btn-remote:hover {
+    background: rgba(229,9,20,0.3);
+    transform: scale(1.08);
+    box-shadow: 0 0 12px rgba(229,9,20,0.35);
+}
+.btn-remote .pulse-dot {
+    position: absolute;
+    top: -3px; right: -3px;
+    width: 9px; height: 9px;
+    background: #46d369;
+    border-radius: 50%;
+    border: 2px solid var(--color-bg-main);
+    animation: pulseDot 2s ease-in-out infinite;
+}
+@keyframes pulseDot {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(1.35); }
+}
+
+/* QR Modal */
+#qr-modal {
+    position: fixed; inset: 0;
+    z-index: 800;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: blur(6px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+#qr-modal.open { opacity: 1; pointer-events: all; }
+
+.qr-box {
+    background: #1c1c1c;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 36px;
+    max-width: 380px; width: 90%;
+    text-align: center;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.8);
+    transform: scale(0.88);
+    transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    position: relative;
+}
+#qr-modal.open .qr-box { transform: scale(1); }
+
+.qr-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.08);
+    border: none; border-radius: 50%;
+    color: #fff; font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+}
+.qr-close:hover { background: rgba(255,255,255,0.16); }
+
+.qr-title {
+    font-family: var(--font-heading);
+    font-size: 1.15rem; font-weight: 800;
+    color: #fff; margin-bottom: 6px;
+}
+.qr-subtitle {
+    font-size: 0.82rem; color: var(--color-text-muted);
+    margin-bottom: 24px; line-height: 1.5;
+}
+.qr-img-wrapper {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    display: inline-block;
+    margin-bottom: 20px;
+    box-shadow: 0 0 0 4px rgba(229,9,20,0.2);
+}
+.qr-img-wrapper img { display: block; width: 200px; height: 200px; }
+.qr-url {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-accent);
+    word-break: break-all;
+    background: rgba(229,9,20,0.07);
+    padding: 8px 12px; border-radius: 6px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(229,9,20,0.15);
+}
+.qr-steps {
+    list-style: none;
+    text-align: left;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    display: flex; flex-direction: column; gap: 6px;
+}
+.qr-steps li { display: flex; align-items: center; gap: 8px; }
+.qr-steps li span { color: var(--color-accent); font-weight: 700; font-size: 0.7rem; }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
 /* 11. PRINT / PDF EXPORT                                                      */

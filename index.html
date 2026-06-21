@@ -112,6 +112,11 @@
             <div id="header-avatar" class="header-profile-mini-icon" style="background:rgba(229,9,20,0.15);" title="Perfil activo">
                 🎓
             </div>
+            <!-- Botón Mando Remoto -->
+            <button id="btn-remote" class="btn-remote" onclick="openQRModal()" aria-label="Abrir mando a distancia" title="Mando a distancia">
+                <i class="fa-solid fa-mobile-screen"></i>
+                <span class="pulse-dot" aria-hidden="true"></span>
+            </button>
             <button onclick="startPresenterMode()" aria-label="Iniciar modo presentación" 
                     style="padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:4px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:border-color 0.2s;"
                     onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">
@@ -532,6 +537,25 @@
         <button class="pbar-btn" onclick="presenterNext()" aria-label="Diapositiva siguiente">
             Siguiente <i class="fa-solid fa-chevron-right"></i>
         </button>
+    </div>
+</div>
+
+<!-- QR MODAL — MANDO A DISTANCIA -->
+<div id="qr-modal" role="dialog" aria-modal="true" aria-label="Mando a distancia" onclick="if(event.target===this)closeQRModal()">
+    <div class="qr-box">
+        <button class="qr-close" onclick="closeQRModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <div class="qr-title">📱 Mando a Distancia</div>
+        <div class="qr-subtitle">Escanea el código QR con tu celular para controlar la presentación de forma inalámbrica.</div>
+        <div class="qr-img-wrapper">
+            <img id="qr-img" src="" alt="Código QR del mando remoto" width="200" height="200">
+        </div>
+        <div class="qr-url" id="qr-url-text">Cargando URL...</div>
+        <ul class="qr-steps">
+            <li><span>1</span> Abre la cámara de tu celular</li>
+            <li><span>2</span> Apunta al código QR de arriba</li>
+            <li><span>3</span> Toca el link que aparece</li>
+            <li><span>4</span> ¡Listo! Controla las diapositivas desde tu celular</li>
+        </ul>
     </div>
 </div>
 
