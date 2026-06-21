@@ -885,6 +885,30 @@ function stopAllPreviews() {
  * Initialises Netflix-style hover preview on every .slide-card that has
  * a data-yt-id attribute.
  */
+/**
+ * Helper to check if a local video file exists and is not a redirect to index.html (common in SPAs).
+ */
+async function checkLocalVideoExists(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return false;
+        
+        // If content-type is HTML, it's a fallback/redirect page, not a real video
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('text/html')) {
+            return false;
+        }
+        return true;
+    } catch (e) {
+        // If CORS blocks fetch (e.g. on file:// protocol), return false to fallback to YouTube
+        return false;
+    }
+}
+
+/**
+ * Initialises Netflix-style hover preview on every .slide-card that has
+ * a data-yt-id attribute.
+ */
 function initCardPreviews() {
     document.querySelectorAll('.slide-card[data-yt-id]').forEach(card => {
         const ytId    = card.dataset.ytId;
@@ -923,74 +947,69 @@ function initCardPreviews() {
                 thumb.appendChild(container);
                 thumb.appendChild(badge);
 
-                let isUsingLocalVideo = true;
+                const videoUrl = `assets/videos/${ytId}.mp4`;
 
-                // Try to load local video first
-                const video = document.createElement('video');
-                video.muted = true;
-                video.autoplay = true;
-                video.loop = true;
-                video.playsInline = true;
-                video.src = `assets/videos/${ytId}.mp4`;
-                video.style.width = '100%';
-                video.style.height = '100%';
-                video.style.objectFit = 'cover';
-                video.style.pointerEvents = 'none';
+                // Check if local video exists before attempting to load it
+                checkLocalVideoExists(videoUrl).then(exists => {
+                    if (exists) {
+                        // Local video exists! Create video element
+                        const video = document.createElement('video');
+                        video.muted = true;
+                        video.autoplay = true;
+                        video.loop = true;
+                        video.playsInline = true;
+                        video.src = videoUrl;
+                        video.style.width = '100%';
+                        video.style.height = '100%';
+                        video.style.objectFit = 'cover';
+                        video.style.pointerEvents = 'none';
 
-                video.addEventListener('loadedmetadata', () => {
-                    if (ytStart > 0) {
-                        video.currentTime = ytStart;
-                    }
-                });
+                        video.addEventListener('loadedmetadata', () => {
+                            if (ytStart > 0) {
+                                video.currentTime = ytStart;
+                            }
+                        });
 
-                video.addEventListener('canplay', () => {
-                    if (isUsingLocalVideo) {
-                        // Local video is loaded and ready! Show it.
-                        container.classList.add('visible');
-                        badge.classList.add('visible');
-                    }
-                });
-
-                video.addEventListener('error', () => {
-                    if (!isUsingLocalVideo) return;
-                    isUsingLocalVideo = false;
-                    video.remove();
-
-                    // Fallback to YouTube iframe
-                    const src = [
-                        `https://www.youtube.com/embed/${ytId}`,
-                        `?autoplay=1`,
-                        `&mute=1`,
-                        `&controls=0`,
-                        `&modestbranding=1`,
-                        `&rel=0`,
-                        `&fs=0`,
-                        `&iv_load_policy=3`,
-                        `&disablekb=1`,
-                        `&start=${ytStart}`,
-                        `&enablejsapi=0`,
-                        `&playsinline=1`
-                    ].join('');
-
-                    const iframe = document.createElement('iframe');
-                    iframe.src = src;
-                    iframe.title = 'Vista previa de video';
-                    iframe.allow = 'autoplay; encrypted-media';
-                    iframe.setAttribute('allowfullscreen', '');
-
-                    container.appendChild(iframe);
-
-                    // Fade in YouTube iframe after a short delay
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
+                        video.addEventListener('canplay', () => {
                             container.classList.add('visible');
                             badge.classList.add('visible');
                         });
-                    });
-                });
 
-                // Append the video element initially to see if it loads
-                container.appendChild(video);
+                        container.appendChild(video);
+                    } else {
+                        // Local video doesn't exist, load YouTube iframe fallback
+                        const src = [
+                            `https://www.youtube.com/embed/${ytId}`,
+                            `?autoplay=1`,
+                            `&mute=1`,
+                            `&controls=0`,
+                            `&modestbranding=1`,
+                            `&rel=0`,
+                            `&fs=0`,
+                            `&iv_load_policy=3`,
+                            `&disablekb=1`,
+                            `&start=${ytStart}`,
+                            `&enablejsapi=0`,
+                            `&playsinline=1`
+                        ].join('');
+
+                        const iframe = document.createElement('iframe');
+                        iframe.src = src;
+                        iframe.title = 'Vista previa de video';
+                        iframe.allow = 'autoplay; encrypted-media';
+                        iframe.setAttribute('allowfullscreen', '');
+
+                        container.appendChild(iframe);
+
+                        // Fade in YouTube iframe after a short delay
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                container.classList.add('visible');
+                                badge.classList.add('visible');
+                            });
+                        });
+                    }
+                });
 
                 // Auto-kill after 15 seconds to save resources
                 _autoKillTimers[cardKey] = setTimeout(() => {
