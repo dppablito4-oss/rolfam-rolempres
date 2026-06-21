@@ -1017,18 +1017,13 @@ body {
 /* OPTIMIZACIÓN DE PROYECTOR MULTIMEDIA (10+ METROS) PARA MODO PRESENTADOR   */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
-#presenter-overlay .presenter-slide-inner {
-    max-width: 1600px;
-    min-height: 75vh;
-    padding: 60px 80px;
-}
-#presenter-overlay h2 { font-size: 3.5rem !important; }
-#presenter-overlay h2 span { font-size: 4rem !important; }
-#presenter-overlay p { font-size: 1.8rem !important; line-height: 1.6 !important; }
-#presenter-overlay .modal-math-box { font-size: 2rem !important; padding: 40px !important; margin: 30px 0 !important; }
-#presenter-overlay .modal-math-box .modal-step-pill { font-size: 1.4rem !important; padding: 10px 20px !important; }
-#presenter-overlay .modal-solution-tag { font-size: 2.2rem !important; margin-top: 40px !important; }
-#presenter-overlay .modal-table th, #presenter-overlay .modal-table td { font-size: 1.8rem !important; padding: 24px !important; }
+#presenter-overlay h2 { font-size: 2.5rem !important; }
+#presenter-overlay h2 span { font-size: 3rem !important; }
+#presenter-overlay p { font-size: 1.3rem !important; line-height: 1.5 !important; }
+#presenter-overlay .modal-math-box { font-size: 1.4rem !important; padding: 24px !important; margin: 20px 0 !important; }
+#presenter-overlay .modal-math-box .modal-step-pill { font-size: 1.1rem !important; padding: 6px 12px !important; }
+#presenter-overlay .modal-solution-tag { font-size: 1.6rem !important; margin-top: 24px !important; }
+#presenter-overlay .modal-table th, #presenter-overlay .modal-table td { font-size: 1.2rem !important; padding: 16px !important; }
 
 /* Escalar de forma inteligente los estilos inline inyectados en app.js */
 #presenter-overlay [style*="font-size:0.7rem"],
