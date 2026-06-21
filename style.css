@@ -1373,6 +1373,70 @@ textarea:focus-visible {
 .qr-steps li span { color: var(--color-accent); font-weight: 700; font-size: 0.7rem; }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
+/* RESPONSIVE DESIGNS (MOBILE)                                                */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    /* Perfiles */
+    .profiles-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .profile-avatar { width: 90px; height: 90px; }
+    
+    /* Cabecera */
+    #netflix-header { padding: 12px 16px; }
+    .nav-links { display: none; }
+    .brand-logo { font-size: 1.3rem; }
+    .user-actions { gap: 12px; }
+
+    /* Hero Banner */
+    #hero-banner { 
+        height: auto; min-height: 70vh; 
+        padding-top: 100px; padding-bottom: 40px; 
+        align-items: center; text-align: center;
+    }
+    .hero-content { margin: 0 auto; padding: 0 20px; }
+    .hero-title { font-size: 2.2rem; }
+    .hero-desc { font-size: 1rem; max-width: 100%; margin: 16px auto 24px; }
+    .hero-floating-slides { display: none; }
+    .hero-actions { flex-direction: column; width: 100%; }
+    .btn-hero { width: 100%; justify-content: center; }
+
+    /* Carruseles */
+    .carousel-track { 
+        overflow-x: auto; padding: 16px; 
+        scroll-snap-type: x mandatory; 
+        -webkit-overflow-scrolling: touch; 
+        scrollbar-width: none; 
+    }
+    .carousel-track::-webkit-scrollbar { display: none; }
+    .carousel-btn { display: none !important; }
+    .slide-card { scroll-snap-align: start; min-width: 220px; }
+    .slide-card:hover { transform: none; box-shadow: none; z-index: 1; }
+    
+    /* Taller IA */
+    .ai-panels { grid-template-columns: 1fr; gap: 16px; }
+    #ai-section { padding: 0 16px; }
+    
+    /* Modal de Diapositiva */
+    .modal-box { width: 95%; margin: 20px auto; max-height: 90vh; }
+    .modal-hero { padding: 20px; aspect-ratio: 16/10; }
+    .modal-hero-bg { font-size: 4rem; }
+    .modal-hero-title { font-size: 1.5rem; }
+    
+    /* Forzar apilamiento de grillas en contenido inline */
+    .modal-body [style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+    .modal-body table.modal-table th, .modal-body table.modal-table td {
+        font-size: 0.8rem; padding: 6px;
+    }
+    
+    /* Presentador */
+    #presenter-slide-title { font-size: 1.4rem; }
+    #presenter-controls { flex-wrap: wrap; justify-content: center; gap: 10px; }
+    #presenter-controls button { width: 100%; justify-content: center; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
 /* 11. PRINT / PDF EXPORT                                                      */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
