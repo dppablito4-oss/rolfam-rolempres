@@ -20,6 +20,7 @@ const SLIDES_DATA = {
         title: '¿Qué significa "Plantear"?',
         icon: '🎓',
         heroColor: 'linear-gradient(135deg, #1a0000, #2d0000)',
+        coverImage: 'assets/images/math_red_cover.png',
         description: 'Proceso riguroso de traducción lingüística y conceptual del lenguaje cotidiano al lenguaje formal matemático.',
         content: `
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;">
@@ -48,6 +49,7 @@ const SLIDES_DATA = {
         title: 'Los 5 Pasos de Oro',
         icon: '✅',
         heroColor: 'linear-gradient(135deg, #001a0d, #002614)',
+        coverImage: 'assets/images/math_green_cover.png',
         description: 'La metodología probada para plantear cualquier ecuación de forma sistemática y sin errores.',
         content: `
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
@@ -78,6 +80,7 @@ const SLIDES_DATA = {
         title: 'Diccionario de Traducción Rápida',
         icon: '📖',
         heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
+        coverImage: 'assets/images/math_blue_cover.png',
         description: 'Referencia rápida de palabras clave y sus operadores matemáticos equivalentes.',
         content: `
             <table class="modal-table">
@@ -101,6 +104,7 @@ const SLIDES_DATA = {
         title: '¡Cuidado! Evita estos Errores',
         icon: '⚠️',
         heroColor: 'linear-gradient(135deg, #1a0000, #2d0000)',
+        coverImage: 'assets/images/math_red_cover.png',
         description: 'Los tres errores más frecuentes al plantear ecuaciones y cómo evitarlos.',
         content: `
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
@@ -120,6 +124,7 @@ const SLIDES_DATA = {
         title: 'En Resumen...',
         icon: '🏆',
         heroColor: 'linear-gradient(135deg, #0a1a00, #102400)',
+        coverImage: 'assets/images/math_olive_cover.png',
         description: 'Las 4 claves fundamentales que garantizan el éxito en el planteo de ecuaciones.',
         content: `
             <ul style="list-style:none;display:flex;flex-direction:column;gap:20px;">
@@ -139,6 +144,7 @@ const SLIDES_DATA = {
         title: 'Ejemplo 1: Suma de Consecutivos',
         icon: '1️⃣',
         heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
+        coverImage: 'assets/images/math_blue_cover.png',
         description: 'Problema clásico de aritmética: la suma de tres números enteros consecutivos es 72.',
         content: `
             <h3 style="font-size:1.1rem;color:var(--color-text-secondary);margin-bottom:20px;">
@@ -158,6 +164,7 @@ const SLIDES_DATA = {
         title: 'Ejemplo 2: Operadores Combinados',
         icon: '2️⃣',
         heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
+        coverImage: 'assets/images/math_olive_cover.png',
         description: 'El doble de un número aumentado en 5 es igual a 21. Encuentra el número.',
         content: `
             <h3 style="font-size:1.1rem;color:var(--color-text-secondary);margin-bottom:20px;">
@@ -176,6 +183,7 @@ const SLIDES_DATA = {
         title: 'Ejemplo 3: Edades (Línea Temporal)',
         icon: '3️⃣',
         heroColor: 'linear-gradient(135deg, #002014, #001a10)',
+        coverImage: 'assets/images/math_green_cover.png',
         description: 'Problema clásico de edades con desplazamiento temporal futuro.',
         content: `
             <h3 style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:16px;">
@@ -202,6 +210,7 @@ const SLIDES_DATA = {
         title: 'Ejemplo 4: Modelado Geométrico',
         icon: '4️⃣',
         heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
+        coverImage: 'assets/images/math_blue_cover.png',
         description: 'Hallar las dimensiones de un rectángulo dado su perímetro.',
         content: `
             <h3 style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:16px;">
@@ -218,6 +227,7 @@ const SLIDES_DATA = {
         title: 'Ejemplo 5: Reparto de Cantidades',
         icon: '5️⃣',
         heroColor: 'linear-gradient(135deg, #002014, #001a10)',
+        coverImage: 'assets/images/math_red_cover.png',
         description: 'Se reparten 50 caramelos entre dos niños: uno recibe 10 más que el otro.',
         content: `
             <h3 style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:16px;">
@@ -362,8 +372,12 @@ function openSlideModal(slideId) {
     const modal = document.getElementById('slide-modal');
     const content = document.getElementById('modal-content');
 
+    const bgStyle = data.coverImage 
+        ? `background: linear-gradient(to top, rgba(20,20,20,1) 0%, rgba(20,20,20,0.4) 50%, rgba(20,20,20,0.85) 100%), url('${data.coverImage}');`
+        : `background: ${data.heroColor};`;
+
     content.innerHTML = `
-        <div class="modal-hero" style="background:${data.heroColor};">
+        <div class="modal-hero" style="${bgStyle}">
             <div class="modal-hero-bg">${data.icon}</div>
             <div class="modal-hero-content">
                 <h2 class="modal-hero-title">${data.title}</h2>
