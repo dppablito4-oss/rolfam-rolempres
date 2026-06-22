@@ -244,6 +244,7 @@ const SLIDES_DATA = {
         title: 'Reto UNI I — Edades en el Tiempo',
         icon: '⭐',
         heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
+        coverImage: 'assets/math_problem_solving.png',
         description: 'Problema de preselección UNI con razones temporales. Calcular a+b.',
         content: `
             <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
@@ -271,6 +272,7 @@ const SLIDES_DATA = {
         title: 'Reto UNI II — Modelado Diofántico',
         icon: '⭐⭐',
         heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
+        coverImage: 'assets/math_logic_concept.png',
         description: 'Ecuación diofántica con restricción de enteros positivos. Cantidad máxima de textos.',
         content: `
             <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
@@ -1165,6 +1167,13 @@ async function generateAIProblem() {
     const output = document.getElementById('ai-problem-output');
     const btnSol = document.getElementById('btn-reveal-solution');
 
+    // Limpiamos y ocultamos el contenedor de solución separado
+    const solOutput = document.getElementById('ai-solution-output');
+    if (solOutput) {
+        solOutput.innerHTML = '';
+        solOutput.style.display = 'none';
+    }
+
     output.innerHTML = `<div style="display:flex;align-items:center;gap:10px;height:100%;justify-content:center;">
         <i class="fa-solid fa-spinner fa-spin" style="color:var(--color-accent);font-size:1.5rem;"></i>
         <span style="color:var(--color-text-muted);">Generando desafío matemático...</span>
@@ -1208,14 +1217,19 @@ async function generateAIProblem() {
 
 function toggleAISolution() {
     if (!lastSolutionHtml) return;
-    const output = document.getElementById('ai-problem-output');
-    output.insertAdjacentHTML('beforeend', `<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
-        <p style="color:#46d369;font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Resolución Paso a Paso:</p>
-        <div style="font-size:0.82rem;display:flex;flex-direction:column;gap:8px;">${lastSolutionHtml}</div>
-    </div>`);
+    const solOutput = document.getElementById('ai-solution-output');
+    if (solOutput) {
+        solOutput.innerHTML = `<div>
+            <p style="color:#46d369;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Resolución Paso a Paso:</p>
+            <div style="font-size:0.82rem;display:flex;flex-direction:column;gap:8px;">${lastSolutionHtml}</div>
+        </div>`;
+        solOutput.style.display = 'block';
+        solOutput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
     document.getElementById('btn-reveal-solution').disabled = true;
     setTimeout(() => renderAllMath(), 50);
 }
+
 
 async function analyzeUserProblem() {
     const text = document.getElementById('user-problem-input').value.trim();
@@ -1468,6 +1482,32 @@ window.deleteProfile = deleteProfile;
 window.cancelProfileForm = cancelProfileForm;
 window.checkTallerAnswer = checkTallerAnswer;
 window.speakText = speakText;
+window.initCardBackgrounds = initCardBackgrounds;
+
+/**
+ * Aplica de forma dinámica las imágenes de fondo opacas (con overlays) 
+ * a cada tarjeta de diapositiva basadas en SLIDES_DATA.
+ */
+function initCardBackgrounds() {
+    document.querySelectorAll('.slide-card').forEach(card => {
+        const onclickAttr = card.getAttribute('onclick') || '';
+        const match = onclickAttr.match(/openSlideModal\(['"]([^'"]+)['"]\)/);
+        if (!match) return;
+        
+        const slideId = match[1];
+        const slideData = SLIDES_DATA[slideId];
+        if (!slideData || !slideData.coverImage) return;
+
+        const thumbInner = card.querySelector('.slide-card-thumb-inner');
+        if (thumbInner) {
+            // Aplicamos degradado semi-opaco oscuro estilo Netflix y la imagen del tema/subtema
+            thumbInner.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.85) 100%), url('${slideData.coverImage}')`;
+            thumbInner.style.backgroundSize = 'cover';
+            thumbInner.style.backgroundPosition = 'center';
+            thumbInner.style.backgroundRepeat = 'no-repeat';
+        }
+    });
+}
 
 // ── Init on DOM Ready ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -1475,4 +1515,5 @@ document.addEventListener('DOMContentLoaded', () => {
     renderProfiles();
     checkAIServiceStatus();
     renderAllMath();
+    initCardBackgrounds();
 });
