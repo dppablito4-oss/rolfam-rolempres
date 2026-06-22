@@ -310,22 +310,214 @@ let activeProfile = null;
 let presenterIndex = 0;
 let carouselOffsets = {};
 let lastSolutionHtml = '';
+let lastExpectedAnswer = '';
 
-// ── Profile Selection ────────────────────────────────────────────────────────
+// ── Profiles Management & Selection ──────────────────────────────────────────
+const DEFAULT_PROFILES = [
+    { name: 'Samuel Pablo', avatar: '🎓', color: '#e50914' },
+    { name: 'Compañero 1', avatar: '📐', color: '#6366f1' },
+    { name: 'Compañero 2', avatar: '∑', color: '#10b981' }
+];
+
+let currentEditingProfileIndex = null; // null represents adding a new profile
+
+function getProfiles() {
+    let profiles = localStorage.getItem('ecuaciones_profiles');
+    if (!profiles) {
+        profiles = JSON.stringify(DEFAULT_PROFILES);
+        localStorage.setItem('ecuaciones_profiles', profiles);
+    }
+    return JSON.parse(profiles);
+}
+
+function saveProfiles(profiles) {
+    localStorage.setItem('ecuaciones_profiles', JSON.stringify(profiles));
+}
+
+function renderProfiles() {
+    const grid = document.getElementById('profiles-grid-container');
+    if (!grid) return;
+
+    const profiles = getProfiles();
+    let html = '';
+    profiles.forEach((p, idx) => {
+        const isFile = p.avatar.includes('/');
+        const avatarHtml = isFile 
+            ? `<div class="profile-avatar">
+                   <img src="${p.avatar}" alt="Avatar de ${p.name}" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,${p.color}aa,${p.color});display:flex;align-items:center;justify-content:center;font-size:3rem;\'>🎓</div>'">
+               </div>`
+            : `<div class="profile-avatar-icon" style="background:linear-gradient(135deg,${p.color}88,${p.color}); color:#fff; display:flex; align-items:center; justify-content:center; font-size:3.5rem;">
+                   ${p.avatar}
+               </div>`;
+
+        html += `
+        <div class="profile-card" role="button" tabindex="0" aria-label="Seleccionar perfil de ${p.name}"
+             onclick="selectProfile('${p.name}', '${p.avatar}', '${p.color}')"
+             onkeydown="if(event.key==='Enter') selectProfile('${p.name}','${p.avatar}','${p.color}')">
+            ${avatarHtml}
+            <span class="profile-name">${p.name}</span>
+        </div>`;
+    });
+
+    // Fixed Guest Profile
+    html += `
+    <div class="profile-card" role="button" tabindex="0" aria-label="Entrar como invitado"
+         onclick="selectProfile('Invitado', '👤', '#6d6d6e')"
+         onkeydown="if(event.key==='Enter') selectProfile('Invitado','👤','#6d6d6e')">
+        <div class="profile-avatar-icon" style="background:rgba(109,109,110,0.2); border:3px solid transparent; color:#6d6d6e; display:flex; align-items:center; justify-content:center; font-size:3.5rem;">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <span class="profile-name">Invitado</span>
+    </div>`;
+
+    grid.innerHTML = html;
+}
+
+function openProfileManageModal() {
+    renderProfileManageList();
+    document.getElementById('profile-list-view').style.display = 'block';
+    document.getElementById('profile-form-view').style.display = 'none';
+    document.getElementById('profile-manage-modal').classList.add('open');
+}
+
+function closeProfileManageModal() {
+    document.getElementById('profile-manage-modal').classList.remove('open');
+    renderProfiles(); // Refresh landing screen profiles
+}
+
+function renderProfileManageList() {
+    const list = document.getElementById('profile-manage-list');
+    if (!list) return;
+    const profiles = getProfiles();
+    let html = '';
+    profiles.forEach((p, idx) => {
+        const isFile = p.avatar.includes('/');
+        const avatarHtml = isFile 
+            ? `<img src="${p.avatar}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">`
+            : p.avatar;
+        html += `
+        <div class="profile-manage-item">
+            <div class="profile-manage-item-info">
+                <div class="profile-manage-item-avatar" style="background:${p.color};">
+                    ${avatarHtml}
+                </div>
+                <span class="profile-manage-item-name">${p.name}</span>
+            </div>
+            <div class="profile-manage-item-actions">
+                <button class="profile-action-btn" onclick="showEditProfileForm(${idx})"><i class="fa-solid fa-pen"></i></button>
+                <button class="profile-action-btn delete" onclick="deleteProfile(${idx})"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>`;
+    });
+    list.innerHTML = html || '<p style="color:var(--color-text-muted);font-size:0.8rem;text-align:center;padding:12px 0;">No hay perfiles personalizados.</p>';
+}
+
+function showAddProfileForm() {
+    currentEditingProfileIndex = null;
+    document.getElementById('profile-form-title').textContent = 'Añadir Perfil';
+    document.getElementById('profile-input-name').value = '';
+    
+    document.querySelectorAll('#avatar-choices .avatar-choice-item').forEach((el, i) => {
+        el.classList.toggle('active', i === 0);
+    });
+    document.querySelectorAll('#color-choices .color-choice-item').forEach((el, i) => {
+        el.classList.toggle('active', i === 0);
+    });
+
+    document.getElementById('profile-list-view').style.display = 'none';
+    document.getElementById('profile-form-view').style.display = 'block';
+}
+
+function showEditProfileForm(idx) {
+    currentEditingProfileIndex = idx;
+    const profiles = getProfiles();
+    const p = profiles[idx];
+
+    document.getElementById('profile-form-title').textContent = 'Editar Perfil';
+    document.getElementById('profile-input-name').value = p.name;
+
+    document.querySelectorAll('#avatar-choices .avatar-choice-item').forEach(el => {
+        el.classList.toggle('active', el.textContent.trim() === p.avatar);
+    });
+
+    document.querySelectorAll('#color-choices .color-choice-item').forEach(el => {
+        const elColor = el.getAttribute('data-color');
+        el.classList.toggle('active', elColor === p.color);
+    });
+
+    document.getElementById('profile-list-view').style.display = 'none';
+    document.getElementById('profile-form-view').style.display = 'block';
+}
+
+function selectAvatarChoice(el) {
+    document.querySelectorAll('#avatar-choices .avatar-choice-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+}
+
+function selectColorChoice(el) {
+    document.querySelectorAll('#color-choices .color-choice-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+}
+
+function saveProfileForm() {
+    const name = document.getElementById('profile-input-name').value.trim();
+    if (!name) {
+        showToast('Por favor, ingresa un nombre para el perfil.', 'warning');
+        return;
+    }
+
+    const activeAvatarEl = document.querySelector('#avatar-choices .avatar-choice-item.active');
+    const avatar = activeAvatarEl ? activeAvatarEl.textContent.trim() : '🎓';
+
+    const activeColorEl = document.querySelector('#color-choices .color-choice-item.active');
+    const color = activeColorEl ? activeColorEl.getAttribute('data-color') : '#e50914';
+
+    const profiles = getProfiles();
+
+    if (currentEditingProfileIndex === null) {
+        profiles.push({ name, avatar, color });
+        showToast(`Perfil "${name}" creado exitosamente.`, 'success');
+    } else {
+        profiles[currentEditingProfileIndex] = { name, avatar, color };
+        showToast(`Perfil "${name}" actualizado.`, 'success');
+    }
+
+    saveProfiles(profiles);
+    renderProfileManageList();
+    cancelProfileForm();
+}
+
+function deleteProfile(idx) {
+    const profiles = getProfiles();
+    const name = profiles[idx].name;
+    if (confirm(`¿Estás seguro de que deseas eliminar el perfil de "${name}"?`)) {
+        profiles.splice(idx, 1);
+        saveProfiles(profiles);
+        renderProfileManageList();
+        showToast(`Perfil "${name}" eliminado.`, 'info');
+    }
+}
+
+function cancelProfileForm() {
+    document.getElementById('profile-list-view').style.display = 'block';
+    document.getElementById('profile-form-view').style.display = 'none';
+}
+
 function selectProfile(name, avatarSrc, accentColor) {
     activeProfile = { name, avatarSrc, accentColor };
 
     // Update header avatar
     const headerAvatar = document.getElementById('header-avatar');
     if (headerAvatar) {
-        if (avatarSrc) {
+        const isEmoji = !avatarSrc || (avatarSrc.length <= 2 && !avatarSrc.includes('/'));
+        if (!isEmoji) {
             headerAvatar.outerHTML = `<div class="header-profile-mini-icon" id="header-avatar" style="background:${accentColor}22;" title="${name}">
                 <img src="${avatarSrc}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;" onerror="this.outerHTML='🎓'">
             </div>`;
         } else {
-            headerAvatar.style.background = `${accentColor}22`;
-            headerAvatar.textContent = '👤';
-            headerAvatar.title = name;
+            headerAvatar.outerHTML = `<div class="header-profile-mini-icon" id="header-avatar" style="background:${accentColor}22; display:flex; align-items:center; justify-content:center;" title="${name}">
+                ${avatarSrc || '🎓'}
+            </div>`;
         }
     }
 
@@ -339,10 +531,8 @@ function selectProfile(name, avatarSrc, accentColor) {
         profileScreen.style.display = 'none';
         mainApp.classList.add('visible');
 
-        // Init scroll reveal
         initScrollReveal();
         renderAllMath();
-        // Init Netflix-style video previews
         initCardPreviews();
     }, 800);
 }
@@ -576,7 +766,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> Ecuación: $4x = 48$.</p>
                 <p><span class="step-pill">Paso 4</span> Resolviendo: $x = 12$.</p>
                 <p><span class="step-pill">Paso 5</span> El hijo tiene 12 años y el padre $3(12) = 36$ años. $12 + 36 = 48$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "12 y 36"
         },
         "Intermedio": {
             problem: "Hace 5 años la edad de María era el doble de la de su prima Lucía. Si hoy sus edades suman 40 años, ¿cuántos años tiene María actualmente?",
@@ -586,7 +777,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> $3y + 10 = 40 \\Rightarrow y = 10$.</p>
                 <p><span class="step-pill">Paso 4</span> María = $2(10) + 5 = 25$ años.</p>
                 <p><span class="step-pill">Paso 5</span> $25 + 15 = 40$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "25"
         },
         "Avanzado": {
             problem: "Un abuelo hoy cuadruplica la edad de su nieto. Hace 10 años era el séxtuple. ¿En cuántos años la edad del abuelo será el triple de la del nieto?",
@@ -596,7 +788,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> Buscamos $N$: $100+N = 3(25+N) \\Rightarrow N=12.5$ años.</p>
                 <p><span class="step-pill">Paso 4</span> Las edades futuras serán 37.5 y 112.5 años, cantidades coherentes.</p>
                 <p><span class="step-pill">Paso 5</span> En 12.5 años: Nieto=37.5, Abuelo=112.5. $112.5/37.5=3$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "12.5"
         }
     },
     "Geometría": {
@@ -608,7 +801,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> $L = 9$ cm.</p>
                 <p><span class="step-pill">Paso 4</span> Área: $9^2 = 81$ cm².</p>
                 <p><span class="step-pill">Paso 5</span> Perímetro: $9 \\times 4 = 36$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "81"
         },
         "Intermedio": {
             problem: "El largo de un rectángulo mide 4 metros más que el doble de su ancho. Si el perímetro es de 56 metros, calcula sus lados.",
@@ -618,7 +812,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> $6x + 8 = 56 \\Rightarrow x = 8$.</p>
                 <p><span class="step-pill">Paso 4</span> Ancho = 8 m, Largo = 20 m.</p>
                 <p><span class="step-pill">Paso 5</span> $2(8) + 2(20) = 56$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "8 y 20"
         },
         "Avanzado": {
             problem: "En un triángulo rectángulo, la hipotenusa mide 2 cm más que el cateto mayor, y este 2 cm más que el menor. Determina el área.",
@@ -628,7 +823,78 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> $x^2 - 4x - 12 = 0 \\Rightarrow (x-6)(x+2)=0 \\Rightarrow x=6$.</p>
                 <p><span class="step-pill">Paso 4</span> Catetos: 6 y 8. Área = $\\frac{6 \\times 8}{2} = 24$ cm².</p>
                 <p><span class="step-pill">Paso 5</span> $6^2 + 8^2 = 100 = 10^2$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "24"
+        }
+    },
+    "Móviles": {
+        "Básico": {
+            problem: "Dos autos parten de ciudades a 150 km de distancia y van al encuentro. Uno viaja a 60 km/h y el otro a 40 km/h. ¿En cuántas horas se encontrarán?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo de encuentro = $t$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Distancias: Auto A = $60t$, Auto B = $40t$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $60t + 40t = 150$.</p>
+                <p><span class="step-pill">Paso 4</span> Resolviendo: $100t = 150 \\Rightarrow t = 1.5$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> Se encuentran en 1.5 horas (1 hora y 30 minutos). $60(1.5) + 40(1.5) = 90 + 60 = 150$ ✓</p>
+            </div>`,
+            answer: "1.5"
+        },
+        "Intermedio": {
+            problem: "Un tren viaja a 80 km/h y otro a 100 km/h en la misma dirección. Si el segundo tren sale 1 hora después del primero, ¿en cuántas horas alcanzará al primer tren?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo del segundo tren = $t$ horas. Tiempo del primer tren = $t+1$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Distancias iguales: $80(t+1) = 100t$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $80t + 80 = 100t$.</p>
+                <p><span class="step-pill">Paso 4</span> Resolviendo: $20t = 80 \\Rightarrow t = 4$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> El segundo tren alcanzará al primero en 4 horas. Distancia recorrida = 400 km ✓</p>
+            </div>`,
+            answer: "4"
+        },
+        "Avanzado": {
+            problem: "Un ciclista recorre una distancia de 36 km. Si hubiera viajado a 3 km/h más rápido, habría tardado 1 hora menos. ¿A qué velocidad en km/h viajó?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Velocidad inicial = $v$ km/h. Tiempo = $t = 36/v$.</p>
+                <p><span class="step-pill">Paso 2</span> Nueva condición: $(v + 3)(t - 1) = 36$.</p>
+                <p><span class="step-pill">Paso 3</span> Sustitución: $(v + 3)(\\frac{36}{v} - 1) = 36 \\Rightarrow 36 - v + \\frac{108}{v} - 3 = 36 \\Rightarrow v^2 + 3v - 108 = 0$.</p>
+                <p><span class="step-pill">Paso 4</span> Factorización: $(v - 9)(v + 12) = 0 \\Rightarrow v = 9$ km/h.</p>
+                <p><span class="step-pill">Paso 5</span> La velocidad original fue de 9 km/h. Con 9 km/h tarda 4h; con 12 km/h tarda 3h ✓</p>
+            </div>`,
+            answer: "9"
+        }
+    },
+    "Grifos": {
+        "Básico": {
+            problem: "Un caño A llena una piscina en 4 horas y otro caño B la llena en 6 horas. Si se abren ambos caños a la vez, ¿en cuántas horas se llenará la piscina?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo de llenado conjunto = $t$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Fracción por hora: Caño A = $1/4$, Caño B = $1/6$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $\\frac{1}{4} + \\frac{1}{6} = \\frac{1}{t}$.</p>
+                <p><span class="step-pill">Paso 4</span> Resolviendo: $\\frac{5}{12} = \\frac{1}{t} \\Rightarrow t = 12/5 = 2.4$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> Se llena en 2.4 horas (2 horas y 24 minutos). $\\frac{2.4}{4} + \\frac{2.4}{6} = 0.6 + 0.4 = 1$ (llena) ✓</p>
+            </div>`,
+            answer: "2.4"
+        },
+        "Intermedio": {
+            problem: "Un grifo llena un tanque en 3 horas y un desagüe lo vacía en 5 horas. Si se abren ambos estando el tanque vacío, ¿en cuántas horas se llenará por completo?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo de llenado = $t$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Trabajo por hora: Grifo = $+1/3$, Desagüe = $-1/5$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $\\frac{1}{3} - \\frac{1}{5} = \\frac{1}{t}$.</p>
+                <p><span class="step-pill">Paso 4</span> Resolviendo: $\\frac{2}{15} = \\frac{1}{t} \\Rightarrow t = 7.5$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> El tanque se llenará en 7.5 horas (7 horas y 30 minutos) ✓</p>
+            </div>`,
+            answer: "7.5"
+        },
+        "Avanzado": {
+            problem: "Un tanque se puede llenar por dos caños en 2 horas. Si el primer caño solo tarda 3 horas más que el segundo solo, ¿cuántas horas tardaría el segundo caño solo en llenar el tanque?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo del segundo caño solo = $x$ horas. Tiempo del primer caño solo = $x+3$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Trabajo por hora conjunto: $\\frac{1}{x} + \\frac{1}{x+3} = \\frac{1}{2}$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $\\frac{2x+3}{x(x+3)} = \\frac{1}{2} \\Rightarrow 4x + 6 = x^2 + 3x \\Rightarrow x^2 - x - 6 = 0$.</p>
+                <p><span class="step-pill">Paso 4</span> Factorización: $(x-3)(x+2) = 0 \\Rightarrow x = 3$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> El segundo caño tarda 3 horas. El primero tarda 6 horas. $\\frac{1}{3} + \\frac{1}{6} = \\frac{1}{2}$ ✓</p>
+            </div>`,
+            answer: "3"
         }
     }
 };
@@ -639,7 +905,7 @@ class AIService {
             setTimeout(() => {
                 const group = MOCK_PROBLEMS[topic] || MOCK_PROBLEMS['Edades'];
                 const item = group[difficulty] || group['Básico'];
-                resolve({ problem: item.problem, solution: item.solution });
+                resolve({ problem: item.problem, solution: item.solution, answer: item.answer });
             }, 800);
         });
     }
@@ -746,6 +1012,16 @@ function initRealtimeUplink() {
             clearTimeout(hideTimeout);
             hideTimeout = setTimeout(() => { laser.style.opacity = '0'; }, 1500);
         })
+        .on('broadcast', { event: 'laser-absolute' }, ({ payload }) => {
+            if (!laser) return;
+            laser.style.opacity = '1';
+            laserX = payload.x * window.innerWidth;
+            laserY = payload.y * window.innerHeight;
+            laser.style.left = `${laserX}px`;
+            laser.style.top = `${laserY}px`;
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => { laser.style.opacity = '0'; }, 1500);
+        })
         .on('broadcast', { event: 'navigate' }, ({ payload }) => {
             if (document.getElementById('presenter-overlay').classList.contains('active')) {
                 if (payload.direction === 'next') presenterNext();
@@ -765,6 +1041,122 @@ function initRealtimeUplink() {
         });
 }
 
+// ── Verification Helpers ──────────────────────────────────────────────────────
+function getNumbers(str) {
+    if (!str) return [];
+    const matches = str.match(/\d+(\.\d+)?/g);
+    return matches ? matches.map(Number).sort((a, b) => a - b) : [];
+}
+
+function verifyUserAnswer(userText, expectedText) {
+    const userNums = getNumbers(userText);
+    const expectedNums = getNumbers(expectedText);
+    
+    if (userNums.length === 0 || expectedNums.length === 0) {
+        return userText.toLowerCase().trim() === expectedText.toLowerCase().trim();
+    }
+    
+    if (userNums.length !== expectedNums.length) return false;
+    
+    return userNums.every((num, idx) => Math.abs(num - expectedNums[idx]) < 0.01);
+}
+
+function checkTallerAnswer() {
+    const input = document.getElementById('practice-user-answer');
+    const feedback = document.getElementById('practice-feedback-msg');
+    if (!input || !feedback) return;
+    
+    const userVal = input.value.trim();
+    if (!userVal) {
+        showToast('Por favor, escribe una respuesta primero.', 'warning');
+        return;
+    }
+    
+    if (!lastExpectedAnswer) {
+        showToast('No hay una respuesta esperada registrada para este problema.', 'info');
+        return;
+    }
+    
+    const isCorrect = verifyUserAnswer(userVal, lastExpectedAnswer);
+    
+    feedback.className = 'practice-feedback ' + (isCorrect ? 'success' : 'error');
+    feedback.innerHTML = isCorrect 
+        ? `<i class="fa-solid fa-face-grin-stars"></i> <strong>¡Correcto!</strong> La respuesta es ${lastExpectedAnswer}. ¡Excelente trabajo!`
+        : `<i class="fa-solid fa-face-frown"></i> <strong>Inténtalo de nuevo.</strong> Sigue intentando y revisa tu planteamiento.`;
+        
+    if (isCorrect) {
+        showToast('¡Respuesta Correcta! 🎉', 'success');
+    } else {
+        showToast('Respuesta incorrecta. Inténtalo otra vez.', 'warning');
+    }
+}
+
+// ── Web Speech Synthesis (Lector de Voz) ──────────────────────────────────────
+function speakText(text) {
+    if (!text) {
+        showToast('No hay texto para leer.', 'warning');
+        return;
+    }
+    
+    // Cancelar cualquier audio en curso
+    window.speechSynthesis.cancel();
+    
+    // Limpiar LaTeX para lectura natural
+    const cleanText = text
+        .replace(/\$/g, '')
+        .replace(/\\Rightarrow/g, ' significa ')
+        .replace(/\\quad/g, ' ')
+        .replace(/\\land/g, ' y ')
+        .replace(/\\/g, '')
+        .replace(/=/g, ' es igual a ')
+        .replace(/\+/g, ' más ')
+        .replace(/-/g, ' menos ');
+        
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'es-ES';
+    
+    // Usar la primera voz disponible en español
+    const voices = window.speechSynthesis.getVoices();
+    const esVoice = voices.find(v => v.lang.startsWith('es'));
+    if (esVoice) utterance.voice = esVoice;
+    
+    utterance.rate = 0.95; // Un poco más despacio para mejor comprensión
+    
+    utterance.onerror = (e) => {
+        console.error('SpeechSynthesis error:', e);
+        showToast('Error al reproducir el audio.', 'error');
+    };
+    
+    window.speechSynthesis.speak(utterance);
+    showToast('🔊 Reproduciendo enunciado en voz alta...', 'info');
+}
+
+function checkAIServiceStatus() {
+    const badge = document.getElementById('ai-status-badge');
+    if (!badge) return;
+    
+    if (SUPABASE_CONFIG.useEdgeFunctions && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+        // Realizar un preflight ping (OPTIONS) para comprobar si responde el endpoint
+        fetch(`${SUPABASE_CONFIG.url}/functions/v1/generate-challenge`, {
+            method: 'OPTIONS'
+        }).then(res => {
+            if (res.ok) {
+                badge.className = 'ai-status-badge online';
+                badge.innerHTML = '<i class="fa-solid fa-bolt"></i> Cloud IA (DeepSeek / OpenAI)';
+            } else {
+                badge.className = 'ai-status-badge offline';
+                badge.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> Offline (Simulación)';
+            }
+        }).catch(() => {
+            badge.className = 'ai-status-badge offline';
+            badge.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> Offline (Simulación)';
+        });
+    } else {
+        badge.className = 'ai-status-badge offline';
+        badge.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> Offline (Simulación)';
+    }
+}
+
 // ── AI Button Handlers ────────────────────────────────────────────────────────
 async function generateAIProblem() {
     const diff = document.getElementById('select-diff').value;
@@ -782,10 +1174,28 @@ async function generateAIProblem() {
     try {
         const challenge = await AIService.generateProblem(topic, diff);
         output.innerHTML = `<div>
-            <p style="color:#46d369;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">¡Nuevo Desafío!</p>
-            <p style="color:var(--color-text-secondary);line-height:1.65;">${challenge.problem}</p>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                <p style="color:#46d369;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin:0;">¡Nuevo Desafío!</p>
+                <button class="speaker-btn" style="margin-left:0; width: 30px; height: 30px;" onclick="speakText(document.getElementById('challenge-text').textContent)" title="Escuchar problema">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+            <p id="challenge-text" style="color:var(--color-text-secondary);line-height:1.65;margin-bottom:12px;">${challenge.problem}</p>
+            
+            <!-- Contenedor interactivo de práctica -->
+            <div class="practice-container">
+                <span class="practice-title">📝 ¡Ponte a prueba!</span>
+                <div class="practice-input-row">
+                    <input type="text" id="practice-user-answer" class="practice-input" placeholder="Ingresa tu respuesta (ej: 12 o 20 y 30)..." onkeydown="if(event.key==='Enter') checkTallerAnswer()">
+                    <button class="practice-btn-check" onclick="checkTallerAnswer()">
+                        <i class="fa-solid fa-circle-check"></i> Verificar
+                    </button>
+                </div>
+                <div id="practice-feedback-msg" class="practice-feedback"></div>
+            </div>
         </div>`;
         lastSolutionHtml = challenge.solution;
+        lastExpectedAnswer = challenge.answer || '';
         btnSol.disabled = false;
         setTimeout(() => renderAllMath(), 50);
     } catch (e) {
@@ -1047,9 +1457,22 @@ window.stopAllPreviews = stopAllPreviews;
 window.initCardPreviews = initCardPreviews;
 window.openQRModal = openQRModal;
 window.closeQRModal = closeQRModal;
+window.openProfileManageModal = openProfileManageModal;
+window.closeProfileManageModal = closeProfileManageModal;
+window.showAddProfileForm = showAddProfileForm;
+window.showEditProfileForm = showEditProfileForm;
+window.selectAvatarChoice = selectAvatarChoice;
+window.selectColorChoice = selectColorChoice;
+window.saveProfileForm = saveProfileForm;
+window.deleteProfile = deleteProfile;
+window.cancelProfileForm = cancelProfileForm;
+window.checkTallerAnswer = checkTallerAnswer;
+window.speakText = speakText;
 
 // ── Init on DOM Ready ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initRealtimeUplink();
+    renderProfiles();
+    checkAIServiceStatus();
     renderAllMath();
 });

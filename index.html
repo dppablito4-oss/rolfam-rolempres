@@ -45,49 +45,11 @@
 
     <h1 class="profile-title">¿Quién está aprendiendo hoy?</h1>
 
-    <div class="profiles-grid">
-        <!-- Perfil Samuel -->
-        <div class="profile-card" role="button" tabindex="0" aria-label="Seleccionar perfil de Samuel Pablo"
-             onclick="selectProfile('Samuel Pablo', 'assets/avatar_samuel.png', '#e50914')"
-             onkeydown="if(event.key==='Enter') selectProfile('Samuel Pablo','assets/avatar_samuel.png','#e50914')">
-            <div class="profile-avatar">
-                <img src="assets/avatar_samuel.png" alt="Avatar de Samuel Pablo" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#7b0008,#c0000f);display:flex;align-items:center;justify-content:center;font-size:3rem;\'>🎓</div>'">
-            </div>
-            <span class="profile-name">Samuel Pablo</span>
-        </div>
-
-        <!-- Perfil Integrante 2 -->
-        <div class="profile-card" role="button" tabindex="0" aria-label="Seleccionar perfil de Integrante 2"
-             onclick="selectProfile('Compañero 1', 'assets/avatar_2.png', '#6366f1')"
-             onkeydown="if(event.key==='Enter') selectProfile('Compañero 1','assets/avatar_2.png','#6366f1')">
-            <div class="profile-avatar">
-                <img src="assets/avatar_2.png" alt="Avatar del integrante 2" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#312e81,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:3rem;\'>📐</div>'">
-            </div>
-            <span class="profile-name">Compañero/a 1</span>
-        </div>
-
-        <!-- Perfil Integrante 3 -->
-        <div class="profile-card" role="button" tabindex="0" aria-label="Seleccionar perfil de Integrante 3"
-             onclick="selectProfile('Compañero 2', 'assets/avatar_3.png', '#10b981')"
-             onkeydown="if(event.key==='Enter') selectProfile('Compañero 2','assets/avatar_3.png','#10b981')">
-            <div class="profile-avatar">
-                <img src="assets/avatar_3.png" alt="Avatar del integrante 3" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#064e3b,#059669);display:flex;align-items:center;justify-content:center;font-size:3rem;\'>∑</div>'">
-            </div>
-            <span class="profile-name">Compañero/a 2</span>
-        </div>
-
-        <!-- Perfil Invitado -->
-        <div class="profile-card" role="button" tabindex="0" aria-label="Entrar como invitado"
-             onclick="selectProfile('Invitado', null, '#6d6d6e')"
-             onkeydown="if(event.key==='Enter') selectProfile('Invitado',null,'#6d6d6e')">
-            <div class="profile-avatar-icon" style="background:rgba(109,109,110,0.2); border:3px solid transparent;">
-                <i class="fa-solid fa-user-plus" style="color:#6d6d6e;"></i>
-            </div>
-            <span class="profile-name">Invitado</span>
-        </div>
+    <div class="profiles-grid" id="profiles-grid-container">
+        <!-- Se genera dinámicamente desde JS -->
     </div>
 
-    <button class="profile-manage" onclick="showToast('Funcionalidad en desarrollo para la próxima versión.', 'info')">
+    <button class="profile-manage" onclick="openProfileManageModal()">
         Gestionar perfiles
     </button>
 </div>
@@ -435,8 +397,9 @@
 
         <!-- ── FILA 4: Taller IA ─────────────────────────────────────── -->
         <section id="ai-section" class="reveal" aria-label="Taller Inteligente con IA">
-            <div class="netflix-row-header" style="padding-top: 8px;">
-                <h2 class="netflix-row-title"><i class="fa-solid fa-wand-magic-sparkles" style="color:#46d369;margin-right:8px;"></i>✨ Taller Inteligente con IA</h2>
+            <div class="netflix-row-header" style="padding-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <h2 class="netflix-row-title" style="margin: 0;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#46d369;margin-right:8px;"></i>✨ Taller Inteligente con IA</h2>
+                <span id="ai-status-badge" class="ai-status-badge offline"><i class="fa-solid fa-cloud-slash"></i> Offline (Simulación)</span>
             </div>
 
             <div class="ai-panels">
@@ -459,6 +422,8 @@
                             <select id="select-topic" class="ai-select" aria-label="Seleccionar tema">
                                 <option value="Edades">Edades y Tiempo</option>
                                 <option value="Geometría">Geometría Plana</option>
+                                <option value="Móviles">Móviles (Velocidad)</option>
+                                <option value="Grifos">Grifos (Trabajo)</option>
                             </select>
                         </div>
                     </div>
@@ -488,7 +453,10 @@
                     <div id="ai-analysis-output" role="status" aria-live="polite" class="ai-output-box" style="margin-top:10px;min-height:100px;">
                         El análisis paso a paso aparecerá aquí...
                     </div>
-                    <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+                    <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:8px;align-items:center;">
+                        <button class="speaker-btn" style="margin-left:0; width: 36px; height: 36px;" onclick="speakText(document.getElementById('user-problem-input').value)" title="Escuchar enunciado">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
                         <button onclick="analyzeUserProblem()" id="btn-analyze-ai" class="btn-netflix-red" aria-label="Analizar y resolver el problema ingresado">
                             <i class="fa-solid fa-brain"></i> Resolver con IA ✨
                         </button>
@@ -561,6 +529,59 @@
             <li><span>3</span> Toca el link que aparece</li>
             <li><span>4</span> ¡Listo! Controla las diapositivas desde tu celular</li>
         </ul>
+    </div>
+</div>
+
+<!-- GESTIONAR PERFILES MODAL -->
+<div id="profile-manage-modal" role="dialog" aria-modal="true" aria-label="Gestionar Perfiles" onclick="if(event.target===this)closeProfileManageModal()">
+    <div class="profile-manage-box">
+        <button class="profile-manage-close" onclick="closeProfileManageModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <div class="profile-manage-title">👥 Gestionar Perfiles</div>
+        
+        <div id="profile-list-view">
+            <div class="profile-manage-list" id="profile-manage-list">
+                <!-- Se genera dinámicamente desde JS -->
+            </div>
+            <button class="btn-profile-add" onclick="showAddProfileForm()">
+                <i class="fa-solid fa-plus"></i> Añadir Perfil
+            </button>
+        </div>
+
+        <div id="profile-form-view" style="display: none;">
+            <h3 id="profile-form-title" style="margin-bottom: 16px; font-size: 1rem; font-family: var(--font-heading);">Añadir Perfil</h3>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                    <label for="profile-input-name" style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:6px; font-weight: 600; text-transform: uppercase;">Nombre</label>
+                    <input type="text" id="profile-input-name" class="ai-select" style="margin-bottom:0;" placeholder="Nombre del estudiante">
+                </div>
+                <div>
+                    <label style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:6px; font-weight: 600; text-transform: uppercase;">Avatar / Icono</label>
+                    <div class="avatar-choices" id="avatar-choices" style="display:flex; gap:8px;">
+                        <span class="avatar-choice-item active" onclick="selectAvatarChoice(this)">🎓</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">📐</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">∑</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">🔍</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">🧪</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">💡</span>
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:6px; font-weight: 600; text-transform: uppercase;">Color de Acento</label>
+                    <div class="color-choices" id="color-choices" style="display:flex; gap:12px;">
+                        <span class="color-choice-item active" style="background:#e50914;" data-color="#e50914" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#6366f1;" data-color="#6366f1" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#10b981;" data-color="#10b981" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#f59e0b;" data-color="#f59e0b" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#a78bfa;" data-color="#a78bfa" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#e02424;" data-color="#e02424" onclick="selectColorChoice(this)"></span>
+                    </div>
+                </div>
+                <div style="display:flex; gap:12px; margin-top:12px;">
+                    <button class="btn-netflix-red" onclick="saveProfileForm()" style="flex:1; justify-content:center; padding: 10px;">Guardar</button>
+                    <button class="btn-netflix-grey" onclick="cancelProfileForm()" style="flex:1; justify-content:center; padding: 10px;">Cancelar</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

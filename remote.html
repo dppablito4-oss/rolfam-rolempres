@@ -212,6 +212,67 @@
             font-size: 0.6rem; color: rgba(255,255,255,0.15);
             letter-spacing: 1px; text-transform: uppercase;
         }
+
+        /* Switch UI para el Puntero Absoluto/Relativo */
+        .mando-switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 340px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .mando-switch-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .mando-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+        .mando-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .mando-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #333;
+            transition: .3s;
+            border-radius: 34px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .mando-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .mando-slider {
+            background-color: var(--red);
+        }
+        input:checked + .mando-slider:before {
+            transform: translateX(22px);
+        }
     </style>
 </head>
 <body>
@@ -225,6 +286,13 @@
 
 <div class="trackpad-section">
     <span class="trackpad-label"><i class="fa-solid fa-crosshairs" style="margin-right:6px;"></i>Área del Puntero Láser</span>
+    <div class="mando-switch-container">
+        <span class="mando-switch-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Puntero Absoluto</span>
+        <label class="mando-switch">
+            <input type="checkbox" id="puntero-modo-abs" onchange="togglePunteroModo(this.checked)">
+            <span class="mando-slider"></span>
+        </label>
+    </div>
     <div id="trackpad">
         <div class="trackpad-hint">
             <i class="fa-regular fa-hand-pointer"></i>
@@ -306,6 +374,11 @@ const laserCursor = document.getElementById('laser-cursor');
 let lastTouch = null;
 let throttleTimer = null;
 const THROTTLE_MS = 30; // ~33fps max send rate
+let isAbsoluteMode = false;
+
+function togglePunteroModo(checked) {
+    isAbsoluteMode = checked;
+}
 
 function handleTrackpadMove(clientX, clientY) {
     const rect = trackpad.getBoundingClientRect();
@@ -317,12 +390,18 @@ function handleTrackpadMove(clientX, clientY) {
     laserCursor.style.left  = relX + 'px';
     laserCursor.style.top   = relY + 'px';
 
-    if (lastTouch && throttleTimer === null) {
+    if (throttleTimer === null) {
         throttleTimer = setTimeout(() => { throttleTimer = null; }, THROTTLE_MS);
-        const dx = (clientX - lastTouch.x) / rect.width;
-        const dy = (clientY - lastTouch.y) / rect.height;
-        if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
-            channel.send({ type: 'broadcast', event: 'laser-move', payload: { dx, dy } });
+        if (isAbsoluteMode) {
+            const pctX = relX / rect.width;
+            const pctY = relY / rect.height;
+            channel.send({ type: 'broadcast', event: 'laser-absolute', payload: { x: pctX, y: pctY } });
+        } else if (lastTouch) {
+            const dx = (clientX - lastTouch.x) / rect.width;
+            const dy = (clientY - lastTouch.y) / rect.height;
+            if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
+                channel.send({ type: 'broadcast', event: 'laser-move', payload: { dx, dy } });
+            }
         }
     }
     lastTouch = { x: clientX, y: clientY };
@@ -334,6 +413,9 @@ trackpad.addEventListener('touchstart', (e) => {
     trackpad.classList.add('active');
     const t = e.touches[0];
     lastTouch = { x: t.clientX, y: t.clientY };
+    if (isAbsoluteMode) {
+        handleTrackpadMove(t.clientX, t.clientY);
+    }
 }, { passive: false });
 
 trackpad.addEventListener('touchmove', (e) => {
@@ -352,6 +434,9 @@ trackpad.addEventListener('touchend', (e) => {
 trackpad.addEventListener('mousedown', (e) => {
     trackpad.classList.add('active');
     lastTouch = { x: e.clientX, y: e.clientY };
+    if (isAbsoluteMode) {
+        handleTrackpadMove(e.clientX, e.clientY);
+    }
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 });
