@@ -550,13 +550,14 @@
         backdrop-filter:blur(12px); border-bottom:1px solid rgba(255,255,255,0.07);
     ">
         <div style="font-size:1.4rem; font-weight:800; color:#e50914;">MATH<span style="color:#fff">-FLIX</span> <span style="font-size:0.75rem;color:#f59e0b;font-weight:700;letter-spacing:2px;">TORNEO EN VIVO</span></div>
-        <div style="display:flex;gap:10px;align-items:center;">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <!-- Controles del profesor -->
-            <button onclick="torneoSetPantalla('lobby')"    id="tc-lobby"    style="padding:7px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">🏠 Lobby</button>
-            <button onclick="torneoSetPantalla('pregunta')" id="tc-pregunta" style="padding:7px 14px;background:rgba(229,9,20,0.15);border:1px solid rgba(229,9,20,0.35);color:#e50914;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">▶ Pregunta</button>
-            <button onclick="torneoSetPantalla('leaderboard')" id="tc-lb"   style="padding:7px 14px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">🏆 Ranking</button>
-            <button onclick="torneoSiguientePregunta()" style="padding:7px 14px;background:rgba(84,179,214,0.12);border:1px solid rgba(84,179,214,0.3);color:#54b3d6;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">⏭ Siguiente</button>
-            <button onclick="torneoReset()" style="padding:7px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#6d6d6e;border-radius:8px;font-size:0.72rem;cursor:pointer;">↺ Reset</button>
+            <button onclick="abrirHistorialRondas()" style="padding:7px 14px;background:rgba(84,179,214,0.12);border:1px solid rgba(84,179,214,0.3);color:#54b3d6;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F4CB; Rondas</button>
+            <button onclick="torneoSetPantalla('lobby')"    id="tc-lobby"    style="padding:7px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F3E0; Lobby</button>
+            <button onclick="torneoSetPantalla('pregunta')" id="tc-pregunta" style="padding:7px 14px;background:rgba(229,9,20,0.15);border:1px solid rgba(229,9,20,0.35);color:#e50914;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x25B6; Pregunta</button>
+            <button onclick="torneoSetPantalla('leaderboard')" id="tc-lb"   style="padding:7px 14px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F3C6; Ranking</button>
+            <button onclick="torneoSiguientePregunta()" style="padding:7px 14px;background:rgba(84,179,214,0.12);border:1px solid rgba(84,179,214,0.3);color:#54b3d6;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x23ED; Siguiente</button>
+            <button onclick="torneoReset()" style="padding:7px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#6d6d6e;border-radius:8px;font-size:0.72rem;cursor:pointer;">&#x21BA; Reset</button>
             <button onclick="closeTorneoOverlay()" style="padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#b3b3b3;border-radius:8px;font-size:0.75rem;cursor:pointer;"><i class="fa-solid fa-xmark"></i> Cerrar</button>
         </div>
     </div>
@@ -649,11 +650,19 @@
                 </div>
                 <div id="tdm-nombre" style="font-size:1.1rem;font-weight:800;color:#fff;margin-top:4px;"></div>
             </div>
-            <button onclick="cerrarDetalleAlumnoModal()" style="
-                background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
-                color:#b3b3b3; border-radius:8px; padding:7px 14px;
-                font-size:0.82rem; cursor:pointer;
-            "><i class="fa-solid fa-xmark"></i> Cerrar</button>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button onclick="editarPuntajeAlumnoManual()" style="
+                    background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3);
+                    color:#f59e0b; border-radius:8px; padding:7px 14px;
+                    font-size:0.78rem; font-weight:700; cursor:pointer;
+                    display:flex;align-items:center;gap:6px;
+                "><i class="fa-solid fa-pen"></i> Editar Nota</button>
+                <button onclick="cerrarDetalleAlumnoModal()" style="
+                    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+                    color:#b3b3b3; border-radius:8px; padding:7px 14px;
+                    font-size:0.82rem; cursor:pointer;
+                "><i class="fa-solid fa-xmark"></i> Cerrar</button>
+            </div>
         </div>
 
         <!-- Cuerpo del modal -->
@@ -717,6 +726,38 @@
 <style>
 @keyframes torneoFadeIn { from{ opacity:0; transform:scale(0.96) translateY(10px); } to{ opacity:1; transform:none; } }
 </style>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- MODAL: HISTORIAL DE RONDAS                                               -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div id="torneo-historial-modal" onclick="if(event.target===this)cerrarHistorialRondas()" style="
+    display:none; position:fixed; inset:0; z-index:9200;
+    background:rgba(0,0,0,0.88); backdrop-filter:blur(10px);
+    align-items:center; justify-content:center; padding:20px;
+">
+    <div style="
+        background:#141414; border:1px solid rgba(255,255,255,0.1);
+        border-radius:20px; width:100%; max-width:680px;
+        max-height:80vh; overflow:auto;
+        display:flex; flex-direction:column;
+        box-shadow:0 30px 80px rgba(0,0,0,0.7);
+        animation:torneoFadeIn 0.3s ease;
+    ">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 28px 0;flex-shrink:0;">
+            <div>
+                <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#54b3d6;">Historial</div>
+                <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-top:4px;">&#x1F4CB; Rondas Archivadas</div>
+            </div>
+            <button onclick="cerrarHistorialRondas()" style="
+                background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+                color:#b3b3b3;border-radius:8px;padding:7px 14px;font-size:0.82rem;cursor:pointer;
+            "><i class="fa-solid fa-xmark"></i> Cerrar</button>
+        </div>
+        <!-- Lista -->
+        <div id="historial-rondas-list" style="display:flex;flex-direction:column;gap:10px;padding:20px 28px 28px;"></div>
+    </div>
+</div>
 
 <!-- GESTIONAR PERFILES MODAL -->
 <div id="profile-manage-modal" role="dialog" aria-modal="true" aria-label="Gestionar Perfiles" onclick="if(event.target===this)closeProfileManageModal()">

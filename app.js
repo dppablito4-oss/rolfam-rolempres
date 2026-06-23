@@ -1578,6 +1578,7 @@ let torneoEstado = { pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_res
 let torneoTimerInterval = null;
 let torneoParticipantes = [];
 let torneoRespuestasActuales = 0;
+let _remoteKeyActual = null;
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initTorneo() {
@@ -1625,8 +1626,21 @@ async function openTorneoOverlay() {
     // Generar QR para torneo.html
     const base      = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
     const torneoURL = base + 'torneo.html';
+    
+    // Generar/obtener clave de seguridad del mando
+    _remoteKeyActual = await _generarObtenerRemoteKey();
+    const remoteURL = base + 'remote.html?key=' + encodeURIComponent(_remoteKeyActual);
+
     document.getElementById('torneo-qr-img').src  = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=141414&bgcolor=ffffff&data=${encodeURIComponent(torneoURL)}`;
     document.getElementById('torneo-qr-url').textContent = torneoURL;
+
+    // Si existe un QR para el mando en el overlay, actualizarlo
+    const remoteQrImg = document.getElementById('torneo-remote-qr-img');
+    if (remoteQrImg) {
+        remoteQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=141414&bgcolor=ffffff&data=${encodeURIComponent(remoteURL)}`;
+    }
+    const remoteQrUrl = document.getElementById('torneo-remote-qr-url');
+    if (remoteQrUrl) remoteQrUrl.textContent = remoteURL;
 
     // Cargar estado actual
     if (supabaseClient) {
@@ -1707,12 +1721,13 @@ async function _torneoRenderPregunta(estado) {
     document.getElementById('torneo-p-badge').textContent = `Pregunta ${pid}`;
     document.getElementById('torneo-p-texto').textContent  = textoFinal;
 
-    // Contar respuestas de esta pregunta
+    // Contar SOLO respuestas procesadas (evaluadas por la IA) de esta pregunta
     if (supabaseClient) {
         const { count } = await supabaseClient
             .from('respuestas')
             .select('*', { count: 'exact', head: true })
-            .eq('pregunta_id', pid);
+            .eq('pregunta_id', pid)
+            .eq('procesado', true);
         torneoRespuestasActuales = count || 0;
     }
     _torneoActualizarContadorRespuestas();
@@ -1826,8 +1841,16 @@ async function torneoSiguientePregunta() {
 }
 
 async function torneoReset() {
-    if (!confirm('¿Resetear el torneo completo? Esto borrará respuestas y puntajes.')) return;
     if (!supabaseClient) return;
+    const nombreRonda = prompt('¿Cómo quieres llamar a esta ronda antes de limpiar? (ej: Ronda 1, Etapa A)\nEscribe el nombre o cancela para no archivar.');
+    if (nombreRonda === null) return; // Cancelado
+
+    if (!confirm('¿Resetear el torneo? Esto borrará respuestas y reiniciará puntajes a 0. Los datos serán archivados si ingresaste un nombre.')) return;
+
+    // Archivar ronda antes de borrar (si se ingresó nombre)
+    if (nombreRonda.trim()) {
+        await archivarRondaActual(nombreRonda.trim());
+    }
 
     await supabaseClient.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     await supabaseClient.from('participantes').update({ puntaje: 0 }).neq('id', '00000000-0000-0000-0000-000000000000');
@@ -1837,7 +1860,7 @@ async function torneoReset() {
     torneoRespuestasActuales = 0;
     _torneoRenderPanel(torneoEstado);
     await _torneoRecargarParticipantes();
-    showToast('Torneo reseteado correctamente', 'info');
+    showToast(nombreRonda.trim() ? `Ronda "${nombreRonda.trim()}" archivada y torneo reseteado.` : 'Torneo reseteado correctamente', 'info');
 }
 
 // ── Global bindings (torneo) ─────────────────────────────────────────────────
@@ -1902,4 +1925,136 @@ async function abrirDetalleAlumno(participanteId, nombre) {
 function cerrarDetalleAlumnoModal() {
     const modal = document.getElementById('torneo-detalle-alumno-modal');
     if (modal) modal.style.display = 'none';
+}
+
+// ── Global bindings extras (nuevas funciones) ──────────────────────────────────
+window.editarPuntajeAlumnoManual = editarPuntajeAlumnoManual;
+window.abrirHistorialRondas      = abrirHistorialRondas;
+window.cerrarHistorialRondas     = cerrarHistorialRondas;
+window.exportarRondaPDF          = exportarRondaPDF;
+
+// ── Seguridad del mando a distancia ─────────────────────────────────────────────
+async function _generarObtenerRemoteKey() {
+    if (!supabaseClient) return 'no-key';
+    const { data } = await supabaseClient.from('estado_juego').select('remote_key').eq('id', 'global').single();
+    if (data?.remote_key) return data.remote_key;
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    const newKey = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+    await supabaseClient.from('estado_juego').update({ remote_key: newKey }).eq('id', 'global');
+    return newKey;
+}
+
+// ── Archivar ronda actual en Supabase ────────────────────────────────────────────
+async function archivarRondaActual(nombreRonda) {
+    if (!supabaseClient) return;
+    const pregId = torneoEstado.pregunta_actual_id || 1;
+    const { data: ronda, error } = await supabaseClient
+        .from('historial_rondas').insert({ nombre_ronda: nombreRonda, pregunta_id: pregId }).select().single();
+    if (error || !ronda) { showToast('Error archivando ronda: ' + (error?.message || ''), 'error'); return; }
+
+    const { data: respuestas } = await supabaseClient.from('respuestas')
+        .select('*, participantes(nombre, puntaje)').eq('procesado', true);
+
+    if (respuestas?.length) {
+        const histRows = respuestas.map(r => ({
+            ronda_id: ronda.id, nombre_alumno: r.participantes?.nombre || 'Desconocido',
+            pregunta_id: r.pregunta_id, puntaje_asignado: r.puntaje_asignado,
+            feedback: r.feedback, transcripcion_interna: r.transcripcion_interna, url_foto: r.url_foto
+        }));
+        await supabaseClient.from('historial_respuestas').insert(histRows);
+    }
+}
+
+// ── Modal: Historial de Rondas ───────────────────────────────────────────────────
+async function abrirHistorialRondas() {
+    const modal = document.getElementById('torneo-historial-modal');
+    if (!modal || !supabaseClient) return;
+    modal.style.display = 'flex';
+    const list = document.getElementById('historial-rondas-list');
+    if (!list) return;
+    list.innerHTML = '<div style="color:#6d6d6e;font-size:0.85rem;text-align:center;padding:24px;">Cargando...</div>';
+
+    const { data: rondas } = await supabaseClient.from('historial_rondas').select('*').order('archivado_at', { ascending: false });
+    if (!rondas?.length) {
+        list.innerHTML = '<div style="color:#6d6d6e;font-size:0.85rem;text-align:center;padding:24px;">Aún no hay rondas archivadas.</div>';
+        return;
+    }
+    list.innerHTML = rondas.map(r => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
+                    background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;gap:12px;">
+            <div>
+                <div style="font-size:0.88rem;font-weight:700;color:#fff;">${r.nombre_ronda}</div>
+                <div style="font-size:0.65rem;color:#6d6d6e;margin-top:2px;">Pregunta ${r.pregunta_id} · ${new Date(r.archivado_at).toLocaleString()}</div>
+            </div>
+            <button onclick="exportarRondaPDF('${r.id}','${r.nombre_ronda.replace(/'/g,'').replace(/"/g,'')}')" style="
+                flex-shrink:0;padding:6px 14px;background:rgba(229,9,20,0.15);border:1px solid rgba(229,9,20,0.3);
+                color:#e50914;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+                <i class="fa-solid fa-file-pdf"></i> PDF</button>
+        </div>`).join('');
+}
+
+function cerrarHistorialRondas() {
+    const modal = document.getElementById('torneo-historial-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function exportarRondaPDF(rondaId, nombreRonda) {
+    if (!supabaseClient) return;
+    const { data: respuestas } = await supabaseClient.from('historial_respuestas').select('*')
+        .eq('ronda_id', rondaId).order('puntaje_asignado', { ascending: false });
+    const win = window.open('', '_blank');
+    if (!win) { showToast('Permite ventanas emergentes para exportar PDF', 'error'); return; }
+    const rows = (respuestas || []).map((r, i) => `<tr>
+        <td>${i+1}</td><td>${r.nombre_alumno}</td><td>P${r.pregunta_id}</td>
+        <td style="font-weight:800;color:${r.puntaje_asignado>=4?'#16a34a':r.puntaje_asignado>=2?'#d97706':'#dc2626'}">${r.puntaje_asignado??'-'}/5</td>
+        <td>${r.transcripcion_interna||'-'}</td><td>${r.feedback||'-'}</td>
+        ${r.url_foto?`<td><img src="${r.url_foto}" style="max-width:100px;border-radius:6px;"></td>`:'<td>-</td>'}
+    </tr>`).join('');
+    win.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Ronda: ${nombreRonda}</title><style>
+        body{font-family:'Segoe UI',sans-serif;margin:32px;color:#111}
+        h1{font-size:1.5rem;color:#e50914;margin-bottom:4px}
+        h2{font-size:.85rem;color:#555;margin-bottom:24px;font-weight:400}
+        table{width:100%;border-collapse:collapse;font-size:.82rem}
+        th{background:#f3f3f3;padding:10px 12px;text-align:left;border-bottom:2px solid #ddd}
+        td{padding:10px 12px;border-bottom:1px solid #eee;vertical-align:top}
+        tr:nth-child(even){background:#fafafa}
+        @media print{body{margin:16px}}</style></head><body>
+        <h1>&#x1F3C6; Math-Flix — ${nombreRonda}</h1>
+        <h2>Archivado: ${new Date().toLocaleString()}</h2>
+        <table><thead><tr><th>#</th><th>Alumno</th><th>Pregunta</th><th>Puntaje</th><th>Transcripción IA</th><th>Feedback</th><th>Foto</th></tr></thead>
+        <tbody>${rows}</tbody></table>
+        <script>window.onload=()=>window.print()<\/script></body></html>`);
+    win.document.close();
+}
+
+// ── Edición manual de puntaje ────────────────────────────────────────────────────
+let _detalleAlumnoActual = { id: null, nombre: null, puntajeActual: 0, respuestaId: null };
+
+async function editarPuntajeAlumnoManual() {
+    const { id, nombre, puntajeActual, respuestaId } = _detalleAlumnoActual;
+    if (!id || !supabaseClient) return;
+    const input = prompt(`Editar calificación de ${nombre}\n(0 a 5 puntos)`, puntajeActual);
+    if (input === null) return;
+    const nuevoPuntaje = parseInt(input);
+    if (isNaN(nuevoPuntaje) || nuevoPuntaje < 0 || nuevoPuntaje > 5) {
+        showToast('El puntaje debe ser un número entre 0 y 5', 'error'); return;
+    }
+    const diff = nuevoPuntaje - puntajeActual;
+    if (respuestaId) await supabaseClient.from('respuestas').update({ puntaje_asignado: nuevoPuntaje }).eq('id', respuestaId);
+    if (diff !== 0) await supabaseClient.rpc('sumar_puntaje_alumno', { alumno_id: id, puntos: diff });
+
+    _detalleAlumnoActual.puntajeActual = nuevoPuntaje;
+    const puntajeEl = document.getElementById('tdm-puntaje');
+    if (puntajeEl) {
+        puntajeEl.textContent = nuevoPuntaje;
+        const sc = { 5:'#46d369', 4:'#46d369', 3:'#f59e0b', 2:'#e50914', 1:'#e50914', 0:'#e50914' };
+        puntajeEl.style.color = sc[nuevoPuntaje] || '#b3b3b3';
+    }
+    const labelEl = document.getElementById('tdm-pregunta-label');
+    if (labelEl) labelEl.textContent = labelEl.textContent.replace(/\d+\/5/, `${nuevoPuntaje}/5`);
+
+    showToast(`Puntaje de ${nombre} actualizado a ${nuevoPuntaje}/5`, 'success');
+    await _torneoRecargarParticipantes();
+    if (torneoEstado.pantalla_actual === 'leaderboard') _torneoRenderLeaderboard();
 }

@@ -1046,6 +1046,7 @@ function setStep(id, state) {
 async function enviarRespuesta() {
     if (!archivoSeleccionado || !alumnoId) return;
 
+    let respuestaIdInsertado = null; // Track insertion so we can rollback on AI error
     const btnEnviar   = document.getElementById('btn-enviar');
     const uploadZone  = document.getElementById('upload-zone');
     const statusCard  = document.getElementById('status-card');
@@ -1092,6 +1093,7 @@ async function enviarRespuesta() {
             .single();
 
         if (insertErr) throw insertErr;
+        respuestaIdInsertado = respuesta.id; // Track so we can delete if AI fails
 
         // PASO 4 — Disparar Edge Function (esperamos por si hay error en la llamada)
         const funcRes = await fetch(`${EDGE_BASE}/evaluar-matematica`, {
@@ -1116,7 +1118,12 @@ async function enviarRespuesta() {
         setTimeout(verificarResultadoManual, 30000, respuesta.id);
 
     } catch (err) {
-        alert('Error al enviar: ' + err.message);
+        // Si ya insertamos una respuesta pero la IA falló, eliminarla para desbloquear al alumno
+        if (respuestaIdInsertado) {
+            await sbClient.from('respuestas').delete().eq('id', respuestaIdInsertado).catch(() => {});
+            respuestaIdInsertado = null;
+        }
+        alert('Error al enviar: ' + err.message + '\n\nPuedes volver a intentarlo.');
         btnEnviar.disabled = false;
         uploadZone.style.display = 'flex';
         statusCard.style.display = 'none';
