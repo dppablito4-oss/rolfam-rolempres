@@ -1024,6 +1024,23 @@ function initRealtimeUplink() {
             clearTimeout(hideTimeout);
             hideTimeout = setTimeout(() => { laser.style.opacity = '0'; }, 1500);
         })
+        .on('broadcast', { event: 'laser-click' }, () => {
+            const el = document.elementFromPoint(laserX, laserY);
+            if (el) {
+                el.click();
+                if (typeof el.focus === 'function') {
+                    el.focus();
+                }
+            }
+        })
+        .on('broadcast', { event: 'scroll' }, ({ payload }) => {
+            const slideView = document.querySelector('.presenter-slide-view');
+            if (slideView && document.getElementById('presenter-overlay').classList.contains('active')) {
+                slideView.scrollBy(0, payload.dy);
+            } else {
+                window.scrollBy(0, payload.dy);
+            }
+        })
         .on('broadcast', { event: 'navigate' }, ({ payload }) => {
             if (document.getElementById('presenter-overlay').classList.contains('active')) {
                 if (payload.direction === 'next') presenterNext();

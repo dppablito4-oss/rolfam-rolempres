@@ -81,8 +81,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px 20px 10px;
-            gap: 14px;
+            padding: 14px 20px 8px;
+            gap: 10px;
+            width: 100%;
         }
 
         .trackpad-label {
@@ -90,10 +91,18 @@
             text-transform: uppercase; color: var(--muted);
         }
 
-        #trackpad {
+        /* Container of trackpad + scrollpad */
+        .trackpad-container {
             width: 100%;
             max-width: 340px;
-            aspect-ratio: 4 / 3;
+            height: 250px; /* Taller touchpad region */
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        #trackpad {
+            flex: 1;
             background: var(--card);
             border: 2px solid var(--border);
             border-radius: 20px;
@@ -131,7 +140,7 @@
             background: var(--red);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 16px 6px rgba(229,9,20,0.6);
+            box-shadow: 0 0 16px 6px rgba(229,9,20,0.65);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.2s;
@@ -139,33 +148,53 @@
         }
         #trackpad.active #laser-cursor { opacity: 1; }
 
-        /* ── Nav Buttons ────────────────────────────────────────── */
-        .nav-section {
-            padding: 0 20px 16px;
+        /* Scroll pad slider next to trackpad */
+        #scrollpad {
+            width: 55px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            position: relative;
+            touch-action: none;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #scrollpad.active {
+            border-color: rgba(229,9,20,0.6);
+            box-shadow: 0 0 20px rgba(229,9,20,0.15);
+        }
+
+        /* ── Nav Buttons ────────────────────────────────────────── */
+        .nav-section {
+            padding: 0 20px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .nav-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 8px;
         }
 
         .btn {
             display: flex; align-items: center; justify-content: center;
-            gap: 10px;
-            padding: 18px 12px;
-            border: none; border-radius: 14px;
+            gap: 8px;
+            padding: 12px 10px; /* More compact buttons */
+            border: none; border-radius: 12px;
             font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem; font-weight: 700;
+            font-size: 0.82rem; font-weight: 700;
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.2s, opacity 0.2s;
             -webkit-tap-highlight-color: transparent;
             letter-spacing: 0.3px;
         }
-        .btn:active { transform: scale(0.94); }
+        .btn:active { transform: scale(0.95); }
 
         .btn-prev {
             background: var(--card);
@@ -186,8 +215,8 @@
             color: var(--muted);
             border: 1px solid var(--border);
             grid-column: 1 / -1;
-            padding: 12px;
-            font-size: 0.78rem;
+            padding: 10px;
+            font-size: 0.72rem;
         }
 
         .btn:hover { opacity: 0.88; }
@@ -293,12 +322,19 @@
             <span class="mando-slider"></span>
         </label>
     </div>
-    <div id="trackpad">
-        <div class="trackpad-hint">
-            <i class="fa-regular fa-hand-pointer"></i>
-            <p>Desliza el dedo aquí</p>
+    <div class="trackpad-container">
+        <div id="trackpad">
+            <div class="trackpad-hint">
+                <i class="fa-regular fa-hand-pointer"></i>
+                <p>Desliza el dedo aquí</p>
+            </div>
+            <div id="laser-cursor"></div>
         </div>
-        <div id="laser-cursor"></div>
+        <div id="scrollpad">
+            <i class="fa-solid fa-chevron-up" style="color: rgba(255,255,255,0.15);"></i>
+            <span style="font-size: 0.55rem; color: rgba(255,255,255,0.2); font-weight: bold; writing-mode: vertical-lr; text-transform: uppercase; letter-spacing: 2px;">Scroll</span>
+            <i class="fa-solid fa-chevron-down" style="color: rgba(255,255,255,0.15);"></i>
+        </div>
     </div>
     <span style="font-size:0.62rem;color:rgba(255,255,255,0.2);letter-spacing:1px;">ARRASTRAR = MOVER PUNTERO</span>
 </div>
@@ -445,11 +481,35 @@ function handleTrackpadMove(clientX, clientY) {
     lastTouch = { x: clientX, y: clientY };
 }
 
+// Click & Scroll & Move handling for Trackpad + Scrollpad
+let touchStartTime = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+let hasMovedSignificant = false;
+
+function triggerTrackpadRipple(clientX, clientY) {
+    const rect = trackpad.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.background = 'rgba(229,9,20,0.4)';
+    ripple.style.width = ripple.style.height = '40px';
+    ripple.style.left = (x - 20) + 'px';
+    ripple.style.top = (y - 20) + 'px';
+    trackpad.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+}
+
 // Touch events
 trackpad.addEventListener('touchstart', (e) => {
     e.preventDefault();
     trackpad.classList.add('active');
     const t = e.touches[0];
+    touchStartTime = Date.now();
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    hasMovedSignificant = false;
     lastTouch = { x: t.clientX, y: t.clientY };
     if (isAbsoluteMode) {
         handleTrackpadMove(t.clientX, t.clientY);
@@ -459,18 +519,35 @@ trackpad.addEventListener('touchstart', (e) => {
 trackpad.addEventListener('touchmove', (e) => {
     e.preventDefault();
     const t = e.touches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        hasMovedSignificant = true;
+    }
     handleTrackpadMove(t.clientX, t.clientY);
 }, { passive: false });
 
 trackpad.addEventListener('touchend', (e) => {
     e.preventDefault();
     trackpad.classList.remove('active');
+    
+    // Tap detection (<250ms and small movement)
+    const duration = Date.now() - touchStartTime;
+    if (!hasMovedSignificant && duration < 250) {
+        channel.send({ type: 'broadcast', event: 'laser-click', payload: {} });
+        triggerTrackpadRipple(touchStartX, touchStartY);
+    }
+    
     lastTouch = null;
 }, { passive: false });
 
 // Mouse events (for testing on desktop)
 trackpad.addEventListener('mousedown', (e) => {
     trackpad.classList.add('active');
+    touchStartTime = Date.now();
+    touchStartX = e.clientX;
+    touchStartY = e.clientY;
+    hasMovedSignificant = false;
     lastTouch = { x: e.clientX, y: e.clientY };
     if (isAbsoluteMode) {
         handleTrackpadMove(e.clientX, e.clientY);
@@ -480,14 +557,53 @@ trackpad.addEventListener('mousedown', (e) => {
 });
 
 function onMouseMove(e) {
+    const dx = e.clientX - touchStartX;
+    const dy = e.clientY - touchStartY;
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        hasMovedSignificant = true;
+    }
     handleTrackpadMove(e.clientX, e.clientY);
 }
-function onMouseUp() {
+
+function onMouseUp(e) {
     trackpad.classList.remove('active');
+    
+    const duration = Date.now() - touchStartTime;
+    if (!hasMovedSignificant && duration < 250) {
+        channel.send({ type: 'broadcast', event: 'laser-click', payload: {} });
+        triggerTrackpadRipple(e.clientX, e.clientY);
+    }
+    
     lastTouch = null;
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseup', onMouseUp);
 }
+
+// Scrollpad events
+const scrollpad = document.getElementById('scrollpad');
+let lastScrollTouchY = null;
+
+scrollpad.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    scrollpad.classList.add('active');
+    lastScrollTouchY = e.touches[0].clientY;
+}, { passive: false });
+
+scrollpad.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (lastScrollTouchY !== null) {
+        const currentY = e.touches[0].clientY;
+        const dy = (currentY - lastScrollTouchY) * 2.5; // Scroll speed multiplier
+        channel.send({ type: 'broadcast', event: 'scroll', payload: { dy: dy } });
+        lastScrollTouchY = currentY;
+    }
+}, { passive: false });
+
+scrollpad.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    scrollpad.classList.remove('active');
+    lastScrollTouchY = null;
+}, { passive: false });
 
 // ── Ripple Effect ────────────────────────────────────────────────────────────
 function rippleEffect(btn) {
