@@ -33,11 +33,12 @@ CREATE POLICY "Inserción anónima de retos"
 
 -- 1. Tabla de Estado del Juego (controla la pantalla global proyectada)
 CREATE TABLE IF NOT EXISTS public.estado_juego (
-    id                  TEXT PRIMARY KEY DEFAULT 'global',
-    pantalla_actual     TEXT NOT NULL DEFAULT 'lobby', -- 'lobby' | 'pregunta' | 'leaderboard'
-    pregunta_actual_id  INT  DEFAULT 1,
-    tiempo_restante     INT  DEFAULT 60,
-    updated_at          TIMESTAMPTZ DEFAULT NOW()
+    id                     TEXT PRIMARY KEY DEFAULT 'global',
+    pantalla_actual        TEXT NOT NULL DEFAULT 'lobby', -- 'lobby' | 'pregunta' | 'leaderboard'
+    pregunta_actual_id     INT  DEFAULT 1,
+    tiempo_restante        INT  DEFAULT 60,
+    pregunta_custom_texto  TEXT,
+    updated_at             TIMESTAMPTZ DEFAULT NOW()
 );
 
 ALTER TABLE public.estado_juego ENABLE ROW LEVEL SECURITY;
@@ -72,14 +73,16 @@ CREATE POLICY "Actualización anónima puntajes"  ON public.participantes FOR UP
 
 -- 3. Tabla de Respuestas enviadas (fotos + calificación de OpenAI)
 CREATE TABLE IF NOT EXISTS public.respuestas (
-    id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    participante_id   UUID        REFERENCES public.participantes(id) ON DELETE CASCADE,
-    pregunta_id       INT         NOT NULL,
-    url_foto          TEXT        NOT NULL,
-    puntaje_asignado  INT         DEFAULT 0,
-    feedback          TEXT,
-    procesado         BOOLEAN     DEFAULT FALSE,
-    created_at        TIMESTAMPTZ DEFAULT NOW()
+    id                    UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    participante_id       UUID        REFERENCES public.participantes(id) ON DELETE CASCADE,
+    pregunta_id           INT         NOT NULL,
+    url_foto              TEXT        NOT NULL,
+    puntaje_asignado      INT         DEFAULT 0,
+    feedback              TEXT,
+    transcripcion_interna TEXT,
+    procesado             BOOLEAN     DEFAULT FALSE,
+    created_at            TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT unique_participante_pregunta UNIQUE (participante_id, pregunta_id)
 );
 
 ALTER TABLE public.respuestas ENABLE ROW LEVEL SECURITY;

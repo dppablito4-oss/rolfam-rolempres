@@ -283,6 +283,86 @@
             letter-spacing: 1px; text-transform: uppercase;
             border-top: 1px solid var(--border);
         }
+
+        /* ── Ya Entregaste / Tiempo Expirado ──────────────────────── */
+        .blocked-notice {
+            width: 100%; max-width: 420px;
+            background: rgba(229,9,20,0.08);
+            border: 1px solid rgba(229,9,20,0.25);
+            border-radius: 16px; padding: 28px 20px;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 14px;
+            animation: fadeIn 0.4s ease;
+        }
+        .blocked-notice .blocked-icon { font-size: 3rem; }
+        .blocked-notice .blocked-title {
+            font-size: 1rem; font-weight: 700; color: var(--red);
+        }
+        .blocked-notice .blocked-sub {
+            font-size: 0.8rem; color: var(--muted); line-height: 1.6;
+        }
+        .expired-notice {
+            width: 100%; max-width: 420px;
+            background: rgba(109,109,110,0.10);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 28px 20px;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 14px;
+            animation: fadeIn 0.4s ease;
+        }
+        .expired-notice .exp-icon { font-size: 3rem; }
+        .expired-notice .exp-title {
+            font-size: 1rem; font-weight: 700; color: var(--muted);
+        }
+        .expired-notice .exp-sub {
+            font-size: 0.8rem; color: var(--faint); line-height: 1.6;
+        }
+
+        /* ── Editor de Imagen Canvas ──────────────────────────────── */
+        .editor-wrap {
+            width: 100%; max-width: 420px;
+            background: var(--card2); border: 1px solid var(--border);
+            border-radius: 14px; overflow: hidden;
+            position: relative; display: none;
+        }
+        .editor-canvas-container {
+            position: relative; width: 100%;
+            touch-action: none; user-select: none;
+        }
+        #editor-base-canvas {
+            display: block; width: 100%; height: auto;
+            max-height: 300px; object-fit: contain;
+        }
+        #editor-overlay-canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            touch-action: none;
+        }
+        .editor-toolbar {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            gap: 8px; padding: 10px 12px;
+            border-top: 1px solid var(--border);
+            background: rgba(0,0,0,0.3);
+        }
+        .editor-btn {
+            flex: 1; padding: 9px 6px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px; color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.72rem; font-weight: 600;
+            cursor: pointer; transition: background 0.15s;
+            display: flex; align-items: center;
+            justify-content: center; gap: 5px;
+        }
+        .editor-btn:active { background: rgba(255,255,255,0.14); }
+        .editor-btn.confirm {
+            background: rgba(229,9,20,0.2);
+            border-color: rgba(229,9,20,0.4);
+            color: var(--red);
+        }
+        .editor-btn.confirm:active { background: rgba(229,9,20,0.3); }
     </style>
 </head>
 <body>
@@ -348,15 +428,47 @@
             <div class="pregunta-texto" id="pregunta-texto">Cargando enunciado...</div>
         </div>
 
-        <!-- Upload zone -->
-        <div class="upload-zone" id="upload-zone">
-            <input type="file" id="foto-input" accept="image/*" capture="environment" onchange="handleFotoSeleccionada(event)">
+        <!-- Bloqueo: ya entregó para esta pregunta -->
+        <div class="blocked-notice" id="blocked-notice" style="display:none;">
+            <div class="blocked-icon">✅</div>
+            <div class="blocked-title">¡Solución enviada!</div>
+            <div class="blocked-sub">Ya enviaste tu respuesta para esta pregunta.<br>Espera los resultados o la siguiente pregunta.</div>
+        </div>
+
+        <!-- Bloqueo: tiempo expirado -->
+        <div class="expired-notice" id="expired-notice" style="display:none;">
+            <div class="exp-icon">⏰</div>
+            <div class="exp-title">Tiempo expirado</div>
+            <div class="exp-sub">Lo sentimos, el tiempo para subir tu solución a esta pregunta ha terminado. Espera la siguiente pregunta.</div>
+        </div>
+
+        <!-- Upload zone (solo visible si no bloqueado) -->
+        <div class="upload-zone" id="upload-zone" onclick="triggerFileInput()">
+            <input type="file" id="foto-input" accept="image/*" capture="environment"
+                   onchange="handleFotoSeleccionada(event)" style="display:none;">
             <div class="upload-icon"><i class="fa-solid fa-camera"></i></div>
             <div class="upload-label">Toca aquí para tomar/subir tu foto</div>
             <div class="upload-hint">Asegúrate que el procedimiento sea legible</div>
         </div>
 
-        <img id="preview-img" alt="Vista previa de tu solución">
+        <!-- Editor de imagen: rotar + recortar -->
+        <div class="editor-wrap" id="editor-wrap">
+            <div class="editor-canvas-container" id="editor-canvas-container">
+                <canvas id="editor-base-canvas"></canvas>
+                <canvas id="editor-overlay-canvas"></canvas>
+            </div>
+            <div class="editor-toolbar">
+                <button class="editor-btn" onclick="editorRotar()">
+                    <i class="fa-solid fa-rotate-right"></i> Rotar
+                </button>
+                <button class="editor-btn" id="btn-toggle-crop" onclick="editorToggleCrop()">
+                    <i class="fa-solid fa-crop-simple"></i> Recortar
+                </button>
+                <button class="editor-btn confirm" onclick="editorConfirmar()">
+                    <i class="fa-solid fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
 
         <div class="status-card" id="status-card" style="display:none;">
             <div class="status-step" id="step-comprimiendo">
@@ -416,11 +528,12 @@ const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ── Estado local ─────────────────────────────────────────────────────────────
 let alumnoId   = localStorage.getItem('torneo_alumno_id')   || null;
 let alumnoNom  = localStorage.getItem('torneo_alumno_nom')  || null;
-let archivoSeleccionado = null;
+let archivoSeleccionado = null;  // Blob o File a enviar (puede ser el editado por canvas)
 let timerInterval = null;
 let preguntaActualId = 1;
+let tiempoExpirado   = false;
 
-// Banco de preguntas sincronizado con app.js (se puede ampliar)
+// Banco de preguntas sincronizado con app.js
 const PREGUNTAS_TORNEO = [
     { id: 1, texto: 'Resolver: La suma de tres números consecutivos es 72. Halla los números.' },
     { id: 2, texto: 'Resolver: El doble de un número aumentado en 5 es igual a 21. Encuentra el número.' },
@@ -428,6 +541,222 @@ const PREGUNTAS_TORNEO = [
     { id: 4, texto: 'Resolver: En un rectángulo el largo es 4 cm mayor que el ancho y su perímetro es 32 cm. Halla sus dimensiones.' },
     { id: 5, texto: 'Resolver: Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro. ¿Cuántos recibe cada uno?' },
 ];
+
+// ── Editor de imagen (Canvas): estado ────────────────────────────────────────
+let editorImg     = null;   // HTMLImageElement cargado originalmente
+let editorRotDeg  = 0;      // Rotación acumulada en múltiplos de 90°
+let editorCropMode = false; // ¿Modo recorte activo?
+let editorCropBox  = null;  // { x, y, w, h } en coordenadas del canvas
+let editorDragState = null; // { handle, startX, startY, origBox }
+const HANDLE_HALF  = 14;    // Radio del handle de recorte en px
+
+function editorRenderFrame() {
+    const baseCanvas = document.getElementById('editor-base-canvas');
+    const ov         = document.getElementById('editor-overlay-canvas');
+    if (!editorImg || !baseCanvas) return;
+
+    // Calcular dimensiones para la rotación
+    const rad   = (editorRotDeg % 360) * Math.PI / 180;
+    const sin   = Math.abs(Math.sin(rad));
+    const cos   = Math.abs(Math.cos(rad));
+    const nW    = Math.round(editorImg.naturalWidth * cos + editorImg.naturalHeight * sin);
+    const nH    = Math.round(editorImg.naturalWidth * sin + editorImg.naturalHeight * cos);
+
+    baseCanvas.width  = nW;
+    baseCanvas.height = nH;
+    ov.width  = nW;
+    ov.height = nH;
+
+    const ctx = baseCanvas.getContext('2d');
+    ctx.clearRect(0, 0, nW, nH);
+    ctx.save();
+    ctx.translate(nW / 2, nH / 2);
+    ctx.rotate(rad);
+    ctx.drawImage(editorImg, -editorImg.naturalWidth / 2, -editorImg.naturalHeight / 2);
+    ctx.restore();
+
+    editorRenderOverlay();
+}
+
+function editorRenderOverlay() {
+    const ov  = document.getElementById('editor-overlay-canvas');
+    if (!ov) return;
+    const ctx = ov.getContext('2d');
+    ctx.clearRect(0, 0, ov.width, ov.height);
+    if (!editorCropMode || !editorCropBox) return;
+
+    const { x, y, w, h } = editorCropBox;
+    // Oscurecer fuera del recorte
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0, 0, ov.width, ov.height);
+    ctx.clearRect(x, y, w, h);
+
+    // Borde del recorte
+    ctx.strokeStyle = '#e50914';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, w, h);
+
+    // Dibuja los 4 handles de esquina + 4 de borde
+    const handles = editorGetHandlePositions();
+    handles.forEach(pt => {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, HANDLE_HALF, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(229,9,20,0.85)';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    });
+}
+
+function editorGetHandlePositions() {
+    if (!editorCropBox) return [];
+    const { x, y, w, h } = editorCropBox;
+    const cx = x + w / 2, cy = y + h / 2;
+    return [
+        { id: 'tl', x, y },            { id: 'tc', x: cx, y },      { id: 'tr', x: x + w, y },
+        { id: 'ml', x, y: cy },                                       { id: 'mr', x: x + w, y: cy },
+        { id: 'bl', x, y: y + h },     { id: 'bc', x: cx, y: y + h },{ id: 'br', x: x + w, y: y + h }
+    ];
+}
+
+function editorHitHandle(px, py) {
+    return editorGetHandlePositions().find(h =>
+        Math.hypot(h.x - px, h.y - py) <= HANDLE_HALF + 4
+    );
+}
+
+function editorTouchToCanvas(e, canvas) {
+    const rect  = canvas.getBoundingClientRect();
+    const touch = (e.touches || [e])[0];
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+        x: (touch.clientX - rect.left) * scaleX,
+        y: (touch.clientY - rect.top)  * scaleY
+    };
+}
+
+function editorInitOverlayEvents() {
+    const ov = document.getElementById('editor-overlay-canvas');
+    if (!ov) return;
+    // Touch
+    ov.addEventListener('touchstart', editorPointerDown, { passive: false });
+    ov.addEventListener('touchmove',  editorPointerMove, { passive: false });
+    ov.addEventListener('touchend',   editorPointerUp,   { passive: false });
+    // Mouse (para pruebas en escritorio)
+    ov.addEventListener('mousedown', editorPointerDown);
+    document.addEventListener('mousemove', editorPointerMove);
+    document.addEventListener('mouseup',   editorPointerUp);
+}
+
+function editorPointerDown(e) {
+    if (!editorCropMode) return;
+    e.preventDefault();
+    const ov = document.getElementById('editor-overlay-canvas');
+    const pt = editorTouchToCanvas(e, ov);
+    const hit = editorHitHandle(pt.x, pt.y);
+    if (hit) {
+        editorDragState = { handle: hit.id, startX: pt.x, startY: pt.y, origBox: { ...editorCropBox } };
+    }
+}
+
+function editorPointerMove(e) {
+    if (!editorDragState || !editorCropMode) return;
+    e.preventDefault && e.preventDefault();
+    const ov = document.getElementById('editor-overlay-canvas');
+    const pt = editorTouchToCanvas(e, ov);
+    const dx = pt.x - editorDragState.startX;
+    const dy = pt.y - editorDragState.startY;
+    const ob = editorDragState.origBox;
+    const MIN = 30;
+    let { x, y, w, h } = ob;
+    const id = editorDragState.handle;
+    if (id.includes('l')) { x = Math.min(ob.x + dx, ob.x + ob.w - MIN); w = ob.w - (x - ob.x); }
+    if (id.includes('r')) { w = Math.max(MIN, ob.w + dx); }
+    if (id.includes('t')) { y = Math.min(ob.y + dy, ob.y + ob.h - MIN); h = ob.h - (y - ob.y); }
+    if (id.includes('b')) { h = Math.max(MIN, ob.h + dy); }
+    // Clamp
+    x = Math.max(0, x); y = Math.max(0, y);
+    w = Math.min(ov.width  - x, w);
+    h = Math.min(ov.height - y, h);
+    editorCropBox = { x, y, w, h };
+    editorRenderOverlay();
+}
+
+function editorPointerUp(e) {
+    editorDragState = null;
+}
+
+function editorRotar() {
+    editorRotDeg = (editorRotDeg + 90) % 360;
+    // Resetear recorte al rotar
+    editorCropBox = null;
+    editorCropMode = false;
+    document.getElementById('btn-toggle-crop').style.background = '';
+    editorRenderFrame();
+    // Resetear cropBox a tamaño completo si crop activo
+    const ov = document.getElementById('editor-overlay-canvas');
+    editorCropBox = { x: ov.width * 0.08, y: ov.height * 0.08, w: ov.width * 0.84, h: ov.height * 0.84 };
+}
+
+function editorToggleCrop() {
+    editorCropMode = !editorCropMode;
+    const btn = document.getElementById('btn-toggle-crop');
+    if (editorCropMode) {
+        btn.style.background = 'rgba(229,9,20,0.2)';
+        const ov = document.getElementById('editor-overlay-canvas');
+        if (!editorCropBox) {
+            editorCropBox = { x: ov.width * 0.08, y: ov.height * 0.08, w: ov.width * 0.84, h: ov.height * 0.84 };
+        }
+    } else {
+        btn.style.background = '';
+    }
+    editorRenderOverlay();
+}
+
+function editorConfirmar() {
+    const baseCanvas = document.getElementById('editor-base-canvas');
+    let srcCanvas = baseCanvas;
+
+    // Si hay recorte activo, aplicarlo
+    if (editorCropMode && editorCropBox) {
+        const { x, y, w, h } = editorCropBox;
+        const cropped = document.createElement('canvas');
+        cropped.width  = Math.round(w);
+        cropped.height = Math.round(h);
+        cropped.getContext('2d').drawImage(baseCanvas, Math.round(x), Math.round(y), Math.round(w), Math.round(h), 0, 0, Math.round(w), Math.round(h));
+        srcCanvas = cropped;
+    }
+
+    // Convertir a blob JPEG
+    srcCanvas.toBlob(blob => {
+        archivoSeleccionado = blob;
+        // Mostrar preview de lo editado
+        const url = URL.createObjectURL(blob);
+        // No hay preview-img separado; el editor ya es el preview
+        document.getElementById('btn-enviar').disabled = false;
+    }, 'image/jpeg', 0.88);
+}
+
+function editorMostrar(src) {
+    editorImg = new Image();
+    editorImg.onload = () => {
+        document.getElementById('upload-zone').style.display   = 'none';
+        document.getElementById('editor-wrap').style.display   = 'block';
+        document.getElementById('btn-enviar').disabled = true;
+        editorRotDeg  = 0;
+        editorCropMode = false;
+        editorCropBox  = null;
+        editorDragState = null;
+        editorRenderFrame();
+        editorInitOverlayEvents();
+        // Pre-setear cropBox
+        const ov = document.getElementById('editor-overlay-canvas');
+        editorCropBox = { x: ov.width * 0.08, y: ov.height * 0.08, w: ov.width * 0.84, h: ov.height * 0.84 };
+    };
+    editorImg.src = src;
+}
 
 // ── Helpers de pantalla ───────────────────────────────────────────────────────
 function showScreen(id) {
@@ -478,14 +807,15 @@ function aplicarEstado(estado) {
             clearInterval(timerInterval);
             showScreen('lobby');
             break;
-        case 'pregunta':
+        case 'pregunta': {
             // Calcular segundos restantes de forma sincronizada usando updated_at
             const ahora = new Date().getTime();
             const updatedAt = estado.updated_at ? new Date(estado.updated_at).getTime() : ahora;
             const segundosTranscurridos = Math.floor((ahora - updatedAt) / 1000);
             const tiempoRestanteSinc = Math.max(0, (estado.tiempo_restante || 60) - segundosTranscurridos);
-            mostrarPregunta(preguntaActualId, tiempoRestanteSinc);
+            mostrarPregunta(preguntaActualId, tiempoRestanteSinc, estado.pregunta_custom_texto || null);
             break;
+        }
         case 'leaderboard':
             clearInterval(timerInterval);
             actualizarMiPuntaje();
@@ -565,82 +895,138 @@ async function handleLogin(e) {
 }
 
 // ── Pregunta & Timer ──────────────────────────────────────────────────────────
-function mostrarPregunta(id, tiempoInicial) {
+async function mostrarPregunta(id, tiempoInicial, preguntaCustomTexto) {
+    preguntaActualId = id;
+    tiempoExpirado = false;
+
+    // Texto: usar custom si existe, sino el banco estático
     const pregunta = PREGUNTAS_TORNEO.find(p => p.id === id) || PREGUNTAS_TORNEO[0];
-    preguntaActualId = pregunta.id;
+    const texto = preguntaCustomTexto || pregunta.texto;
 
-    document.getElementById('pregunta-badge').textContent = `Pregunta ${pregunta.id}`;
-    document.getElementById('pregunta-num').textContent   = `PROBLEMA ${pregunta.id} DE ${PREGUNTAS_TORNEO.length}`;
-    document.getElementById('pregunta-texto').textContent  = pregunta.texto;
+    document.getElementById('pregunta-badge').textContent = `Pregunta ${id}`;
+    document.getElementById('pregunta-num').textContent   = `PROBLEMA ${id}`;
+    document.getElementById('pregunta-texto').textContent  = texto;
 
-    // Reset upload zone
+    // Reset UI
     archivoSeleccionado = null;
-    document.getElementById('preview-img').style.display = 'none';
-    document.getElementById('upload-zone').classList.remove('has-file');
-    document.getElementById('upload-zone').style.display = 'flex';
-    document.getElementById('btn-enviar').disabled = true;
-    document.getElementById('status-card').style.display = 'none';
+    document.getElementById('editor-wrap').style.display    = 'none';
+    document.getElementById('blocked-notice').style.display = 'none';
+    document.getElementById('expired-notice').style.display = 'none';
+    document.getElementById('status-card').style.display    = 'none';
     document.getElementById('foto-input').value = '';
+    document.getElementById('btn-enviar').disabled = true;
+    editorImg = null; editorRotDeg = 0; editorCropMode = false; editorCropBox = null;
+
+    // Verificar si ya entregó respuesta para esta pregunta
+    const yaEntrego = await verificarYaEntrego(preguntaActualId);
+    if (yaEntrego) {
+        document.getElementById('upload-zone').style.display = 'none';
+        document.getElementById('blocked-notice').style.display = 'flex';
+    } else {
+        document.getElementById('upload-zone').style.display = 'flex';
+    }
 
     showScreen('pregunta');
     iniciarTimer(tiempoInicial);
 }
 
+async function verificarYaEntrego(pregId) {
+    if (!alumnoId) return false;
+    try {
+        const { data } = await sbClient
+            .from('respuestas')
+            .select('id')
+            .eq('participante_id', alumnoId)
+            .eq('pregunta_id', pregId)
+            .maybeSingle();
+        return !!data;
+    } catch { return false; }
+}
+
 function iniciarTimer(segundos) {
     clearInterval(timerInterval);
-    let t = segundos;
+    let t = Math.max(0, segundos);
     const el = document.getElementById('timer-display');
     const actualizar = () => {
         el.textContent = t;
         el.classList.toggle('urgent', t <= 10);
-        if (t <= 0) { clearInterval(timerInterval); }
+        if (t <= 0) {
+            clearInterval(timerInterval);
+            bloquearPorTiempo();
+            return;
+        }
         t--;
     };
     actualizar();
     timerInterval = setInterval(actualizar, 1000);
 }
 
+function bloquearPorTiempo() {
+    if (tiempoExpirado) return;
+    tiempoExpirado = true;
+    // Solo bloquear si el alumno no envió ya y no está en proceso de envío
+    const statusCard = document.getElementById('status-card');
+    if (statusCard.style.display !== 'none') return; // En proceso de envío, no interrumpir
+    document.getElementById('upload-zone').style.display   = 'none';
+    document.getElementById('editor-wrap').style.display   = 'none';
+    document.getElementById('blocked-notice').style.display = 'none';
+    document.getElementById('expired-notice').style.display = 'flex';
+    document.getElementById('btn-enviar').disabled = true;
+}
+
 // ── Foto ──────────────────────────────────────────────────────────────────────
 function triggerFileInput() {
+    if (tiempoExpirado) return;
     document.getElementById('foto-input').click();
 }
 
 function handleFotoSeleccionada(e) {
     const file = e.target.files[0];
     if (!file) return;
-    archivoSeleccionado = file;
 
-    // Mostrar preview
+    // Cargar en el editor de canvas
     const reader = new FileReader();
     reader.onload = ev => {
-        const img = document.getElementById('preview-img');
-        img.src = ev.target.result;
-        img.style.display = 'block';
+        editorMostrar(ev.target.result);
     };
     reader.readAsDataURL(file);
-
-    document.getElementById('upload-zone').classList.add('has-file');
-    document.getElementById('btn-enviar').disabled = false;
 }
 
 // ── Comprimir imagen con Canvas ───────────────────────────────────────────────
-function compressImage(file, maxWidth = 1024) {
+// Acepta File, Blob, o HTMLCanvasElement
+function compressImage(source, maxWidth = 1024) {
     return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = ev => {
+        // Si ya es un Blob/File editado por el editor, redimensionar directamente
+        if (source instanceof Blob) {
             const img = new Image();
-            img.src = ev.target.result;
+            const url = URL.createObjectURL(source);
             img.onload = () => {
+                URL.revokeObjectURL(url);
                 const canvas = document.createElement('canvas');
                 const scale  = Math.min(1, maxWidth / img.width);
                 canvas.width  = img.width  * scale;
                 canvas.height = img.height * scale;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                ctx.canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.80);
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.80);
             };
-        };
+            img.src = url;
+        } else {
+            // Fallback File → dataURL
+            const reader = new FileReader();
+            reader.readAsDataURL(source);
+            reader.onload = ev => {
+                const img = new Image();
+                img.src = ev.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const scale  = Math.min(1, maxWidth / img.width);
+                    canvas.width  = img.width  * scale;
+                    canvas.height = img.height * scale;
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.80);
+                };
+            };
+        }
     });
 }
 

@@ -1657,13 +1657,15 @@ async function _torneoRecargarParticipantes() {
 
     countEl.textContent = data.length;
     grid.innerHTML = data.map(p => `
-        <div style="
+        <div onclick="abrirDetalleAlumno('${p.id}','${p.nombre.replace(/'/g,"'")}')"
+             style="
             background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09);
             border-radius:10px; padding:8px 14px;
             font-size:0.8rem; font-weight:600; color:#e5e5e5;
             display:flex; align-items:center; gap:8px;
             animation:fadeInCard 0.4s ease;
-        ">
+            cursor:pointer; transition:background 0.15s;
+        " onmouseover="this.style.background='rgba(255,255,255,0.11)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
             <span style="width:28px;height:28px;border-radius:50%;background:rgba(229,9,20,0.15);
                 display:flex;align-items:center;justify-content:center;font-size:0.9rem;">🎓</span>
             ${p.nombre}
@@ -1673,10 +1675,13 @@ async function _torneoRecargarParticipantes() {
 // ── Panel: Pregunta ───────────────────────────────────────────────────────────
 async function _torneoRenderPregunta(estado) {
     const pid = estado.pregunta_actual_id || 1;
+    // Usar texto personalizado si existe, sino banco estático
+    const textoCustom = estado.pregunta_custom_texto;
     const pregunta = TORNEO_PREGUNTAS.find(p => p.id === pid) || TORNEO_PREGUNTAS[0];
+    const textoFinal = textoCustom || pregunta.texto;
 
-    document.getElementById('torneo-p-badge').textContent = `Pregunta ${pregunta.id} de ${TORNEO_PREGUNTAS.length}`;
-    document.getElementById('torneo-p-texto').textContent  = pregunta.texto;
+    document.getElementById('torneo-p-badge').textContent = `Pregunta ${pid}`;
+    document.getElementById('torneo-p-texto').textContent  = textoFinal;
 
     // Contar respuestas de esta pregunta
     if (supabaseClient) {
@@ -1742,7 +1747,8 @@ async function _torneoRenderLeaderboard() {
         const isTop   = i < 3;
         const accent  = i === 0 ? '#f59e0b' : i === 1 ? '#9ca3af' : i === 2 ? '#b87333' : '#b3b3b3';
         return `
-        <div style="
+        <div onclick="abrirDetalleAlumno('${p.id || ''}','${(p.nombre || '').replace(/'/g,"'")}')"
+             style="
             display:flex; align-items:center; justify-content:space-between;
             padding:14px 20px;
             background:${isTop ? `rgba(255,255,255,0.05)` : `rgba(255,255,255,0.02)`};
@@ -1750,7 +1756,8 @@ async function _torneoRenderLeaderboard() {
             border-radius:12px;
             ${i === 0 ? 'box-shadow:0 0 24px rgba(245,158,11,0.15);' : ''}
             animation:fadeInCard 0.3s ease ${i * 0.06}s both;
-        ">
+            cursor:pointer; transition:background 0.12s;
+        " onmouseover="this.style.filter='brightness(1.12)'" onmouseout="this.style.filter=''">
             <div style="display:flex;align-items:center;gap:14px;">
                 <span style="font-size:${isTop ? '1.5rem' : '1rem'};min-width:32px;text-align:center;">${medal}</span>
                 <span style="font-size:${isTop ? '1rem' : '0.88rem'};font-weight:${isTop ? '700' : '500'};color:#fff;">${p.nombre}</span>
@@ -1810,8 +1817,65 @@ async function torneoReset() {
 }
 
 // ── Global bindings (torneo) ─────────────────────────────────────────────────
-window.openTorneoOverlay      = openTorneoOverlay;
-window.closeTorneoOverlay     = closeTorneoOverlay;
-window.torneoSetPantalla      = torneoSetPantalla;
+window.openTorneoOverlay       = openTorneoOverlay;
+window.closeTorneoOverlay      = closeTorneoOverlay;
+window.torneoSetPantalla       = torneoSetPantalla;
 window.torneoSiguientePregunta = torneoSiguientePregunta;
-window.torneoReset            = torneoReset;
+window.torneoReset             = torneoReset;
+window.abrirDetalleAlumno      = abrirDetalleAlumno;
+window.cerrarDetalleAlumnoModal = cerrarDetalleAlumnoModal;
+
+// ── Modal Visor de Soluciones ────────────────────────────────────────────────
+async function abrirDetalleAlumno(participanteId, nombre) {
+    if (!supabaseClient || !participanteId) return;
+    const modal = document.getElementById('torneo-detalle-alumno-modal');
+    if (!modal) return;
+
+    // Rellenar con datos básicos mientras carga
+    document.getElementById('tdm-nombre').textContent       = nombre || '—';
+    document.getElementById('tdm-puntaje').textContent      = '…';
+    document.getElementById('tdm-transcripcion').textContent = '…';
+    document.getElementById('tdm-feedback').textContent     = '…';
+    document.getElementById('tdm-foto').src                 = '';
+    document.getElementById('tdm-pregunta-label').textContent = '';
+    modal.style.display = 'flex';
+
+    // Consultar última respuesta procesada del alumno
+    const { data } = await supabaseClient
+        .from('respuestas')
+        .select('*')
+        .eq('participante_id', participanteId)
+        .eq('procesado', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (!data) {
+        document.getElementById('tdm-puntaje').textContent      = '—';
+        document.getElementById('tdm-transcripcion').textContent = 'Sin respuesta evaluada aún.';
+        document.getElementById('tdm-feedback').textContent     = '—';
+        return;
+    }
+
+    const scoreColors = { 5:'#46d369', 4:'#46d369', 3:'#f59e0b', 2:'#e50914', 1:'#e50914', 0:'#e50914' };
+    const puntajeEl = document.getElementById('tdm-puntaje');
+    puntajeEl.textContent  = data.puntaje_asignado ?? '—';
+    puntajeEl.style.color  = scoreColors[data.puntaje_asignado] || '#b3b3b3';
+
+    document.getElementById('tdm-pregunta-label').textContent =
+        `Pregunta ${data.pregunta_id} · ${data.puntaje_asignado ?? '?'}/5 puntos`;
+    document.getElementById('tdm-transcripcion').textContent =
+        data.transcripcion_interna || '(sin transcripción disponible)';
+    document.getElementById('tdm-feedback').textContent =
+        data.feedback || '(sin feedback disponible)';
+
+    if (data.url_foto) {
+        document.getElementById('tdm-foto').src = data.url_foto;
+        document.getElementById('tdm-foto').style.display = 'block';
+    }
+}
+
+function cerrarDetalleAlumnoModal() {
+    const modal = document.getElementById('torneo-detalle-alumno-modal');
+    if (modal) modal.style.display = 'none';
+}

@@ -125,7 +125,7 @@ Debes responder ESTRICTAMENTE en formato JSON plano con la siguiente estructura,
 
     // 6. Parsear el resultado de la IA (OpenAI ya debe responder JSON puro)
     let evaluarResult: string = jsonTexto
-    let evaluacion: { puntaje: number; feedback: string }
+    let evaluacion: { puntaje: number; feedback: string; transcripcion_interna?: string }
     try {
       // Limpiar posible markdown residual por seguridad
       const limpio = evaluarResult.replace(/```json|```/g, '').trim()
@@ -152,9 +152,10 @@ Debes responder ESTRICTAMENTE en formato JSON plano con la siguiente estructura,
     const { error: errUpdate } = await supabase
       .from('respuestas')
       .update({
-        puntaje_asignado: puntajeFinal,
-        feedback:         evaluacion.feedback,
-        procesado:        true
+        puntaje_asignado:      puntajeFinal,
+        feedback:              evaluacion.feedback,
+        transcripcion_interna: evaluacion.transcripcion_interna ?? null,
+        procesado:             true
       })
       .eq('id', respuestaId)
 
