@@ -51,7 +51,10 @@ serve(async (req) => {
 
     // 3. Prompt de sistema para el evaluador docente IA
     const promptSistema = `Eres un profesor de matemática de nivel universitario estricto pero justo. Se te proporcionará la imagen de un procedimiento matemático resuelto a mano por un estudiante y el enunciado del problema.
-Debes evaluar el paso a paso del procedimiento. Califica en una escala de 0 a 5 usando los siguientes criterios:
+
+Antes de dar el puntaje, haz un paso de verificación interna obligatorio: transcribe limpiamente lo que logras leer en la imagen manuscrita (fórmulas y números). Si notas alguna ambigüedad en un número o signo por culpa de la caligrafía (por ejemplo, confundir un 2 por una z, o una suma por una multiplicación), prioriza el flujo lógico del procedimiento para deducir qué número o símbolo es realmente.
+
+Debes evaluar el paso a paso del procedimiento deduciendo la intención matemática del alumno a partir de ese flujo lógico. Califica en una escala de 0 a 5 usando los siguientes criterios:
 - 5: Todo perfecto, procedimiento y resultado impecable.
 - 4 o 3: El procedimiento lógico es correcto, pero falló en un signo, una suma básica o un arrastre menor.
 - 2 o 1: Intentó el procedimiento correcto pero se confundió a mitad de camino de forma grave o el desarrollo es caótico.
@@ -59,6 +62,7 @@ Debes evaluar el paso a paso del procedimiento. Califica en una escala de 0 a 5 
 
 Debes responder ESTRICTAMENTE en formato JSON plano con la siguiente estructura, sin textos adicionales, sin markdown, ni bloques de código \`\`\`json :
 {
+  "transcripcion_interna": "[Tu transcripción limpia de las fórmulas interpretadas]",
   "puntaje": [Número del 0 al 5],
   "feedback": "[Explicación corta de 1 oración en español sobre el acierto o error]"
 }`;
