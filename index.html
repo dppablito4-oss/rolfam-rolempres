@@ -609,6 +609,13 @@
             <button onclick="torneoSetPantalla('leaderboard')" id="tc-lb"   style="padding:7px 14px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F3C6; Ranking</button>
             <button onclick="torneoSiguientePregunta()" style="padding:7px 14px;background:rgba(84,179,214,0.12);border:1px solid rgba(84,179,214,0.3);color:#54b3d6;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x23ED; Siguiente</button>
             <button onclick="torneoReset()" style="padding:7px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#6d6d6e;border-radius:8px;font-size:0.72rem;cursor:pointer;">&#x21BA; Reset</button>
+            <!-- Exportación de reportes PDF de la ronda activa -->
+            <button onclick="descargarRondaCompletaPDF('alfabetico')" style="padding:7px 14px;background:rgba(70,211,105,0.15);border:1px solid rgba(70,211,105,0.35);color:#46d369;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;" title="Descargar respuestas de la ronda en orden alfabético A-Z">
+                <i class="fa-solid fa-file-pdf"></i> Ronda A-Z
+            </button>
+            <button onclick="descargarRondaCompletaPDF('puntaje')" style="padding:7px 14px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);color:#f59e0b;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;" title="Descargar respuestas de la ronda ordenadas por puntaje">
+                <i class="fa-solid fa-file-pdf"></i> Ronda Puntaje
+            </button>
             <button onclick="closeTorneoOverlay()" style="padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#b3b3b3;border-radius:8px;font-size:0.75rem;cursor:pointer;"><i class="fa-solid fa-xmark"></i> Cerrar</button>
         </div>
     </div>
@@ -702,6 +709,12 @@
                 <div id="tdm-nombre" style="font-size:1.1rem;font-weight:800;color:#fff;margin-top:4px;"></div>
             </div>
             <div style="display:flex;gap:8px;align-items:center;">
+                <button onclick="descargarAlumnoPDFActual()" style="
+                    background:rgba(70,211,105,0.15); border:1px solid rgba(70,211,105,0.3);
+                    color:#46d369; border-radius:8px; padding:7px 14px;
+                    font-size:0.78rem; font-weight:700; cursor:pointer;
+                    display:flex;align-items:center;gap:6px;
+                "><i class="fa-solid fa-file-pdf"></i> Descargar PDF</button>
                 <button onclick="editarPuntajeAlumnoManual()" style="
                     background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3);
                     color:#f59e0b; border-radius:8px; padding:7px 14px;

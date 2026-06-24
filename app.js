@@ -2015,12 +2015,21 @@ async function abrirDetalleAlumno(participanteId, nombre) {
         document.getElementById('tdm-puntaje').textContent = '—';
         document.getElementById('tdm-transcripcion').textContent = 'Sin respuesta evaluada aún.';
         document.getElementById('tdm-feedback').textContent = '—';
+        _detalleAlumnoActual.respuestaId = null;
+        _detalleAlumnoActual.url_foto = null;
+        _detalleAlumnoActual.feedback = null;
+        _detalleAlumnoActual.pregunta_id = null;
+        _detalleAlumnoActual.created_at = null;
         return;
     }
 
     // Actualizar con la respuesta cargada
     _detalleAlumnoActual.respuestaId = data.id;
     _detalleAlumnoActual.puntajeActual = data.puntaje_asignado ?? 0;
+    _detalleAlumnoActual.url_foto = data.url_foto;
+    _detalleAlumnoActual.feedback = data.feedback;
+    _detalleAlumnoActual.pregunta_id = data.pregunta_id;
+    _detalleAlumnoActual.created_at = data.created_at;
 
     const scoreColors = { 5: '#46d369', 4: '#46d369', 3: '#f59e0b', 2: '#e50914', 1: '#e50914', 0: '#e50914' };
     const puntajeEl = document.getElementById('tdm-puntaje');
@@ -2157,7 +2166,7 @@ async function exportarRondaPDF(rondaId, nombreRonda) {
 }
 
 // ── Edición manual de puntaje ────────────────────────────────────────────────────
-let _detalleAlumnoActual = { id: null, nombre: null, puntajeActual: 0, respuestaId: null };
+let _detalleAlumnoActual = { id: null, nombre: null, puntajeActual: 0, respuestaId: null, url_foto: null, feedback: null, pregunta_id: null, created_at: null };
 
 async function editarPuntajeAlumnoManual() {
     const { id, nombre, puntajeActual, respuestaId } = _detalleAlumnoActual;
@@ -2186,3 +2195,627 @@ async function editarPuntajeAlumnoManual() {
     await _torneoRecargarParticipantes();
     if (torneoEstado.pantalla_actual === 'leaderboard') _torneoRenderLeaderboard();
 }
+
+// ── Exportación de Reportes PDF (Funcionalidades del Docente) ──────────────────────
+
+async function descargarAlumnoPDF(participanteId, nombre) {
+    if (!supabaseClient || !participanteId) return;
+
+    // Consultar última respuesta procesada de este alumno
+    const { data: resp } = await supabaseClient
+        .from('respuestas')
+        .select('*')
+        .eq('participante_id', participanteId)
+        .eq('procesado', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (!resp) {
+        showToast('Este alumno no tiene respuestas evaluadas aún.', 'error');
+        return;
+    }
+
+    // Buscar enunciado
+    let preguntaTexto = '';
+    if (resp.pregunta_id === (torneoEstado.pregunta_actual_id || 1) && torneoEstado.pregunta_custom_texto) {
+        preguntaTexto = torneoEstado.pregunta_custom_texto;
+    } else {
+        const preg = TORNEO_PREGUNTAS.find(p => p.id === resp.pregunta_id);
+        preguntaTexto = preg ? preg.texto : `Problema ${resp.pregunta_id}`;
+    }
+
+    const win = window.open('', '_blank');
+    if (!win) {
+        showToast('Permite ventanas emergentes para descargar el PDF', 'error');
+        return;
+    }
+
+    const logoUrl = new URL('assets/logo_educacion_myf.png', window.location.href).href;
+
+    const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Participación - ${nombre}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            line-height: 1.6;
+        }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #e50914;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header-title-box {
+            flex: 1;
+        }
+        .school-logo {
+            height: 70px;
+            object-fit: contain;
+            margin-left: 20px;
+        }
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #e50914;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+        }
+        .sub-header {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0;
+        }
+        .academic-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #54b3d6;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+        .info-item span.label {
+            font-weight: 700;
+            color: #4b5563;
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .info-item span.value {
+            color: #111827;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #111827;
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .content-box {
+            background-color: #fdfdfd;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .solution-image-container {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+        }
+        .solution-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            object-fit: contain;
+        }
+        .evaluation-box {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .evaluation-box.score-5, .evaluation-box.score-4 {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+        }
+        .evaluation-box.score-2, .evaluation-box.score-1, .evaluation-box.score-0 {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .evaluation-box.score-5 .score-circle, .evaluation-box.score-4 .score-circle {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 2px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 .score-circle {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 2px solid #fcd34d;
+        }
+        .evaluation-box.score-2 .score-circle, .evaluation-box.score-1 .score-circle, .evaluation-box.score-0 .score-circle {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 2px solid #fecaca;
+        }
+        .score-val {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+        .score-max {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .feedback-text {
+            font-size: 0.95rem;
+            color: #374151;
+            font-weight: 500;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: 50px;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        @media print {
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-title-box">
+            <h1>Torneo Math-Flix</h1>
+            <div class="sub-header">UNHEVAL — Huánuco · Reporte de Participación</div>
+        </div>
+        <img class="school-logo" src="${logoUrl}" alt="Logo">
+    </div>
+
+    <div class="academic-info">
+        <div class="info-item">
+            <span class="label">Alumno</span>
+            <span class="value">${nombre}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Docente</span>
+            <span class="value">Joel Cipriano Tarazona Bardales</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Fecha y Hora</span>
+            <span class="value">${new Date(resp.created_at).toLocaleString()}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Actividad</span>
+            <span class="value">Pregunta ${resp.pregunta_id} · Torneo en Vivo</span>
+        </div>
+    </div>
+
+    <div class="section-title">Pregunta / Enunciado</div>
+    <div class="content-box">
+        ${preguntaTexto}
+    </div>
+
+    ${resp.url_foto ? `
+    <div class="section-title">Resolución del Alumno</div>
+    <div class="solution-image-container">
+        <img class="solution-image" src="${resp.url_foto}" alt="Resolución">
+    </div>
+    ` : ''}
+
+    <div class="section-title">Calificación y Corrección IA</div>
+    <div class="evaluation-box score-${resp.puntaje_asignado}">
+        <div class="score-circle">
+            <span class="score-val">${resp.puntaje_asignado}</span>
+            <span class="score-max">de 5</span>
+        </div>
+        <div class="feedback-text">
+            <strong>Retroalimentación del Evaluador IA:</strong><br>
+            ${resp.feedback || 'Sin retroalimentación.'}
+        </div>
+    </div>
+
+    <div class="footer-note">
+        Desarrollado por Pablito_DP y su grupo · © 2026 PABLITO_DP
+    </div>
+
+    <script>
+        window.onload = () => {
+            setTimeout(() => {
+                window.print();
+            }, 650);
+        };
+    <\/script>
+</body>
+</html>
+    `;
+
+    win.document.write(html);
+    win.document.close();
+}
+
+function descargarAlumnoPDFActual() {
+    if (!_detalleAlumnoActual || !_detalleAlumnoActual.id) {
+        showToast('No hay ningún alumno seleccionado.', 'error');
+        return;
+    }
+    descargarAlumnoPDF(_detalleAlumnoActual.id, _detalleAlumnoActual.nombre);
+}
+
+async function descargarRondaCompletaPDF(sortBy) {
+    if (!supabaseClient) return;
+    const pid = torneoEstado.pregunta_actual_id || 1;
+
+    // Cargar todas las respuestas procesadas de esta ronda con el nombre del participante
+    const { data: respuestas, error } = await supabaseClient
+        .from('respuestas')
+        .select('*, participantes(nombre, puntaje)')
+        .eq('pregunta_id', pid)
+        .eq('procesado', true);
+
+    if (error) {
+        showToast('Error al cargar las respuestas: ' + error.message, 'error');
+        return;
+    }
+
+    if (!respuestas || respuestas.length === 0) {
+        showToast('No hay respuestas evaluadas en esta ronda para descargar.', 'error');
+        return;
+    }
+
+    // Ordenar respuestas
+    if (sortBy === 'alfabetico') {
+        respuestas.sort((a, b) => {
+            const nameA = (a.participantes?.nombre || '').toLowerCase();
+            const nameB = (b.participantes?.nombre || '').toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+    } else if (sortBy === 'puntaje') {
+        respuestas.sort((a, b) => {
+            const scoreA = a.puntaje_asignado ?? 0;
+            const scoreB = b.puntaje_asignado ?? 0;
+            if (scoreB !== scoreA) return scoreB - scoreA;
+            const nameA = (a.participantes?.nombre || '').toLowerCase();
+            const nameB = (b.participantes?.nombre || '').toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+    }
+
+    // Enunciado
+    const preguntaTexto = torneoEstado.pregunta_custom_texto || 
+        (TORNEO_PREGUNTAS.find(p => p.id === pid)?.texto || `Pregunta ${pid}`);
+
+    const win = window.open('', '_blank');
+    if (!win) {
+        showToast('Permite ventanas emergentes para exportar PDF', 'error');
+        return;
+    }
+
+    const logoUrl = new URL('assets/logo_educacion_myf.png', window.location.href).href;
+
+    // Generar el HTML con page breaks
+    const studentSections = respuestas.map((resp, i) => {
+        const alumnoNombre = resp.participantes?.nombre || 'Alumno';
+        return `
+        <div class="student-report">
+            <div class="header-container">
+                <div class="header-title-box">
+                    <h1>Torneo Math-Flix</h1>
+                    <div class="sub-header">UNHEVAL — Huánuco · Reporte de Participación</div>
+                </div>
+                <img class="school-logo" src="${logoUrl}" alt="Logo">
+            </div>
+
+            <div class="academic-info">
+                <div class="info-item">
+                    <span class="label">Alumno</span>
+                    <span class="value">${alumnoNombre}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Docente</span>
+                    <span class="value">Joel Cipriano Tarazona Bardales</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Fecha y Hora</span>
+                    <span class="value">${new Date(resp.created_at).toLocaleString()}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Actividad</span>
+                    <span class="value">Pregunta ${resp.pregunta_id} · Torneo en Vivo</span>
+                </div>
+            </div>
+
+            <div class="section-title">Pregunta / Enunciado</div>
+            <div class="content-box">
+                ${preguntaTexto}
+            </div>
+
+            ${resp.url_foto ? `
+            <div class="section-title">Resolución del Alumno</div>
+            <div class="solution-image-container">
+                <img class="solution-image" src="${resp.url_foto}" alt="Resolución">
+            </div>
+            ` : ''}
+
+            <div class="section-title">Calificación y Corrección IA</div>
+            <div class="evaluation-box score-${resp.puntaje_asignado}">
+                <div class="score-circle">
+                    <span class="score-val">${resp.puntaje_asignado}</span>
+                    <span class="score-max">de 5</span>
+                </div>
+                <div class="feedback-text">
+                    <strong>Retroalimentación del Evaluador IA:</strong><br>
+                    ${resp.feedback || 'Sin retroalimentación.'}
+                </div>
+            </div>
+
+            <div class="footer-note">
+                Desarrollado por Pablito_DP y su grupo · © 2026 PABLITO_DP
+            </div>
+        </div>
+        `;
+    }).join('');
+
+    const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte Completo - Pregunta ${pid} (${sortBy === 'alfabetico' ? 'A-Z' : 'Puntaje'})</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            line-height: 1.6;
+        }
+        .student-report {
+            padding: 40px;
+            page-break-after: always;
+            box-sizing: border-box;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .student-report:last-child {
+            page-break-after: avoid;
+        }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #e50914;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header-title-box {
+            flex: 1;
+        }
+        .school-logo {
+            height: 70px;
+            object-fit: contain;
+            margin-left: 20px;
+        }
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #e50914;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+        }
+        .sub-header {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0;
+        }
+        .academic-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #54b3d6;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+        .info-item span.label {
+            font-weight: 700;
+            color: #4b5563;
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .info-item span.value {
+            color: #111827;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #111827;
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .content-box {
+            background-color: #fdfdfd;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .solution-image-container {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+        }
+        .solution-image {
+            max-width: 100%;
+            max-height: 380px;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            object-fit: contain;
+        }
+        .evaluation-box {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .evaluation-box.score-5, .evaluation-box.score-4 {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+        }
+        .evaluation-box.score-2, .evaluation-box.score-1, .evaluation-box.score-0 {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .evaluation-box.score-5 .score-circle, .evaluation-box.score-4 .score-circle {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 2px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 .score-circle {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 2px solid #fcd34d;
+        }
+        .evaluation-box.score-2 .score-circle, .evaluation-box.score-1 .score-circle, .evaluation-box.score-0 .score-circle {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 2px solid #fecaca;
+        }
+        .score-val {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+        .score-max {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .feedback-text {
+            font-size: 0.95rem;
+            color: #374151;
+            font-weight: 500;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: auto;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        @media print {
+            .student-report {
+                padding: 0;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    ${studentSections}
+
+    <script>
+        window.onload = () => {
+            setTimeout(() => {
+                window.print();
+            }, 700);
+        };
+    <\/script>
+</body>
+</html>
+    `;
+
+    win.document.write(html);
+    win.document.close();
+}
+
+window.descargarAlumnoPDF = descargarAlumnoPDF;
+window.descargarAlumnoPDFActual = descargarAlumnoPDFActual;
+window.descargarRondaCompletaPDF = descargarRondaCompletaPDF;
