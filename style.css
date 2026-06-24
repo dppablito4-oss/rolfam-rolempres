@@ -1074,97 +1074,146 @@ body {
 /* OPTIMIZACIÓN DE PROYECTOR MULTIMEDIA (10+ METROS) PARA MODO PRESENTADOR   */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
-#presenter-overlay h2 {
-    font-size: 2.5rem !important;
-    color: #fff !important;
-    text-shadow: 0 0 10px rgba(255, 0, 85, 0.5), 0 0 20px rgba(255, 0, 85, 0.2) !important;
-    border-bottom: 2px solid var(--color-neon-red) !important;
-    box-shadow: 0 1px 12px rgba(255, 0, 85, 0.2);
-    padding-bottom: 12px;
-}
-#presenter-overlay h2 span {
-    font-size: 3rem !important;
-    text-shadow: 0 0 12px rgba(255, 0, 85, 0.6) !important;
-}
-#presenter-overlay p {
-    font-size: 1.3rem !important;
-    line-height: 1.6 !important;
-    color: #e2e8f0 !important; /* Brighter secondary text */
-}
-#presenter-overlay .modal-math-box {
-    font-size: 1.4rem !important;
-    padding: 24px !important;
-    margin: 20px 0 !important;
-    background: rgba(255, 0, 85, 0.02) !important;
-    border-left: 4px solid var(--color-neon-red) !important;
-    box-shadow: 0 0 15px rgba(255, 0, 85, 0.1) !important;
-}
-#presenter-overlay .modal-math-box .modal-step-pill {
-    font-size: 1.1rem !important;
-    padding: 6px 12px !important;
-    background: var(--color-neon-cyan) !important;
-    color: #000000 !important;
-    font-weight: 800 !important;
-    text-shadow: none !important;
-    box-shadow: 0 0 12px rgba(0, 243, 255, 0.5) !important;
-}
-#presenter-overlay .modal-solution-tag {
-    font-size: 1.6rem !important;
-    margin-top: 24px !important;
-    color: var(--color-neon-green) !important;
-    text-shadow: 0 0 12px rgba(57, 255, 20, 0.5) !important;
-}
-#presenter-overlay .modal-table th {
-    font-size: 1.2rem !important;
-    padding: 16px !important;
-    color: var(--color-neon-cyan) !important;
-    text-shadow: 0 0 8px rgba(0, 243, 255, 0.4) !important;
-}
-#presenter-overlay .modal-table td {
-    font-size: 1.2rem !important;
-    padding: 16px !important;
-}
-#presenter-overlay .modal-table td.mono {
-    color: var(--color-neon-cyan) !important;
-    text-shadow: 0 0 5px rgba(0, 243, 255, 0.2) !important;
+@media (min-width: 1024px) {
+    #presenter-overlay h2 {
+        font-size: 2.5rem !important;
+        color: #fff !important;
+        text-shadow: 0 0 10px rgba(255, 0, 85, 0.5), 0 0 20px rgba(255, 0, 85, 0.2) !important;
+        border-bottom: 2px solid var(--color-neon-red) !important;
+        box-shadow: 0 1px 12px rgba(255, 0, 85, 0.2);
+        padding-bottom: 12px;
+    }
+    #presenter-overlay h2 span {
+        font-size: 3rem !important;
+        text-shadow: 0 0 12px rgba(255, 0, 85, 0.6) !important;
+    }
+    #presenter-overlay p {
+        font-size: 1.3rem !important;
+        line-height: 1.6 !important;
+        color: #e2e8f0 !important; /* Brighter secondary text */
+    }
+    #presenter-overlay .modal-math-box {
+        font-size: 1.4rem !important;
+        padding: 24px !important;
+        margin: 20px 0 !important;
+        background: rgba(255, 0, 85, 0.02) !important;
+        border-left: 4px solid var(--color-neon-red) !important;
+        box-shadow: 0 0 15px rgba(255, 0, 85, 0.1) !important;
+    }
+    #presenter-overlay .modal-math-box .modal-step-pill {
+        font-size: 1.1rem !important;
+        padding: 6px 12px !important;
+        background: var(--color-neon-cyan) !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        text-shadow: none !important;
+        box-shadow: 0 0 12px rgba(0, 243, 255, 0.5) !important;
+    }
+    #presenter-overlay .modal-solution-tag {
+        font-size: 1.6rem !important;
+        margin-top: 24px !important;
+        color: var(--color-neon-green) !important;
+        text-shadow: 0 0 12px rgba(57, 255, 20, 0.5) !important;
+    }
+    #presenter-overlay .modal-table th {
+        font-size: 1.2rem !important;
+        padding: 16px !important;
+        color: var(--color-neon-cyan) !important;
+        text-shadow: 0 0 8px rgba(0, 243, 255, 0.4) !important;
+    }
+    #presenter-overlay .modal-table td {
+        font-size: 1.2rem !important;
+        padding: 16px !important;
+    }
+    #presenter-overlay .modal-table td.mono {
+        color: var(--color-neon-cyan) !important;
+        text-shadow: 0 0 5px rgba(0, 243, 255, 0.2) !important;
+    }
+
+    /* Escalar de forma inteligente los estilos inline */
+    #presenter-overlay [style*="font-size:0.7rem"],
+    #presenter-overlay [style*="font-size: 0.7rem"] { font-size: 1.1rem !important; }
+    #presenter-overlay [style*="font-size:0.8rem"],
+    #presenter-overlay [style*="font-size: 0.8rem"] { font-size: 1.2rem !important; }
+    #presenter-overlay [style*="font-size:0.85rem"],
+    #presenter-overlay [style*="font-size: 0.85rem"] { font-size: 1.3rem !important; }
+    #presenter-overlay [style*="font-size:0.9rem"],
+    #presenter-overlay [style*="font-size: 0.9rem"] { font-size: 1.4rem !important; }
+    #presenter-overlay [style*="font-size:1rem"],
+    #presenter-overlay [style*="font-size: 1rem"] { font-size: 1.5rem !important; }
+    #presenter-overlay [style*="font-size:1.05rem"],
+    #presenter-overlay [style*="font-size: 1.05rem"] { font-size: 1.6rem !important; }
+    #presenter-overlay [style*="font-size:1.1rem"],
+    #presenter-overlay [style*="font-size: 1.1rem"] { font-size: 1.7rem !important; }
+    #presenter-overlay [style*="font-size:1.2rem"],
+    #presenter-overlay [style*="font-size: 1.2rem"] { font-size: 1.8rem !important; }
+    #presenter-overlay [style*="font-size:1.4rem"],
+    #presenter-overlay [style*="font-size: 1.4rem"] { font-size: 2rem !important; }
+    #presenter-overlay [style*="font-size:1.5rem"],
+    #presenter-overlay [style*="font-size: 1.5rem"] { font-size: 2.2rem !important; }
+    #presenter-overlay [style*="font-size:2rem"],
+    #presenter-overlay [style*="font-size: 2rem"] { font-size: 2.8rem !important; }
+    #presenter-overlay [style*="font-size:2.5rem"],
+    #presenter-overlay [style*="font-size: 2.5rem"] { font-size: 3.5rem !important; }
+    #presenter-overlay [style*="font-size:3rem"],
+    #presenter-overlay [style*="font-size: 3rem"] { font-size: 4rem !important; }
+    #presenter-overlay [style*="font-size:5rem"],
+    #presenter-overlay [style*="font-size: 5rem"] { font-size: 6rem !important; }
+
+    /* Separaciones mayores para proyectores */
+    #presenter-overlay [style*="margin-bottom:12px"] { margin-bottom: 24px !important; }
+    #presenter-overlay [style*="margin-bottom:16px"] { margin-bottom: 32px !important; }
+    #presenter-overlay [style*="margin-bottom:20px"] { margin-bottom: 40px !important; }
+    #presenter-overlay [style*="padding:20px"] { padding: 40px !important; }
+    #presenter-overlay [style*="padding:24px"] { padding: 48px !important; }
 }
 
-/* Escalar de forma inteligente pero equilibrada los estilos inline */
-#presenter-overlay [style*="font-size:0.7rem"],
-#presenter-overlay [style*="font-size: 0.7rem"] { font-size: 1.1rem !important; }
-#presenter-overlay [style*="font-size:0.8rem"],
-#presenter-overlay [style*="font-size: 0.8rem"] { font-size: 1.2rem !important; }
-#presenter-overlay [style*="font-size:0.85rem"],
-#presenter-overlay [style*="font-size: 0.85rem"] { font-size: 1.3rem !important; }
-#presenter-overlay [style*="font-size:0.9rem"],
-#presenter-overlay [style*="font-size: 0.9rem"] { font-size: 1.4rem !important; }
-#presenter-overlay [style*="font-size:1rem"],
-#presenter-overlay [style*="font-size: 1rem"] { font-size: 1.5rem !important; }
-#presenter-overlay [style*="font-size:1.05rem"],
-#presenter-overlay [style*="font-size: 1.05rem"] { font-size: 1.6rem !important; }
-#presenter-overlay [style*="font-size:1.1rem"],
-#presenter-overlay [style*="font-size: 1.1rem"] { font-size: 1.7rem !important; }
-#presenter-overlay [style*="font-size:1.2rem"],
-#presenter-overlay [style*="font-size: 1.2rem"] { font-size: 1.8rem !important; }
-#presenter-overlay [style*="font-size:1.4rem"],
-#presenter-overlay [style*="font-size: 1.4rem"] { font-size: 2rem !important; }
-#presenter-overlay [style*="font-size:1.5rem"],
-#presenter-overlay [style*="font-size: 1.5rem"] { font-size: 2.2rem !important; }
-#presenter-overlay [style*="font-size:2rem"],
-#presenter-overlay [style*="font-size: 2rem"] { font-size: 2.8rem !important; }
-#presenter-overlay [style*="font-size:2.5rem"],
-#presenter-overlay [style*="font-size: 2.5rem"] { font-size: 3.5rem !important; }
-#presenter-overlay [style*="font-size:3rem"],
-#presenter-overlay [style*="font-size: 3rem"] { font-size: 4rem !important; }
-#presenter-overlay [style*="font-size:5rem"],
-#presenter-overlay [style*="font-size: 5rem"] { font-size: 6rem !important; }
-
-/* Separaciones mayores para proyectores */
-#presenter-overlay [style*="margin-bottom:12px"] { margin-bottom: 24px !important; }
-#presenter-overlay [style*="margin-bottom:16px"] { margin-bottom: 32px !important; }
-#presenter-overlay [style*="margin-bottom:20px"] { margin-bottom: 40px !important; }
-#presenter-overlay [style*="padding:20px"] { padding: 40px !important; }
-#presenter-overlay [style*="padding:24px"] { padding: 48px !important; }
+@media (max-width: 1023px) {
+    #presenter-overlay h2 {
+        font-size: 1.4rem !important;
+        border-bottom: 2px solid var(--color-neon-red) !important;
+        padding-bottom: 8px !important;
+    }
+    #presenter-overlay h2 span {
+        font-size: 1.6rem !important;
+    }
+    #presenter-overlay p {
+        font-size: 0.95rem !important;
+        line-height: 1.55 !important;
+    }
+    #presenter-overlay .modal-math-box {
+        font-size: 1.05rem !important;
+        padding: 16px !important;
+        margin: 12px 0 !important;
+        border-left-width: 4px !important;
+    }
+    #presenter-overlay .modal-math-box .modal-step-pill {
+        font-size: 0.85rem !important;
+        padding: 4px 8px !important;
+    }
+    #presenter-overlay .modal-solution-tag {
+        font-size: 1.2rem !important;
+        margin-top: 16px !important;
+    }
+    #presenter-overlay .modal-table th,
+    #presenter-overlay .modal-table td {
+        font-size: 0.85rem !important;
+        padding: 8px 10px !important;
+    }
+    
+    #presenter-overlay .presenter-slide-card {
+        padding: 30px var(--space-4) !important;
+        min-height: calc(100vh - 64px) !important;
+    }
+    .presenter-bar {
+        height: 64px !important;
+        padding: 0 var(--space-4) !important;
+    }
+    .presenter-bar .btn {
+        font-size: 1rem !important;
+        padding: 8px 16px !important;
+    }
+}
 
 .pbar-btn {
     padding: var(--space-2) var(--space-6);
@@ -1557,11 +1606,37 @@ textarea:focus-visible {
     .profiles-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
     .profile-avatar { width: 90px; height: 90px; }
     
+    .profile-screen-header {
+        flex-direction: column !important;
+        gap: 16px !important;
+        text-align: center !important;
+        align-items: center !important;
+    }
+    .profile-uni-info {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+    .profile-uni-text {
+        align-items: center !important;
+        text-align: center !important;
+    }
+    .profile-academic-meta {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    .profile-academic-meta span[style*="rgba(255,255,255,0.15)"],
+    .profile-academic-meta span[style*="rgba(255, 255, 255, 0.15)"] {
+        display: none !important;
+    }
+    
     /* Cabecera */
     #netflix-header { padding: 12px 16px; }
-    .nav-links { display: none; }
-    .brand-logo { font-size: 1.3rem; }
-    .user-actions { gap: 12px; }
+    .header-nav { display: none !important; }
+    .header-logo { font-size: 1.25rem !important; }
+    .header-right { gap: 8px !important; }
+    .header-right .fa-magnifying-glass { display: none !important; }
+    #btn-presenter .btn-text { display: none !important; }
 
     /* Hero Banner */
     #hero-banner { 
@@ -1571,10 +1646,16 @@ textarea:focus-visible {
     }
     .hero-content { margin: 0 auto; padding: 0 20px; }
     .hero-title { font-size: 2.2rem; }
-    .hero-desc { font-size: 1rem; max-width: 100%; margin: 16px auto 24px; }
+    .hero-description { font-size: 0.95rem; max-width: 100%; margin: 16px auto 24px; }
     .hero-floating-slides { display: none; }
-    .hero-actions { flex-direction: column; width: 100%; }
-    .btn-hero { width: 100%; justify-content: center; }
+    .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
+    .hero-actions button, .hero-actions .btn-more-info { 
+        width: 100% !important; 
+        justify-content: center !important; 
+        margin: 0 !important;
+        display: flex;
+        align-items: center;
+    }
 
     /* Carruseles */
     .carousel-track { 
@@ -1610,6 +1691,103 @@ textarea:focus-visible {
     #presenter-slide-title { font-size: 1.4rem; }
     #presenter-controls { flex-wrap: wrap; justify-content: center; gap: 10px; }
     #presenter-controls button { width: 100%; justify-content: center; }
+
+    /* Torneo Live Dashboard adaptado a Móviles */
+    #torneo-topbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 12px 16px !important;
+        gap: 12px !important;
+    }
+    #torneo-topbar > div:first-child {
+        text-align: center !important;
+    }
+    #torneo-topbar > div:last-child {
+        justify-content: center !important;
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+    }
+    #torneo-topbar button {
+        font-size: 0.7rem !important;
+        padding: 6px 10px !important;
+        flex-grow: 1 !important;
+    }
+
+    #torneo-content {
+        overflow-y: auto !important;
+        display: block !important;
+        width: 100% !important;
+    }
+
+    #torneo-panel-lobby {
+        padding: 20px 16px !important;
+        gap: 20px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    #torneo-panel-lobby > div[style*="display:grid"],
+    #torneo-panel-lobby > div[style*="display: grid"] {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+    }
+    #torneo-participantes-grid {
+        justify-content: center !important;
+    }
+
+    #torneo-panel-pregunta {
+        padding: 20px 16px !important;
+        gap: 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    #torneo-panel-pregunta > div[style*="padding:32px"] {
+        padding: 16px !important;
+    }
+    #torneo-timer {
+        font-size: 2.2rem !important;
+        min-width: 60px !important;
+    }
+    #torneo-p-texto {
+        font-size: 1rem !important;
+    }
+
+    #torneo-panel-leaderboard {
+        padding: 20px 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    #torneo-detalle-alumno-modal > div {
+        max-height: 95vh !important;
+        margin: 10px !important;
+    }
+    #torneo-detalle-alumno-modal > div > div:first-child {
+        padding: 16px 20px 0 !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+    #torneo-detalle-alumno-modal > div > div:first-child > div:last-child {
+        width: 100% !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+    #torneo-detalle-alumno-modal > div > div:first-child button {
+        flex: 1 1 45% !important;
+        justify-content: center !important;
+        font-size: 0.72rem !important;
+        padding: 8px 10px !important;
+    }
+    #torneo-detalle-alumno-modal > div > div:last-child {
+        padding: 16px 20px 20px !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+    #torneo-detalle-alumno-modal #tdm-foto {
+        max-height: 220px !important;
+        object-fit: contain !important;
+    }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
