@@ -212,6 +212,78 @@
             font-size: 0.6rem; color: rgba(255,255,255,0.15);
             letter-spacing: 1px; text-transform: uppercase;
         }
+
+        /* ── Torneito Section ───────────────────────────────────── */
+        .torneo-section {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+        }
+        .torneo-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #a78bfa;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .torneo-subtitle {
+            font-size: 0.62rem;
+            color: var(--muted);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .torneo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .btn-torneo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 14px 8px;
+            background: rgba(167,139,250,0.06);
+            border: 2px solid rgba(167,139,250,0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-torneo:active { transform: scale(0.93); }
+        .btn-torneo.active-block {
+            background: rgba(167,139,250,0.2);
+            border-color: #a78bfa;
+            box-shadow: 0 0 16px rgba(167,139,250,0.3);
+        }
+        .torneo-num {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #a78bfa;
+            line-height: 1;
+        }
+        .btn-torneo.active-block .torneo-num { color: #c4b5fd; }
+        .torneo-label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.3;
+            letter-spacing: 0.3px;
+        }
+        .btn-torneo.active-block .torneo-label { color: #c4b5fd; }
+        .torneo-active-label {
+            font-size: 0.65rem;
+            color: var(--muted);
+            text-align: center;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -254,6 +326,29 @@
             <i class="fa-solid fa-compress"></i> Salir del Modo Presentación
         </button>
     </div>
+</div>
+
+<!-- ── Torneito Block Management ──────────────────────────────────────────── -->
+<div class="torneo-section">
+    <div class="torneo-title">
+        <i class="fa-solid fa-trophy"></i> Gestión del Torneito
+    </div>
+    <div class="torneo-subtitle">Selecciona el bloque de preguntas activo</div>
+    <div class="torneo-grid">
+        <button class="btn-torneo" id="btn-block-0" onclick="sendBlockChange(0)">
+            <span class="torneo-num">1</span>
+            <span class="torneo-label">Clásicos<br>de Planteo</span>
+        </button>
+        <button class="btn-torneo" id="btn-block-1" onclick="sendBlockChange(1)">
+            <span class="torneo-num">2</span>
+            <span class="torneo-label">Problemas<br>Mixtos</span>
+        </button>
+        <button class="btn-torneo" id="btn-block-2" onclick="sendBlockChange(2)">
+            <span class="torneo-num">3</span>
+            <span class="torneo-label">Nivel<br>UNI</span>
+        </button>
+    </div>
+    <div class="torneo-active-label" id="torneo-active-label">Bloque activo: 1</div>
 </div>
 
 <footer>ECUACIONES.io · Mando Remoto · Supabase Realtime</footer>
@@ -378,6 +473,27 @@ function rippleEffect(btn) {
     btn.appendChild(ripple);
     ripple.addEventListener('animationend', () => ripple.remove());
 }
+
+// ── Torneito Block Change ─────────────────────────────────────────────────────
+let currentActiveBlock = 0;
+
+function sendBlockChange(blockIndex) {
+    channel.send({ type: 'broadcast', event: 'change-block', payload: { blockIndex } });
+    currentActiveBlock = blockIndex;
+    updateBlockButtons();
+    const blockNames = ['Clásicos de Planteo', 'Problemas Mixtos', 'Nivel UNI'];
+    const label = document.getElementById('torneo-active-label');
+    if (label) label.textContent = `Bloque activo: ${blockIndex + 1} — ${blockNames[blockIndex]}`;
+}
+
+function updateBlockButtons() {
+    document.querySelectorAll('.btn-torneo').forEach((btn, i) => {
+        btn.classList.toggle('active-block', i === currentActiveBlock);
+    });
+}
+
+// Initialize block buttons state
+updateBlockButtons();
 </script>
 </body>
 </html>

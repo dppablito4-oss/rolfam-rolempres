@@ -298,12 +298,494 @@ const SLIDES_DATA = {
     }
 };
 
-// All slides in presenter order
-const PRESENTER_SLIDES = [
-    'slide-planteo', 'slide-pasos', 'slide-diccionario',
-    'slide-ej1', 'slide-ej2', 'slide-ej3', 'slide-ej4', 'slide-ej5',
-    'slide-ej6', 'slide-ej7', 'slide-errores', 'slide-resumen'
+// ── Torneo Data (3 bloques x 5 niveles) ─────────────────────────────────────
+const DEFAULT_TORNEO_BLOCKS = [
+    // ══════════ BLOQUE 1 ══════════
+    {
+        id: 'bloque-1',
+        nombre: 'Bloque 1 — Clásicos de Planteo',
+        color: '#e50914',
+        preguntas: [
+            {
+                nivel: 1,
+                titulo: 'Nivel 1: El Número Misterioso',
+                subtitulo: 'Básico · Traducción directa',
+                icono: '🔢',
+                ecuacion: '2x + 12 = 42',
+                enunciado: 'El doble de un número, aumentado en 12, es igual a 42. Hallar el número.',
+                planteamiento: `<p><span class="modal-step-pill">Incógnita</span> El número desconocido: $x$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Traducción</span> El doble del número: $2x$. Aumentado en 12: $+12$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$2x + 12 = 42$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> Restamos 12 a ambos lados: $$2x = 42 - 12 = 30$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> Dividimos entre 2: $$x = \\frac{30}{2} = 15$$</p>`,
+                respuesta: 'El número es <strong>15</strong>.'
+            },
+            {
+                nivel: 2,
+                titulo: 'Nivel 2: Los Hermanos Consecutivos',
+                subtitulo: 'Intermedio-Bajo · Consecutivos',
+                icono: '👫',
+                ecuacion: 'x + (x+1) + (x+2) = 105',
+                enunciado: 'La suma de tres números enteros consecutivos es igual a 105. ¿Cuál es el número mayor?',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Primer número: $x$. Segundo: $x+1$. Tercero (mayor): $x+2$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$x + (x+1) + (x+2) = 105$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> Agrupamos términos semejantes: $$3x + 3 = 105$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$3x = 102 \\Rightarrow x = 34$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 3</span> El mayor es $x + 2 = 34 + 2 = 36$.</p>`,
+                respuesta: 'El número mayor es <strong>36</strong>.'
+            },
+            {
+                nivel: 3,
+                titulo: 'Nivel 3: Desafío en la Granja',
+                subtitulo: 'Intermedio · Cabezas y patas',
+                icono: '🐓',
+                ecuacion: '4c + 2(35 - c) = 116',
+                enunciado: 'En una granja hay gallinas y conejos. En total se cuentan 35 cabezas y 116 patas. ¿Cuántos conejos hay?',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Conejos: $c$ (4 patas). Gallinas: $35 - c$ (2 patas).</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$4c + 2(35 - c) = 116$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> Aplicamos distributiva: $$4c + 70 - 2c = 116$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$2c = 116 - 70 = 46$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 3</span> $$c = 23$$</p>`,
+                respuesta: 'Hay <strong>23 conejos</strong> en la granja.'
+            },
+            {
+                nivel: 4,
+                titulo: 'Nivel 4: Gastos Compartidos',
+                subtitulo: 'Intermedio-Avanzado · Aporte variable',
+                icono: '🎁',
+                ecuacion: '10A = 8(A + 5)',
+                enunciado: 'Un grupo de 10 amigos compra un regalo. 2 no pudieron pagar, y los restantes pusieron 5 soles más cada uno. ¿Cuánto costó el regalo?',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Cuota inicial: $A$. Amigos que pagan: $10 - 2 = 8$. Cuota final: $A + 5$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Igualdad</span> El costo total es el mismo: $$10A = 8(A + 5)$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$10A = 8A + 40$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$2A = 40 \\Rightarrow A = 20 \\text{ soles}$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 3</span> Costo total: $$10 \\times 20 = 200 \\text{ soles}$$</p>`,
+                respuesta: 'El regalo costó <strong>200 soles</strong>.'
+            },
+            {
+                nivel: 5,
+                titulo: 'Nivel 5: El Dilema de las Edades',
+                subtitulo: 'Avanzado · Cruce temporal',
+                icono: '⏳',
+                ecuacion: '7x = 70',
+                enunciado: 'Yo tengo el triple de la edad que tú tenías cuando yo tenía la edad que tú tienes. Cuando tú tengas la edad que yo tengo, la suma de nuestras edades será 70. ¿Qué edad tengo actualmente?',
+                planteamiento: `<p><span class="modal-step-pill">Clave</span> La diferencia de edades (Yo − Tú) es constante en el tiempo.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Pasado</span> Tú tenías $x$. Yo tenía lo que tú tienes ahora: $y$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Presente</span> Yo tengo $3x$. Tú tienes $y$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Relación</span> $$y - x = 3x - y \\Rightarrow 2y = 4x \\Rightarrow y = 2x$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Futuro</span> Tú tendrás $3x$ (pasan $x$ años). Yo tendré $3x + x = 4x$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$4x + 3x = 70 \\Rightarrow 7x = 70 \\Rightarrow x = 10$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Mi edad</span> $$3x = 3(10) = 30 \\text{ años}$$</p>`,
+                respuesta: 'Actualmente tengo <strong>30 años</strong>.'
+            }
+        ]
+    },
+    // ══════════ BLOQUE 2 ══════════
+    {
+        id: 'bloque-2',
+        nombre: 'Bloque 2 — Problemas Mixtos',
+        color: '#6366f1',
+        preguntas: [
+            {
+                nivel: 1,
+                titulo: 'Nivel 1: La Mitad y el Resto',
+                subtitulo: 'Básico · Fracciones de un número',
+                icono: '½',
+                ecuacion: 'x/2 + 8 = 22',
+                enunciado: 'La mitad de un número aumentada en 8 es igual a 22. ¿Cuál es el número?',
+                planteamiento: `<p><span class="modal-step-pill">Incógnita</span> El número: $x$. Su mitad: $\\frac{x}{2}$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$\\frac{x}{2} + 8 = 22$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$\\frac{x}{2} = 14$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$x = 28$$</p>`,
+                respuesta: 'El número es <strong>28</strong>.'
+            },
+            {
+                nivel: 2,
+                titulo: 'Nivel 2: Números Pares Consecutivos',
+                subtitulo: 'Intermedio-Bajo · Pares',
+                icono: '2️⃣',
+                ecuacion: 'x + (x+2) + (x+4) = 90',
+                enunciado: 'La suma de tres números pares consecutivos es 90. Halla el mayor.',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Primer par: $x$. Segundo: $x+2$. Tercero (mayor): $x+4$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$x + (x+2) + (x+4) = 90$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$3x + 6 = 90 \\Rightarrow 3x = 84 \\Rightarrow x = 28$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Mayor</span> $$x + 4 = 32$$</p>`,
+                respuesta: 'El número mayor es <strong>32</strong>.'
+            },
+            {
+                nivel: 3,
+                titulo: 'Nivel 3: La Piscina',
+                subtitulo: 'Intermedio · Geometría rectangular',
+                icono: '🏊',
+                ecuacion: '2x + 2(2x+5) = 70',
+                enunciado: 'El largo de una piscina excede al doble del ancho en 5 m. El perímetro es 70 m. Halla el largo.',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Ancho: $x$. Largo: $2x + 5$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Perímetro</span> $$2x + 2(2x + 5) = 70$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$2x + 4x + 10 = 70 \\Rightarrow 6x = 60 \\Rightarrow x = 10$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Largo</span> $$2(10) + 5 = 25 \\text{ m}$$</p>`,
+                respuesta: 'El largo mide <strong>25 m</strong>.'
+            },
+            {
+                nivel: 4,
+                titulo: 'Nivel 4: El Viaje en Tren',
+                subtitulo: 'Intermedio-Avanzado · Velocidad',
+                icono: '🚂',
+                ecuacion: '60t = 80(t - 1)',
+                enunciado: 'Un tren parte a 60 km/h. Una hora después sale otro a 80 km/h por la misma ruta. ¿Cuánto tarda el segundo en alcanzar al primero?',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Tiempo del 2° tren: $t$ horas. Tiempo del 1°: $t + 1$ horas.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Igualdad</span> Distancias iguales al alcanzar: $$60(t+1) = 80t$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$60t + 60 = 80t \\Rightarrow 60 = 20t \\Rightarrow t = 3 \\text{ h}$$</p>`,
+                respuesta: 'El segundo tren alcanza al primero en <strong>3 horas</strong>.'
+            },
+            {
+                nivel: 5,
+                titulo: 'Nivel 5: Dos Capitales con Interés',
+                subtitulo: 'Avanzado · Interés simple',
+                icono: '💰',
+                ecuacion: '0.05x + 0.08(20000-x) = 1300',
+                enunciado: 'Se invierten S/. 20,000 en dos cuentas: una al 5% y otra al 8% anual. Los intereses suman S/. 1,300. ¿Cuánto se invirtió en cada cuenta?',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Capital al 5%: $x$. Capital al 8%: $20000 - x$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$0.05x + 0.08(20000 - x) = 1300$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$0.05x + 1600 - 0.08x = 1300$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$-0.03x = -300 \\Rightarrow x = 10000$$</p>`,
+                respuesta: '<strong>S/. 10,000 al 5%</strong> y <strong>S/. 10,000 al 8%</strong>.'
+            }
+        ]
+    },
+    // ══════════ BLOQUE 3 ══════════
+    {
+        id: 'bloque-3',
+        nombre: 'Bloque 3 — Nivel UNI',
+        color: '#10b981',
+        preguntas: [
+            {
+                nivel: 1,
+                titulo: 'Nivel 1: División en Partes',
+                subtitulo: 'Básico · Proporciones directas',
+                icono: '📊',
+                ecuacion: '3x + x = 80',
+                enunciado: 'Dividir 80 en dos partes de forma que una sea el triple de la otra. Halla la parte mayor.',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Parte menor: $x$. Parte mayor: $3x$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$3x + x = 80$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$4x = 80 \\Rightarrow x = 20$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Mayor</span> $$3x = 60$$</p>`,
+                respuesta: 'La parte mayor es <strong>60</strong>.'
+            },
+            {
+                nivel: 2,
+                titulo: 'Nivel 2: Monedas en la Alcancía',
+                subtitulo: 'Intermedio-Bajo · Sistemas monedas',
+                icono: '🪙',
+                ecuacion: '0.50x + 1.00(30-x) = 20',
+                enunciado: 'Una alcancía tiene 30 monedas de 50 céntimos y 1 sol. En total hay S/. 20. ¿Cuántas monedas de 1 sol hay?',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Monedas de 50 cts: $x$. Monedas de 1 sol: $30 - x$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$0.50x + 1.00(30 - x) = 20$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$0.50x + 30 - x = 20 \\Rightarrow -0.50x = -10 \\Rightarrow x = 20$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">De 1 sol</span> $$30 - 20 = 10$$</p>`,
+                respuesta: 'Hay <strong>10 monedas de 1 sol</strong>.'
+            },
+            {
+                nivel: 3,
+                titulo: 'Nivel 3: El Descuento Justo',
+                subtitulo: 'Intermedio · Porcentajes comerciales',
+                icono: '🏷️',
+                ecuacion: 'x - 0.15x = 510',
+                enunciado: 'Un artículo tiene un descuento del 15%. Si el precio final es S/. 510, ¿cuál era el precio original?',
+                planteamiento: `<p><span class="modal-step-pill">Variable</span> Precio original: $x$. Con 15% de descuento: $x - 0.15x = 0.85x$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$0.85x = 510$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$x = \\frac{510}{0.85} = 600$$</p>`,
+                respuesta: 'El precio original era <strong>S/. 600</strong>.'
+            },
+            {
+                nivel: 4,
+                titulo: 'Nivel 4: La Mezcla de Soluciones',
+                subtitulo: 'Intermedio-Avanzado · Concentración',
+                icono: '🧪',
+                ecuacion: '0.30x + 0.70(10-x) = 0.50(10)',
+                enunciado: 'Se mezclan litros de una solución al 30% y al 70% para obtener 10 L al 50%. ¿Cuántos litros de cada una se necesitan?',
+                planteamiento: `<p><span class="modal-step-pill">Variables</span> Litros al 30%: $x$. Litros al 70%: $10 - x$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$0.30x + 0.70(10 - x) = 0.50 \\times 10$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$0.30x + 7 - 0.70x = 5 \\Rightarrow -0.40x = -2 \\Rightarrow x = 5$$</p>`,
+                respuesta: '<strong>5 L al 30%</strong> y <strong>5 L al 70%</strong>.'
+            },
+            {
+                nivel: 5,
+                titulo: 'Nivel 5: Edades en Razón (UNI)',
+                subtitulo: 'Avanzado · Razones y tiempo',
+                icono: '⭐',
+                ecuacion: '(A-5)/(B-5) = 5/4',
+                enunciado: 'La suma de edades de A y B es 46 y su diferencia es 4. Hace $a$ años la razón era 5:4. Dentro de $b$ años será 7:6. Calcule $a+b$.',
+                planteamiento: `<p><span class="modal-step-pill">Sistema</span> $A + B = 46$ y $A - B = 4$. Resolviendo: $A = 25$, $B = 21$.</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Pasado</span> $$\\frac{25-a}{21-a} = \\frac{5}{4}$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Futuro</span> $$\\frac{25+b}{21+b} = \\frac{7}{6}$$</p>`,
+                resolucion: `<p><span class="modal-step-pill">Pasado</span> $4(25-a) = 5(21-a) \\Rightarrow 100-4a = 105-5a \\Rightarrow a = 5$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Futuro</span> $6(25+b) = 7(21+b) \\Rightarrow 150+6b = 147+7b \\Rightarrow b = 3$</p>`,
+                respuesta: '$a + b = 5 + 3 = $ <strong style="color:#46d369;font-size:1.2rem;">8</strong>'
+            }
+        ]
+    }
 ];
+
+// ── Torneo State & Persistence ───────────────────────────────────────────────
+const TORNEO_STORAGE_KEY = 'ecuaciones_io_torneo_v1';
+let torneoActiveBlock = 0; // índice 0, 1 o 2
+let torneoBlocks = null;
+
+function loadTorneoData() {
+    try {
+        const saved = localStorage.getItem(TORNEO_STORAGE_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            torneoBlocks = parsed.blocks || JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS));
+            torneoActiveBlock = typeof parsed.activeBlock === 'number' ? parsed.activeBlock : 0;
+        } else {
+            torneoBlocks = JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS));
+            torneoActiveBlock = 0;
+        }
+    } catch(e) {
+        torneoBlocks = JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS));
+        torneoActiveBlock = 0;
+    }
+}
+
+function saveTorneoData() {
+    try {
+        localStorage.setItem(TORNEO_STORAGE_KEY, JSON.stringify({
+            blocks: torneoBlocks,
+            activeBlock: torneoActiveBlock
+        }));
+    } catch(e) { console.warn('No se pudo guardar en localStorage:', e); }
+}
+
+function resetTorneoData() {
+    torneoBlocks = JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS));
+    torneoActiveBlock = 0;
+    saveTorneoData();
+}
+
+// ── Dynamic SLIDES_DATA injection for Torneo ─────────────────────────────────
+function updateTorneoSlides() {
+    const block = torneoBlocks[torneoActiveBlock];
+    if (!block) return;
+
+    const levelColors = ['#e50914','#f59e0b','#10b981','#6366f1','#a78bfa'];
+
+    block.preguntas.forEach((p, i) => {
+        const slideId = `slide-torneo-${i + 1}`;
+        SLIDES_DATA[slideId] = {
+            title: p.titulo,
+            icon: p.icono,
+            heroColor: `linear-gradient(135deg, #0d0d1a, #1a1a2e)`,
+            description: p.subtitulo,
+            content: `
+                <div style="border-left:4px solid ${levelColors[i]};padding:12px 20px;background:rgba(255,255,255,0.03);border-radius:0 8px 8px 0;margin-bottom:20px;">
+                    <p style="font-size:0.95rem;color:var(--color-text-secondary);line-height:1.7;">${p.enunciado}</p>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div>
+                        <p style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);font-weight:700;letter-spacing:1px;margin-bottom:12px;">📐 Planteamiento</p>
+                        <div class="modal-math-box" style="border-color:${levelColors[i]};">
+                            ${p.planteamiento}
+                        </div>
+                    </div>
+                    <div>
+                        <p style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);font-weight:700;letter-spacing:1px;margin-bottom:12px;">🔢 Resolución</p>
+                        <div class="modal-math-box" style="border-color:${levelColors[i]};">
+                            ${p.resolucion}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-solution-tag" style="margin-top:20px;">
+                    <i class="fa-solid fa-circle-check"></i> ${p.respuesta}
+                </div>`
+        };
+    });
+}
+
+function getTorneoPresenterSlides() {
+    return [1,2,3,4,5].map(n => `slide-torneo-${n}`);
+}
+
+// ── Dynamic PRESENTER_SLIDES (computed) ──────────────────────────────────────
+function getPresenterSlides() {
+    return [
+        'slide-planteo', 'slide-pasos', 'slide-diccionario',
+        'slide-ej1', 'slide-ej2', 'slide-ej3', 'slide-ej4', 'slide-ej5',
+        ...getTorneoPresenterSlides(),
+        'slide-errores', 'slide-resumen'
+    ];
+}
+
+// Backward compatibility — mantener PRESENTER_SLIDES como referencia mutable
+let PRESENTER_SLIDES = getPresenterSlides();
+
+// ── Torneo Card Rendering ─────────────────────────────────────────────────────
+function renderTorneoCards() {
+    const track = document.getElementById('track-row-torneo');
+    if (!track) return;
+
+    loadTorneoData();
+    updateTorneoSlides();
+    PRESENTER_SLIDES = getPresenterSlides();
+
+    const block = torneoBlocks[torneoActiveBlock];
+    const levelBadges = ['Básico','Intermedio-Bajo','Intermedio','Intermedio-Avanzado','Avanzado'];
+    const levelColors = ['#46d369','#f59e0b','#f59e0b','#f59e0b','#e50914'];
+    const accentColor = block.color;
+
+    track.innerHTML = block.preguntas.map((p, i) => `
+        <div class="slide-card" onclick="openSlideModal('slide-torneo-${i+1}')" aria-label="Ver: ${p.titulo}">
+            <div class="slide-card-thumb">
+                <div class="slide-card-thumb-inner" style="background:linear-gradient(135deg,#1a1a2e,#0d0d1a);">
+                    <div class="slide-card-icon" style="color:${accentColor};">${p.icono}</div>
+                    <div class="slide-card-label">${p.titulo.replace(/Nivel \d+: /, '')}</div>
+                    <div class="slide-card-math" style="font-family:var(--font-mono);color:rgba(255,255,255,0.3);font-size:0.7rem;">${p.ecuacion}</div>
+                </div>
+            </div>
+            <div class="slide-card-info">
+                <div class="slide-card-actions">
+                    <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-torneo-${i+1}')" aria-label="Abrir diapositiva">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button class="card-btn" aria-label="Más opciones"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+                <div class="slide-card-info-title">${p.titulo}</div>
+                <div class="slide-card-info-tags">
+                    <span class="card-tag" style="color:${levelColors[i]};font-weight:700;">${levelBadges[i]}</span>
+                    <span class="card-tag">${block.nombre.split('—')[1].trim()}</span>
+                </div>
+            </div>
+        </div>`
+    ).join('');
+
+    // Update section header subtitle
+    const blockLabel = document.getElementById('torneo-block-label');
+    if (blockLabel) {
+        blockLabel.textContent = block.nombre;
+        blockLabel.style.color = block.color;
+    }
+}
+
+// ── Torneo Block Switch (called from Admin & Realtime) ───────────────────────
+function switchTorneoBlock(blockIndex, fromRemote = false) {
+    if (blockIndex < 0 || blockIndex >= torneoBlocks.length) return;
+    torneoActiveBlock = blockIndex;
+    saveTorneoData();
+    renderTorneoCards();
+    const block = torneoBlocks[blockIndex];
+    showToast(`🏆 ${fromRemote ? '📡 Remoto: ' : ''}Bloque activado: ${block.nombre}`, 'success');
+
+    // Broadcast to remote if triggered locally
+    if (!fromRemote && supabaseClient) {
+        try {
+            supabaseClient.channel('presentation-planteo-ecuaciones').send({
+                type: 'broadcast',
+                event: 'change-block',
+                payload: { blockIndex }
+            });
+        } catch(e) {}
+    }
+}
+
+// ── Admin Modal ──────────────────────────────────────────────────────────────
+let adminActiveBlockTab = 0;
+
+function openAdminModal() {
+    loadTorneoData();
+    adminActiveBlockTab = torneoActiveBlock;
+    renderAdminModal();
+    document.getElementById('admin-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAdminModal() {
+    document.getElementById('admin-modal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function renderAdminModal() {
+    // Update active block tabs highlight
+    document.querySelectorAll('.admin-block-tab').forEach((tab, i) => {
+        tab.classList.toggle('active', i === adminActiveBlockTab);
+    });
+
+    const block = torneoBlocks[adminActiveBlockTab];
+    const container = document.getElementById('admin-questions-container');
+    if (!container) return;
+
+    container.innerHTML = block.preguntas.map((p, qi) => `
+        <div class="admin-question-card">
+            <div class="admin-question-header">
+                <span class="admin-question-num">Nivel ${qi + 1}</span>
+                <span class="admin-question-icon">${p.icono}</span>
+            </div>
+            <div class="admin-field-group">
+                <label class="admin-label" for="aq-${qi}-titulo">Título</label>
+                <input class="admin-input" id="aq-${qi}-titulo" type="text" value="${p.titulo.replace(/"/g,'&quot;')}" placeholder="Título del nivel">
+            </div>
+            <div class="admin-field-group">
+                <label class="admin-label" for="aq-${qi}-subtitulo">Subtítulo / Etiqueta</label>
+                <input class="admin-input" id="aq-${qi}-subtitulo" type="text" value="${p.subtitulo.replace(/"/g,'&quot;')}" placeholder="Ej: Básico · Traducción">
+            </div>
+            <div class="admin-field-group">
+                <label class="admin-label" for="aq-${qi}-ecuacion">Ecuación (texto plano para la tarjeta)</label>
+                <input class="admin-input" id="aq-${qi}-ecuacion" type="text" value="${p.ecuacion.replace(/"/g,'&quot;')}" placeholder="Ej: 2x + 12 = 42">
+            </div>
+            <div class="admin-field-group">
+                <label class="admin-label" for="aq-${qi}-enunciado">Enunciado del Problema</label>
+                <textarea class="admin-textarea" id="aq-${qi}-enunciado" rows="3" placeholder="Escribe el enunciado del problema...">${p.enunciado}</textarea>
+            </div>
+            <div class="admin-field-group">
+                <label class="admin-label" for="aq-${qi}-planteamiento">Planteamiento (HTML + KaTeX $$...$$)</label>
+                <textarea class="admin-textarea" id="aq-${qi}-planteamiento" rows="5" placeholder="HTML con fórmulas KaTeX...">${p.planteamiento.trim()}</textarea>
+            </div>
+            <div class="admin-field-group">
+                <label class="admin-label" for="aq-${qi}-resolucion">Resolución Paso a Paso (HTML + KaTeX $$...$$)</label>
+                <textarea class="admin-textarea" id="aq-${qi}-resolucion" rows="5" placeholder="HTML con fórmulas KaTeX...">${p.resolucion.trim()}</textarea>
+            </div>
+            <div class="admin-field-group">
+                <label class="admin-label" for="aq-${qi}-respuesta">Respuesta Final (HTML corto)</label>
+                <input class="admin-input" id="aq-${qi}-respuesta" type="text" value="${p.respuesta.replace(/"/g,'&quot;')}" placeholder="Ej: El número es &lt;strong&gt;15&lt;/strong&gt;.">
+            </div>
+        </div>`
+    ).join('');
+}
+
+function switchAdminTab(blockIndex) {
+    adminActiveBlockTab = blockIndex;
+    renderAdminModal();
+}
+
+function saveAdminChanges() {
+    const block = torneoBlocks[adminActiveBlockTab];
+    block.preguntas.forEach((p, qi) => {
+        p.titulo       = document.getElementById(`aq-${qi}-titulo`)?.value       || p.titulo;
+        p.subtitulo    = document.getElementById(`aq-${qi}-subtitulo`)?.value    || p.subtitulo;
+        p.ecuacion     = document.getElementById(`aq-${qi}-ecuacion`)?.value     || p.ecuacion;
+        p.enunciado    = document.getElementById(`aq-${qi}-enunciado`)?.value    || p.enunciado;
+        p.planteamiento = document.getElementById(`aq-${qi}-planteamiento`)?.value || p.planteamiento;
+        p.resolucion   = document.getElementById(`aq-${qi}-resolucion`)?.value   || p.resolucion;
+        p.respuesta    = document.getElementById(`aq-${qi}-respuesta`)?.value    || p.respuesta;
+    });
+
+    saveTorneoData();
+    updateTorneoSlides();
+    if (adminActiveBlockTab === torneoActiveBlock) renderTorneoCards();
+
+    showToast('✅ Cambios guardados correctamente.', 'success');
+}
+
+function resetAdminBlock() {
+    if (!confirm(`¿Restaurar el Bloque ${adminActiveBlockTab + 1} a sus valores originales? Esta acción no se puede deshacer.`)) return;
+    torneoBlocks[adminActiveBlockTab] = JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS[adminActiveBlockTab]));
+    saveTorneoData();
+    renderAdminModal();
+    if (adminActiveBlockTab === torneoActiveBlock) {
+        updateTorneoSlides();
+        renderTorneoCards();
+    }
+    showToast('🔄 Bloque restaurado a valores originales.', 'info');
+}
 
 // ── State ────────────────────────────────────────────────────────────────────
 let activeProfile = null;
@@ -344,6 +826,8 @@ function selectProfile(name, avatarSrc, accentColor) {
         renderAllMath();
         // Init Netflix-style video previews
         initCardPreviews();
+        // Init Torneo dynamic cards
+        renderTorneoCards();
     }, 800);
 }
 
@@ -486,6 +970,8 @@ window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeQRModal();
     } else if (document.getElementById('slide-modal').classList.contains('open')) {
         if (e.key === 'Escape') closeSlideModal();
+    } else if (document.getElementById('admin-modal').classList.contains('open')) {
+        if (e.key === 'Escape') closeAdminModal();
     }
 });
 
@@ -759,6 +1245,11 @@ function initRealtimeUplink() {
         .on('broadcast', { event: 'exit-presentation' }, () => {
             exitPresenterMode();
             showToast('⏹️ Presentación detenida desde el mando remoto', 'info');
+        })
+        .on('broadcast', { event: 'change-block' }, ({ payload }) => {
+            if (typeof payload.blockIndex === 'number') {
+                switchTorneoBlock(payload.blockIndex, true);
+            }
         })
         .subscribe((status) => {
             if (status === 'SUBSCRIBED') showToast('🔗 Mando remoto listo', 'success');
@@ -1047,9 +1538,20 @@ window.stopAllPreviews = stopAllPreviews;
 window.initCardPreviews = initCardPreviews;
 window.openQRModal = openQRModal;
 window.closeQRModal = closeQRModal;
+window.openAdminModal = openAdminModal;
+window.closeAdminModal = closeAdminModal;
+window.switchAdminTab = switchAdminTab;
+window.saveAdminChanges = saveAdminChanges;
+window.resetAdminBlock = resetAdminBlock;
+window.switchTorneoBlock = switchTorneoBlock;
+window.renderTorneoCards = renderTorneoCards;
 
 // ── Init on DOM Ready ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initRealtimeUplink();
     renderAllMath();
+    // Pre-load torneo data so it's ready when the user selects a profile
+    loadTorneoData();
+    updateTorneoSlides();
+    PRESENTER_SLIDES = getPresenterSlides();
 });

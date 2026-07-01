@@ -126,6 +126,11 @@
                     onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">
                 <i class="fa-solid fa-expand"></i> Presentar
             </button>
+            <button id="btn-admin" onclick="openAdminModal()" aria-label="Panel de administración del Torneito"
+                    style="padding:6px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#b3b3b3;border-radius:4px;font-size:0.8rem;cursor:pointer;transition:all 0.2s;"
+                    onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.color='#b3b3b3';this.style.borderColor='rgba(255,255,255,0.15)'">
+                <i class="fa-solid fa-gear"></i>
+            </button>
         </div>
     </header>
 
@@ -391,45 +396,21 @@
             </div>
         </section>
 
-        <!-- ── FILA 3: Retos UNI ─────────────────────────────────────── -->
-        <section id="row-retos" class="netflix-row row-theme-purple reveal" aria-label="Sección Retos de Alto Voltaje UNI">
+        <!-- ── FILA 3: El Torneito ──────────────────────────────────── -->
+        <section id="row-torneo" class="netflix-row row-theme-purple reveal" aria-label="Sección El Torneito">
             <div class="netflix-row-header">
-                <h2 class="netflix-row-title"><i class="fa-solid fa-star" style="color:#a78bfa;margin-right:8px;"></i>Retos de Alto Voltaje · Nivel UNI</h2>
-                <span class="netflix-row-see-all">Ver retos</span>
+                <h2 class="netflix-row-title"><i class="fa-solid fa-trophy" style="color:#a78bfa;margin-right:8px;"></i>El Torneito 🏆</h2>
+                <span id="torneo-block-label" style="font-size:0.78rem;font-weight:700;color:#e50914;opacity:0.85;">Bloque 1 — Clásicos de Planteo</span>
+                <span class="netflix-row-see-all" onclick="openAdminModal()" style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+                    <i class="fa-solid fa-pen-to-square"></i> Gestionar bloques
+                </span>
             </div>
             <div class="carousel-wrapper">
-                <button class="carousel-btn prev" aria-label="Anterior" onclick="slideCarousel('row-retos', -1)"><i class="fa-solid fa-chevron-left"></i></button>
-                <div class="carousel-track" id="track-row-retos">
-                    <div class="slide-card" onclick="openSlideModal('slide-ej6')" data-yt-id="F71H4y2t5aY" data-yt-start="120">
-                        <div class="slide-card-thumb">
-                            <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#a78bfa;">⭐</div>
-                                <div class="slide-card-label">Reto UNI I<br>Edades en el Tiempo</div>
-                                <div class="slide-card-math">(A-a)/(B-a) = 5/4</div>
-                            </div>
-                        </div>
-                        <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej6')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Reto UNI I: Edades en el Tiempo</div>
-                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">UNI</span></div>
-                        </div>
-                    </div>
-                    <div class="slide-card" onclick="openSlideModal('slide-ej7')" data-yt-id="F71H4y2t5aY" data-yt-start="240">
-                        <div class="slide-card-thumb">
-                            <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#a78bfa;">⭐⭐</div>
-                                <div class="slide-card-label">Reto UNI II<br>Modelado Diofántico</div>
-                                <div class="slide-card-math">3x + 2y = 50, y > 2x</div>
-                            </div>
-                        </div>
-                        <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej7')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Reto UNI II: Modelado Diofántico</div>
-                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">Diofántico</span></div>
-                        </div>
-                    </div>
+                <button class="carousel-btn prev" aria-label="Anterior" onclick="slideCarousel('row-torneo', -1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="carousel-track" id="track-row-torneo">
+                    <!-- Las tarjetas se inyectan dinámicamente por renderTorneoCards() -->
                 </div>
-                <button class="carousel-btn next" aria-label="Siguiente" onclick="slideCarousel('row-retos', 1)"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="carousel-btn next" aria-label="Siguiente" onclick="slideCarousel('row-torneo', 1)"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </section>
 
@@ -561,6 +542,49 @@
             <li><span>3</span> Toca el link que aparece</li>
             <li><span>4</span> ¡Listo! Controla las diapositivas desde tu celular</li>
         </ul>
+    </div>
+</div>
+
+<!-- ADMIN MODAL — PANEL DE ADMINISTRACIÓN DEL TORNEITO -->
+<div id="admin-modal" role="dialog" aria-modal="true" aria-label="Panel de administración del Torneito" onclick="if(event.target===this)closeAdminModal()">
+    <div class="admin-modal-box">
+        <div class="admin-modal-header">
+            <div class="admin-modal-title">
+                <i class="fa-solid fa-trophy" style="color:#a78bfa;"></i>
+                Panel de Administración — El Torneito
+            </div>
+            <button class="admin-modal-close" onclick="closeAdminModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Block Tabs -->
+        <div class="admin-block-tabs">
+            <button class="admin-block-tab active" id="admin-tab-0" onclick="switchAdminTab(0)">
+                <i class="fa-solid fa-1"></i> Bloque 1
+            </button>
+            <button class="admin-block-tab" id="admin-tab-1" onclick="switchAdminTab(1)">
+                <i class="fa-solid fa-2"></i> Bloque 2
+            </button>
+            <button class="admin-block-tab" id="admin-tab-2" onclick="switchAdminTab(2)">
+                <i class="fa-solid fa-3"></i> Bloque 3
+            </button>
+            <div class="admin-block-tabs-divider"></div>
+            <button class="admin-activate-btn" onclick="switchTorneoBlock(adminActiveBlockTab)">
+                <i class="fa-solid fa-bolt"></i> Activar este bloque
+            </button>
+        </div>
+
+        <!-- Questions Container (rendered dynamically) -->
+        <div id="admin-questions-container" class="admin-questions-container"></div>
+
+        <!-- Footer Actions -->
+        <div class="admin-modal-footer">
+            <button class="admin-btn-reset" onclick="resetAdminBlock()">
+                <i class="fa-solid fa-rotate-left"></i> Restaurar bloque
+            </button>
+            <button class="admin-btn-save" onclick="saveAdminChanges()">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+            </button>
+        </div>
     </div>
 </div>
 
