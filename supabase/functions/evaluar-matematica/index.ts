@@ -4,9 +4,7 @@
 // Requiere: OPENAI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
-import { encode } from "https://deno.land/std@0.177.0/encoding/base64.ts"
 
 // Headers para evitar problemas de CORS desde el celular de los alumnos
 const corsHeaders = {
@@ -14,7 +12,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+Deno.serve(async (req) => {
   // Manejar peticiones OPTIONS (Preflight de CORS)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -44,7 +52,7 @@ serve(async (req) => {
       throw new Error(`No se pudo descargar la imagen: ${imageResponse.status}`)
     }
     const imageBuffer = await imageResponse.arrayBuffer()
-    const base64Image = encode(new Uint8Array(imageBuffer))
+    const base64Image = arrayBufferToBase64(imageBuffer)
 
     // Detectar MIME type desde el Content-Type de la respuesta o asumir JPEG
     const contentType = imageResponse.headers.get('content-type') || 'image/jpeg'
