@@ -71,6 +71,9 @@ CREATE POLICY "Inserción anónima participantes" ON public.participantes FOR IN
 DROP POLICY IF EXISTS "Actualización anónima puntajes" ON public.participantes;
 CREATE POLICY "Actualización anónima puntajes"  ON public.participantes FOR UPDATE USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Eliminación pública participantes" ON public.participantes;
+CREATE POLICY "Eliminación pública participantes" ON public.participantes FOR DELETE USING (true);
+
 -- 3. Tabla de Respuestas enviadas (fotos + calificación de OpenAI)
 CREATE TABLE IF NOT EXISTS public.respuestas (
     id                    UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -95,6 +98,9 @@ CREATE POLICY "Inserción anónima respuestas" ON public.respuestas FOR INSERT W
 
 DROP POLICY IF EXISTS "Actualización respuestas" ON public.respuestas;
 CREATE POLICY "Actualización respuestas"     ON public.respuestas FOR UPDATE USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Eliminación pública respuestas" ON public.respuestas;
+CREATE POLICY "Eliminación pública respuestas" ON public.respuestas FOR DELETE USING (true);
 
 -- 4. Habilitar Realtime para las tablas críticas del torneo (idempotente)
 DO $$
@@ -164,6 +170,10 @@ CREATE POLICY "Inserción pública anónima de exámenes"
 DROP POLICY IF EXISTS "Actualización pública anónima de exámenes" ON storage.objects;
 CREATE POLICY "Actualización pública anónima de exámenes"
     ON storage.objects FOR UPDATE USING (bucket_id = 'examenes') WITH CHECK (bucket_id = 'examenes');
+
+DROP POLICY IF EXISTS "Eliminación pública de exámenes" ON storage.objects;
+CREATE POLICY "Eliminación pública de exámenes"
+    ON storage.objects FOR DELETE USING (bucket_id = 'examenes');
 
 -- ──────────────────────────────────────────────────────────────────────────────
 -- VERIFICACIÓN:
