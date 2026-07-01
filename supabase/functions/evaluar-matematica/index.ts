@@ -65,7 +65,7 @@ Debes responder ESTRICTAMENTE en formato JSON plano con la siguiente estructura,
 {
   "transcripcion_interna": "[Tu transcripción limpia de las fórmulas interpretadas]",
   "puntaje": [Número del 0 al 5],
-  "feedback": "[Explicación corta de 1 oración en español sobre el acierto o error]"
+  "feedback": "[Retroalimentación detallada en español que debe incluir: 1. Breve explicación del acierto o error cometido por el alumno. 2. La RESOLUCIÓN PASO A PASO detallada y completa del problema planteado, para que el estudiante aprenda el procedimiento correcto, independientemente de si su respuesta fue correcta o incorrecta. Usa saltos de línea (con \\n) y formato legible sin markdown.]"
 }`;
 
     // 4. Configurar el Payload para OpenAI gpt-5.4-mini (Multimodal)

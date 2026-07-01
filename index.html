@@ -748,8 +748,19 @@
             </div>
         </div>
 
+        <!-- Contenedor de Pestañas (Preguntas respondidas) -->
+        <div id="tdm-tabs-container" style="
+            display: flex; gap: 8px; padding: 12px 28px;
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            overflow-x: auto; white-space: nowrap;
+        ">
+            <!-- Pestañas dinámicas -->
+        </div>
+
         <!-- Cuerpo del modal -->
-        <div style="display:flex;flex-wrap:wrap;gap:24px;padding:24px 28px 28px;">
+        <div id="tdm-details-body" style="display:flex;flex-wrap:wrap;gap:24px;padding:24px 28px 28px;">
             <!-- Columna izquierda: Imagen manuscrita -->
             <div style="flex:1;min-width:220px;max-width:420px;">
                 <div style="font-size:0.6rem;color:#6d6d6e;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">
@@ -798,11 +809,18 @@
                         <i class="fa-solid fa-comment-dots" style="color:#f59e0b;margin-right:5px;"></i>
                         Feedback del Profesor IA
                     </div>
-                    <div id="tdm-feedback" style="font-size:0.85rem;color:#b3b3b3;line-height:1.7;">
+                    <div id="tdm-feedback" style="font-size:0.85rem;color:#b3b3b3;line-height:1.7; white-space: pre-wrap;">
                         —
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Vista vacía si no hay respuestas -->
+        <div id="tdm-empty-state" style="display:none; flex-direction:column; align-items:center; justify-content:center; padding:60px 28px; text-align:center; color:#888;">
+            <i class="fa-solid fa-folder-open" style="font-size:3rem; color:#444; margin-bottom:16px;"></i>
+            <div style="font-size:1.1rem; font-weight:700; color:#fff;">Sin respuestas aún</div>
+            <div style="font-size:0.85rem; margin-top:8px; color:#888;">Este alumno no ha enviado respuestas evaluadas en este torneo.</div>
         </div>
     </div>
 </div>

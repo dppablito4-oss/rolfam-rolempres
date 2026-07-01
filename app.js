@@ -2097,18 +2097,19 @@ window.abrirDetalleAlumno = abrirDetalleAlumno;
 window.cerrarDetalleAlumnoModal = cerrarDetalleAlumnoModal;
 
 // ── Modal Visor de Soluciones ────────────────────────────────────────────────
-async function abrirDetalleAlumno(participanteId, nombre) {
+// ── Modal Visor de Soluciones ────────────────────────────────────────────────
+async function abrirDetalleAlumno(participanteId, nombre, autoSelectPreguntaId = null) {
     if (!supabaseClient || !participanteId) return;
     const modal = document.getElementById('torneo-detalle-alumno-modal');
     if (!modal) return;
 
-    // Rellenar con datos básicos mientras carga
+    // Rellenar con datos básicos del estudiante y mostrar modal
     document.getElementById('tdm-nombre').textContent = nombre || '—';
-    document.getElementById('tdm-puntaje').textContent = '…';
-    document.getElementById('tdm-transcripcion').textContent = '…';
-    document.getElementById('tdm-feedback').textContent = '…';
-    document.getElementById('tdm-foto').src = '';
-    document.getElementById('tdm-pregunta-label').textContent = '';
+    document.getElementById('tdm-tabs-container').innerHTML = '<div style="color:#b3b3b3; font-size:0.8rem; padding:8px;">Cargando historial de respuestas...</div>';
+    
+    document.getElementById('tdm-details-body').style.display = 'none';
+    document.getElementById('tdm-empty-state').style.display = 'none';
+    
     modal.style.display = 'flex';
 
     // Inicializar _detalleAlumnoActual
@@ -2120,20 +2121,21 @@ async function abrirDetalleAlumno(participanteId, nombre) {
         respuestaId: null
     };
 
-    // Consultar última respuesta procesada del alumno
-    const { data } = await supabaseClient
+    // Consultar TODAS las respuestas procesadas del alumno de este torneo
+    const { data: respuestas, error } = await supabaseClient
         .from('respuestas')
         .select('*')
         .eq('participante_id', participanteId)
         .eq('procesado', true)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .order('pregunta_id', { ascending: true });
 
-    if (!data) {
-        document.getElementById('tdm-puntaje').textContent = '—';
-        document.getElementById('tdm-transcripcion').textContent = 'Sin respuesta evaluada aún.';
-        document.getElementById('tdm-feedback').textContent = '—';
+    const tabsContainer = document.getElementById('tdm-tabs-container');
+    tabsContainer.innerHTML = '';
+
+    if (error || !respuestas || respuestas.length === 0) {
+        // Mostrar empty state
+        document.getElementById('tdm-details-body').style.display = 'none';
+        document.getElementById('tdm-empty-state').style.display = 'flex';
         _detalleAlumnoActual.respuestaId = null;
         _detalleAlumnoActual.url_foto = null;
         _detalleAlumnoActual.feedback = null;
@@ -2142,29 +2144,103 @@ async function abrirDetalleAlumno(participanteId, nombre) {
         return;
     }
 
-    // Actualizar con la respuesta cargada
-    _detalleAlumnoActual.respuestaId = data.id;
-    _detalleAlumnoActual.puntajeActual = data.puntaje_asignado ?? 0;
-    _detalleAlumnoActual.url_foto = data.url_foto;
-    _detalleAlumnoActual.feedback = data.feedback;
-    _detalleAlumnoActual.pregunta_id = data.pregunta_id;
-    _detalleAlumnoActual.created_at = data.created_at;
+    // Mostrar cuerpo del modal
+    document.getElementById('tdm-details-body').style.display = 'flex';
+    document.getElementById('tdm-empty-state').style.display = 'none';
+
+    // Generar pestañas
+    let activeResp = null;
+    let activeBtn = null;
+
+    respuestas.forEach((resp) => {
+        const btn = document.createElement('button');
+        
+        // Color de insignia según el puntaje
+        const scoreColors = { 5: '#46d369', 4: '#46d369', 3: '#f59e0b', 2: '#e50914', 1: '#e50914', 0: '#e50914' };
+        const color = scoreColors[resp.puntaje_asignado] || '#b3b3b3';
+        
+        btn.innerHTML = `Pregunta ${resp.pregunta_id} <span style="background:${color}22; color:${color}; padding:2px 6px; border-radius:4px; font-size:0.7rem; margin-left:6px; font-weight:700;">${resp.puntaje_asignado} pts</span>`;
+        btn.style.cssText = `
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #b3b3b3;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        `;
+        
+        btn.onclick = () => seleccionarTabRespuesta(resp, btn);
+        tabsContainer.appendChild(btn);
+
+        // Lógica de autoselección:
+        // Si hay una pregunta activa para auto-seleccionar, elegir esa
+        if (autoSelectPreguntaId !== null) {
+            if (resp.pregunta_id === autoSelectPreguntaId) {
+                activeResp = resp;
+                activeBtn = btn;
+            }
+        }
+    });
+
+    // Si no se seleccionó ninguna de forma automática por parámetro, elegir la última del historial
+    if (!activeResp) {
+        activeResp = respuestas[respuestas.length - 1];
+        activeBtn = tabsContainer.lastChild;
+    }
+
+    if (activeResp && activeBtn) {
+        seleccionarTabRespuesta(activeResp, activeBtn);
+    }
+}
+
+function seleccionarTabRespuesta(resp, activeBtn) {
+    // 1. Quitar estilos activos de todos los botones en el contenedor de pestañas
+    const container = document.getElementById('tdm-tabs-container');
+    Array.from(container.children).forEach(child => {
+        child.style.background = 'rgba(255,255,255,0.04)';
+        child.style.border = '1px solid rgba(255,255,255,0.08)';
+        child.style.color = '#b3b3b3';
+    });
+
+    // 2. Aplicar estilos activos a la pestaña seleccionada
+    activeBtn.style.background = 'rgba(229,9,20,0.15)';
+    activeBtn.style.border = '1px solid rgba(229,9,20,0.3)';
+    activeBtn.style.color = '#e50914';
+
+    // 3. Rellenar los datos en el modal
+    _detalleAlumnoActual.respuestaId = resp.id;
+    _detalleAlumnoActual.puntajeActual = resp.puntaje_asignado ?? 0;
+    _detalleAlumnoActual.url_foto = resp.url_foto;
+    _detalleAlumnoActual.feedback = resp.feedback;
+    _detalleAlumnoActual.pregunta_id = resp.pregunta_id;
+    _detalleAlumnoActual.created_at = resp.created_at;
 
     const scoreColors = { 5: '#46d369', 4: '#46d369', 3: '#f59e0b', 2: '#e50914', 1: '#e50914', 0: '#e50914' };
     const puntajeEl = document.getElementById('tdm-puntaje');
-    puntajeEl.textContent = data.puntaje_asignado ?? '—';
-    puntajeEl.style.color = scoreColors[data.puntaje_asignado] || '#b3b3b3';
+    puntajeEl.textContent = resp.puntaje_asignado ?? '—';
+    puntajeEl.style.color = scoreColors[resp.puntaje_asignado] || '#b3b3b3';
 
     document.getElementById('tdm-pregunta-label').textContent =
-        `Pregunta ${data.pregunta_id} · ${data.puntaje_asignado ?? '?'}/5 puntos`;
+        `Pregunta ${resp.pregunta_id} · ${resp.puntaje_asignado ?? '?'}/5 puntos`;
+    
     document.getElementById('tdm-transcripcion').textContent =
-        data.transcripcion_interna || '(sin transcripción disponible)';
+        resp.transcripcion_interna || '(sin transcripción disponible)';
+    
     document.getElementById('tdm-feedback').textContent =
-        data.feedback || '(sin feedback disponible)';
+        resp.feedback || '(sin feedback disponible)';
 
-    if (data.url_foto) {
-        document.getElementById('tdm-foto').src = data.url_foto;
-        document.getElementById('tdm-foto').style.display = 'block';
+    const imgEl = document.getElementById('tdm-foto');
+    if (resp.url_foto) {
+        imgEl.src = resp.url_foto;
+        imgEl.style.display = 'block';
+    } else {
+        imgEl.style.display = 'none';
+        imgEl.src = '';
     }
 }
 
@@ -2336,35 +2412,32 @@ async function editarPuntajeAlumnoManual() {
     if (respuestaId) await supabaseClient.from('respuestas').update({ puntaje_asignado: nuevoPuntaje }).eq('id', respuestaId);
     if (diff !== 0) await supabaseClient.rpc('sumar_puntaje_alumno', { alumno_id: id, puntos: diff });
 
-    _detalleAlumnoActual.puntajeActual = nuevoPuntaje;
-    const puntajeEl = document.getElementById('tdm-puntaje');
-    if (puntajeEl) {
-        puntajeEl.textContent = nuevoPuntaje;
-        const sc = { 5: '#46d369', 4: '#46d369', 3: '#f59e0b', 2: '#e50914', 1: '#e50914', 0: '#e50914' };
-        puntajeEl.style.color = sc[nuevoPuntaje] || '#b3b3b3';
-    }
-    const labelEl = document.getElementById('tdm-pregunta-label');
-    if (labelEl) labelEl.textContent = labelEl.textContent.replace(/\d+\/5/, `${nuevoPuntaje}/5`);
-
     showToast(`Puntaje de ${nombre} actualizado a ${nuevoPuntaje}/5`, 'success');
     await _torneoRecargarParticipantes();
     if (torneoEstado.pantalla_actual === 'leaderboard') _torneoRenderLeaderboard();
+    
+    // Recargar modal manteniendo seleccionada la pestaña actual editada
+    await abrirDetalleAlumno(id, nombre, _detalleAlumnoActual.pregunta_id);
 }
 
 // ── Exportación de Reportes PDF (Funcionalidades del Docente) ──────────────────────
 
-async function descargarAlumnoPDF(participanteId, nombre) {
+async function descargarAlumnoPDF(participanteId, nombre, preguntaId = null) {
     if (!supabaseClient || !participanteId) return;
 
-    // Consultar última respuesta procesada de este alumno
-    const { data: resp } = await supabaseClient
+    let query = supabaseClient
         .from('respuestas')
         .select('*')
         .eq('participante_id', participanteId)
-        .eq('procesado', true)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .eq('procesado', true);
+
+    if (preguntaId !== null) {
+        query = query.eq('pregunta_id', preguntaId);
+    } else {
+        query = query.order('created_at', { ascending: false }).limit(1);
+    }
+
+    const { data: resp } = await query.maybeSingle();
 
     if (!resp) {
         showToast('Este alumno no tiene respuestas evaluadas aún.', 'error');
@@ -2643,7 +2716,7 @@ function descargarAlumnoPDFActual() {
         showToast('No hay ningún alumno seleccionado.', 'error');
         return;
     }
-    descargarAlumnoPDF(_detalleAlumnoActual.id, _detalleAlumnoActual.nombre);
+    descargarAlumnoPDF(_detalleAlumnoActual.id, _detalleAlumnoActual.nombre, _detalleAlumnoActual.pregunta_id);
 }
 
 async function descargarRondaCompletaPDF(sortBy) {
