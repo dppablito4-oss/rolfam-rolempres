@@ -68,9 +68,9 @@ Debes responder ESTRICTAMENTE en formato JSON plano con la siguiente estructura,
   "feedback": "[Explicación corta de 1 oración en español sobre el acierto o error]"
 }`;
 
-    // 4. Configurar el Payload para OpenAI gpt-4o-mini (Multimodal)
+    // 4. Configurar el Payload para OpenAI gpt-5.4-mini (Multimodal)
     const payload = {
-      model: "gpt-4o-mini",
+      model: "gpt-5.4-mini",
       messages: [
         {
           role: "system",
