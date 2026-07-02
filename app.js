@@ -241,6 +241,75 @@ const SLIDES_DATA = {
             <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Niño A = <strong style="margin:0 4px;">20</strong> · Niño B = <strong style="margin:0 4px;">30</strong> caramelos.</div>`
     },
     'slide-ej6': {
+        title: 'Ejemplo 6: Reparto de Fondos (Socios)',
+        icon: '6️⃣',
+        heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
+        coverImage: 'assets/images/math_blue_cover.png',
+        description: 'Modelado multivariable para determinar la mayor cantidad de fondos entre cuatro socios.',
+        content: `
+            <h3 style="font-size:0.95rem;color:var(--color-text-secondary);margin-bottom:16px;">
+                <strong>Problema:</strong> Entre Aldo, Beto, Carlos y David tienen S/. 20 000. Beto tiene el doble de lo que tiene Carlos, Aldo tiene S/.1000 más que Beto, y David el triple de la diferencia entre lo que tiene Aldo y Carlos. ¿Quién tiene la mayor cantidad de dinero?
+            </h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;font-size:0.85rem;border:1px solid rgba(255,255,255,0.05);">
+                    <div style="font-weight:700;color:var(--color-accent);margin-bottom:6px;">1. Declaración de Variables:</div>
+                    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;color:var(--color-text-muted);">
+                        <li>Carlos = $x$</li>
+                        <li>Beto = $2x$</li>
+                        <li>Aldo = $2x + 1000$</li>
+                        <li>David = $3(2x + 1000 - x) = 3(x + 1000)$</li>
+                    </ul>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;font-size:0.85rem;border:1px solid rgba(255,255,255,0.05);">
+                    <div style="font-weight:700;color:var(--color-accent);margin-bottom:6px;">2. Planteamiento e Igualdad:</div>
+                    <div class="modal-math-box" style="margin:4px 0 0;padding:8px;font-size:0.85rem;">
+                        $$x + 2x + (2x + 1000) + 3(x + 1000) = 20\\,000$$
+                        $$8x + 4000 = 20\\,000 \\Rightarrow x = 2000$$
+                    </div>
+                </div>
+            </div>
+            <div style="background:rgba(70,211,105,0.05);border:1px solid rgba(70,211,105,0.15);border-radius:8px;padding:12px;font-size:0.85rem;display:flex;justify-content:space-around;margin-bottom:12px;color:var(--color-text-secondary);">
+                <span>Carlos: <strong>S/. 2 000</strong></span>
+                <span>Beto: <strong>S/. 4 000</strong></span>
+                <span>Aldo: <strong>S/. 5 000</strong></span>
+                <span>David: <strong>S/. 9 000</strong></span>
+            </div>
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Solución: <strong>David</strong> tiene la mayor cantidad (S/. 9 000).</div>`
+    },
+    'slide-ej7': {
+        title: 'Ejemplo 7: Distribución Equitativa',
+        icon: '7️⃣',
+        heroColor: 'linear-gradient(135deg, #002014, #001a10)',
+        coverImage: 'assets/images/math_green_cover.png',
+        description: 'Distribución proporcional equivalente de bienes y dinero en partes iguales.',
+        content: `
+            <h3 style="font-size:0.95rem;color:var(--color-text-secondary);margin-bottom:16px;">
+                <strong>Problema:</strong> Tres estudiantes se reparten equitativamente S/. 17, una calculadora, 6 libros y 9 plumones de S/. 3 cada uno. Si uno de ellos recibe 4 libros y el dinero, otro la calculadora y el tercero lo restante. ¿Cuánto vale la calculadora?
+            </h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;font-size:0.85rem;border:1px solid rgba(255,255,255,0.05);">
+                    <div style="font-weight:700;color:var(--color-accent);margin-bottom:6px;">1. Reparto del Inventario:</div>
+                    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;color:var(--color-text-muted);">
+                        <li>Estudiante 1: $4\\text{ Libros} + \\text{S/. } 17$</li>
+                        <li>Estudiante 2: $1\\text{ Calculadora } (C)$</li>
+                        <li>Estudiante 3: $2\\text{ Libros} + \\text{S/. } 27 \\text{ (9 plumones)}$</li>
+                    </ul>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;font-size:0.85rem;border:1px solid rgba(255,255,255,0.05);">
+                    <div style="font-weight:700;color:var(--color-accent);margin-bottom:6px;">2. Igualdad (Est. 1 = Est. 3):</div>
+                    <div class="modal-math-box" style="margin:4px 0 0;padding:8px;font-size:0.85rem;">
+                        $$4L + 17 = 2L + 27$$
+                        $$2L = 10 \\Rightarrow L = 5 \\text (Libro)$$
+                    </div>
+                </div>
+            </div>
+            <div class="modal-math-box" style="padding:10px;font-size:0.9rem;text-align:center;background:rgba(229,9,20,0.03);border-color:rgba(229,9,20,0.15);margin-bottom:12px;">
+                <strong>Valor de la Calculadora (Est. 2 = Est. 1):</strong>
+                $$C = 4(5) + 17 = 37$$
+            </div>
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Solución: La calculadora vale <strong>S/. 37</strong>.</div>`
+    },
+    'slide-ej8': {
         title: 'Reto UNHEVAL I — Edades en el Tiempo',
         icon: '⭐',
         heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
@@ -268,7 +337,7 @@ const SLIDES_DATA = {
             </div>
             <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Resultado: $a + b = 5 + b = $ <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">8</strong></div>`
     },
-    'slide-ej7': {
+    'slide-ej9': {
         title: 'Reto UNHEVAL II — Modelado Diofántico',
         icon: '⭐⭐',
         heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
@@ -345,7 +414,7 @@ const SLIDES_DATA = {
                                 <div class="rec-mini-genre">Competencia Math-Flix</div>
                             </div>
                         </div>
-                        <div class="rec-mini-card" onclick="exitPresenterMode(); openSlideModal('slide-ej6');">
+                        <div class="rec-mini-card" onclick="exitPresenterMode(); openSlideModal('slide-ej8');">
                             <div class="rec-mini-icon">⭐</div>
                             <div class="rec-mini-info">
                                 <div class="rec-mini-title">Reto UNHEVAL I</div>
@@ -362,7 +431,7 @@ const SLIDES_DATA = {
 const PRESENTER_SLIDES = [
     'slide-planteo', 'slide-pasos', 'slide-diccionario',
     'slide-ej1', 'slide-ej2', 'slide-ej3', 'slide-ej4', 'slide-ej5',
-    'slide-ej6', 'slide-ej7', 'slide-errores', 'slide-resumen', 'slide-fin'
+    'slide-ej6', 'slide-ej7', 'slide-ej8', 'slide-ej9', 'slide-errores', 'slide-resumen', 'slide-fin'
 ];
 
 // ── State ────────────────────────────────────────────────────────────────────
