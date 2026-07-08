@@ -228,17 +228,17 @@ const SLIDES_DATA = {
         icon: '5️⃣',
         heroColor: 'linear-gradient(135deg, #002014, #001a10)',
         coverImage: 'assets/images/math_red_cover.png',
-        description: 'Se reparten 50 caramelos entre dos niños: uno recibe 10 más que el otro.',
+        description: 'Se reparten 90 caramelos entre tres niños: el segundo recibe el doble que el primero, y el tercero 10 más que el primero.',
         content: `
             <div class="modal-problem-box glow-red">
-                <h3><strong>Problema:</strong> Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro.</h3>
+                <h3><strong>Problema:</strong> Se reparten 90 caramelos entre tres niños de modo que el segundo recibe el doble que el primero, y el tercero recibe 10 más que el primero.</h3>
             </div>
             <div class="modal-math-box">
-                <p>Niño A: $x$ · Niño B: $x + 10$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$x + (x + 10) = 50$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Solución</span> $$2x = 40 \\Rightarrow x = 20$$</p>
+                <p>Niño A: $x$ · Niño B: $2x$ · Niño C: $x + 10$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$x + 2x + (x + 10) = 90$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Solución</span> $$4x = 80 \\Rightarrow x = 20$$</p>
             </div>
-            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Niño A = <strong style="margin:0 4px;">20</strong> · Niño B = <strong style="margin:0 4px;">30</strong> caramelos.</div>`
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Niño A = <strong style="margin:0 4px;">20</strong> · Niño B = <strong style="margin:0 4px;">40</strong> · Niño C = <strong style="margin:0 4px;">30</strong> caramelos.</div>`
     },
     'slide-ej6': {
         title: 'Ejemplo 6: Reparto de Fondos (Socios)',
