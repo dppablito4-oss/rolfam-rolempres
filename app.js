@@ -368,19 +368,19 @@ const SLIDES_DATA = {
             <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Máximo de textos de Química: <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">22</strong></div>`
     },
     'slide-fin': {
-        title: 'Clase Completada',
+        title: 'Exposición Finalizada',
         icon: '🎬',
         heroColor: 'linear-gradient(135deg, #09090b, #111115)',
-        description: 'Has completado la Clase Magistral de Planteo de Ecuaciones.',
+        description: '¡Muchas gracias por su atención!',
         content: `
             <div class="netflix-ending-container">
                 <div class="netflix-ending-left">
                     <div class="netflix-credits-box">
-                        <h3 class="credits-logo">ECUACIONES<span>.io</span></h3>
-                        <p class="credits-title">Clase Magistral de Planteo de Ecuaciones</p>
+                        <h3 class="credits-logo" style="font-family:'Poppins', sans-serif;font-weight:900;letter-spacing:-1px;color:#e50914;font-size:2rem;margin-bottom:12px;">MATH<span style="color:#fff;">-FLIX</span></h3>
+                        <p class="credits-title" style="font-size:0.95rem;color:#e5e5e5;font-weight:700;margin-bottom:18px;">Exposición: Planteo de Ecuaciones</p>
                         <div class="credits-roll">
-                            <div class="credit-row"><span class="credit-label">Presentador:</span> <span class="credit-value">Joel Cipriano Tarazona Bardales</span></div>
-                            <div class="credit-row"><span class="credit-label">Especialidad:</span> <span class="credit-value">Matemática y Física</span></div>
+                            <div class="credit-row"><span class="credit-label">Expositores:</span> <span class="credit-value">Grupo 5</span></div>
+                            <div class="credit-row"><span class="credit-label">Docente:</span> <span class="credit-value">Joel Cipriano Tarazona Bardales</span></div>
                             <div class="credit-row"><span class="credit-label">Universidad:</span> <span class="credit-value">UNHEVAL (Huánuco)</span></div>
                             <div class="credit-row"><span class="credit-label">Plataforma:</span> <span class="credit-value">Math-Flix Presenter 2.0</span></div>
                         </div>
