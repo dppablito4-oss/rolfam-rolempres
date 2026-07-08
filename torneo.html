@@ -1525,12 +1525,7 @@ function aplicarEstado(estado) {
             break;
         }
         case 'pregunta': {
-            // Calcular segundos restantes de forma sincronizada usando updated_at
-            const ahora = new Date().getTime();
-            const updatedAt = estado.updated_at ? new Date(estado.updated_at).getTime() : ahora;
-            const segundosTranscurridos = Math.floor((ahora - updatedAt) / 1000);
-            const tiempoRestanteSinc = Math.max(0, (estado.tiempo_restante || 60) - segundosTranscurridos);
-            mostrarPregunta(preguntaActualId, tiempoRestanteSinc, estado.pregunta_custom_texto || null);
+            mostrarPregunta(preguntaActualId, estado.tiempo_restante || 60, estado.updated_at, estado.pregunta_custom_texto || null);
             break;
         }
         case 'leaderboard':
@@ -1622,7 +1617,7 @@ async function handleLogin(e) {
 }
 
 // ── Pregunta & Timer ──────────────────────────────────────────────────────────
-async function mostrarPregunta(id, tiempoInicial, preguntaCustomTexto) {
+async function mostrarPregunta(id, tiempoTotal, updatedAtStr, preguntaCustomTexto) {
     preguntaActualId = id;
     tiempoExpirado = false;
 
@@ -1633,7 +1628,21 @@ async function mostrarPregunta(id, tiempoInicial, preguntaCustomTexto) {
 
     document.getElementById('pregunta-badge').textContent = `Pregunta ${id}`;
     document.getElementById('pregunta-num').textContent   = `PROBLEMA ${id}`;
-    document.getElementById('pregunta-texto').textContent  = texto;
+    const pregTextEl = document.getElementById('pregunta-texto');
+    if (pregTextEl) {
+        pregTextEl.innerHTML = texto;
+        if (window.renderMathInElement) {
+            window.renderMathInElement(pregTextEl, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false },
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ],
+                throwOnError: false
+            });
+        }
+    }
 
     // Reset UI
     archivoSeleccionado = null;
@@ -1671,7 +1680,7 @@ async function mostrarPregunta(id, tiempoInicial, preguntaCustomTexto) {
     }
 
     showScreen('pregunta');
-    iniciarTimer(tiempoInicial);
+    iniciarTimer(tiempoTotal, updatedAtStr);
 }
 
 async function obtenerRespuestaActual(pregId) {
@@ -1712,27 +1721,75 @@ function suscribirMiParticipante() {
             showScreen('login');
             alert('Has sido retirado del torneo o se ha reiniciado la ronda.');
         })
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'participantes',
+            filter: `id=eq.${alumnoId}`
+        }, (payload) => {
+            if (payload.new && payload.new.activo === false) {
+                const modal = document.getElementById('torneo-reiniciado-modal');
+                const nameEl = document.getElementById('rejoin-student-name');
+                if (modal && nameEl) {
+                    nameEl.textContent = alumnoNom;
+                    modal.style.display = 'flex';
+                }
+            }
+        })
         .subscribe();
 }
+
+async function unirmeAProximaRonda() {
+    if (!alumnoId || !sbClient) return;
+    try {
+        const { error } = await sbClient
+            .from('participantes')
+            .update({ activo: true, puntaje: 0 })
+            .eq('id', alumnoId);
+        if (error) throw error;
+        
+        const modal = document.getElementById('torneo-reiniciado-modal');
+        if (modal) modal.style.display = 'none';
+        
+        await cargarEstadoInicial();
+        
+        // Redirigir según la pantalla actual del estado
+        const { data: estado } = await sbClient.from('estado_juego').select('pantalla_actual').eq('id', 'global').single();
+        if (estado && estado.pantalla_actual !== 'lobby') {
+            await cargarEstadoInicial();
+        } else {
+            showScreen('lobby');
+        }
+    } catch (err) {
+        alert('Error al unirse a la ronda: ' + err.message);
+    }
+}
+window.unirmeAProximaRonda = unirmeAProximaRonda;
 
 async function verificarYaEntrego(pregId) {
     const res = await obtenerRespuestaActual(pregId);
     return !!res;
 }
 
-function iniciarTimer(segundos) {
+function iniciarTimer(tiempoTotal, updatedAtStr) {
     clearInterval(timerInterval);
-    let t = Math.max(0, segundos);
     const el = document.getElementById('timer-display');
+    if (!el) return;
+
     const actualizar = () => {
+        const ahora = new Date().getTime();
+        const updatedAt = updatedAtStr ? new Date(updatedAtStr).getTime() : ahora;
+        const segundosTranscurridos = Math.floor((ahora - updatedAt) / 1000);
+        const t = Math.max(0, tiempoTotal - segundosTranscurridos);
+
         el.textContent = t;
         el.classList.toggle('urgent', t <= 10);
+        
         if (t <= 0) {
             clearInterval(timerInterval);
             bloquearPorTiempo();
             return;
         }
-        t--;
     };
     actualizar();
     timerInterval = setInterval(actualizar, 1000);
@@ -1971,7 +2028,9 @@ function mostrarResultado(puntaje, feedback) {
             window.renderMathInElement(contentBox, {
                 delimiters: [
                     { left: "$$", right: "$$", display: true },
-                    { left: "$", right: "$", display: false }
+                    { left: "$", right: "$", display: false },
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
                 ],
                 throwOnError: false
             });
@@ -2010,7 +2069,9 @@ function toggleExpiredResolucion() {
             window.renderMathInElement(box, {
                 delimiters: [
                     { left: "$$", right: "$$", display: true },
-                    { left: "$", right: "$", display: false }
+                    { left: "$", right: "$", display: false },
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
                 ],
                 throwOnError: false
             });
@@ -2370,11 +2431,10 @@ async function rejectRound() {
         try {
             const { data, error } = await sbClient
                 .from('participantes')
-                .select('id')
+                .select('id, activo')
                 .eq('id', alumnoId)
                 .maybeSingle();
             if (!data) {
-                // No existe, limpiar sesión local y mandar a login
                 localStorage.removeItem('torneo_alumno_id');
                 localStorage.removeItem('torneo_alumno_nom');
                 localStorage.removeItem('torneo_ronda_timestamp');
@@ -2382,6 +2442,13 @@ async function rejectRound() {
                 alumnoNom = null;
                 showScreen('login');
                 return;
+            } else if (data.activo === false) {
+                const modal = document.getElementById('torneo-reiniciado-modal');
+                const nameEl = document.getElementById('rejoin-student-name');
+                if (modal && nameEl) {
+                    nameEl.textContent = alumnoNom;
+                    modal.style.display = 'flex';
+                }
             }
         } catch (e) {
             console.error('Error al validar participante en init:', e);
@@ -2396,7 +2463,45 @@ async function rejectRound() {
         if (!activa || activa.id === 'screen-login') showScreen('lobby');
     }
 })();
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && sbClient && alumnoId) {
+        cargarEstadoInicial().catch(err => console.error('Error al sincronizar en visibilitychange:', err));
+    }
+});
 </script>
+
+    <!-- MODAL REINICIO DE TORNEO (SUTIL) -->
+    <div id="torneo-reiniciado-modal" style="
+        display:none; position:fixed; inset:0; z-index:9500;
+        background:rgba(10,10,10,0.92); backdrop-filter:blur(15px);
+        align-items:center; justify-content:center; padding:24px;
+        animation:torneoFadeIn 0.3s ease;
+    ">
+        <div style="
+            background:#141414; border:1px solid rgba(255,255,255,0.08);
+            border-radius:24px; padding:32px 24px; width:100%; max-width:400px;
+            text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.5);
+            display:flex; flex-direction:column; gap:20px; align-items:center;
+        ">
+            <div style="font-size:3.5rem;">🏁</div>
+            <div>
+                <h2 style="font-size:1.4rem; font-weight:800; color:#fff; margin:0 0 8px 0;">¡Ronda Terminada!</h2>
+                <p style="color:#b3b3b3; font-size:0.88rem; line-height:1.5; margin:0;">El profesor ha cerrado o reiniciado el bloque anterior.</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:12px 18px; width:100%;">
+                <div style="font-size:0.65rem; color:#6d6d6e; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Tu nombre registrado</div>
+                <div id="rejoin-student-name" style="font-size:1.1rem; font-weight:700; color:#46d369;">—</div>
+            </div>
+            <button onclick="unirmeAProximaRonda()" style="
+                width:100%; padding:14px; background:#e50914; color:#fff;
+                border:none; border-radius:12px; font-weight:700; font-size:0.95rem;
+                cursor:pointer; transition: transform 0.2s, background 0.2s;
+                box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+            " onmouseover="this.style.background='#ff0f22';this.style.transform='scale(1.02)'" onmouseout="this.style.background='#e50914';this.style.transform='none'">
+                🚀 ¡Unirme a la Siguiente Ronda!
+            </button>
+        </div>
+    </div>
 
 </body>
 </html>

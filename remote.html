@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
     <style>
         :root {
             --red: #e50914;
@@ -1473,13 +1477,25 @@ function previewBancoPregunta() {
     if (!selectedBancoPregunta) return;
     
     document.getElementById('banco-preview-id').textContent = `Pregunta #${selectedBancoPregunta.id}`;
-    document.getElementById('banco-preview-texto').textContent = selectedBancoPregunta.texto;
+    document.getElementById('banco-preview-texto').innerHTML = selectedBancoPregunta.texto;
     document.getElementById('banco-preview-ecuacion').textContent = selectedBancoPregunta.ecuacion;
     document.getElementById('banco-preview-respuesta').textContent = selectedBancoPregunta.respuesta;
     
     resBox.innerHTML = selectedBancoPregunta.resolucion;
     resBox.style.display = 'none';
     card.style.display = 'block';
+    
+    if (window.renderMathInElement) {
+        window.renderMathInElement(card, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            throwOnError: false
+        });
+    }
 }
 
 function togglePreviewResolucion() {
@@ -1545,13 +1561,25 @@ async function generarPreguntaIA() {
             resolucion: data.solution
         };
         
-        document.getElementById('ai-preview-texto').textContent = data.problem;
+        document.getElementById('ai-preview-texto').innerHTML = data.problem;
         document.getElementById('ai-preview-ecuacion').textContent = 'Estimada por la IA';
         document.getElementById('ai-preview-respuesta').textContent = data.answer;
         
         resBox.innerHTML = data.solution;
         resBox.style.display = 'none';
         card.style.display = 'block';
+        
+        if (window.renderMathInElement) {
+            window.renderMathInElement(card, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false },
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ],
+                throwOnError: false
+            });
+        }
     } catch (e) {
         console.error('Error al generar pregunta con IA:', e);
         alert('Error al generar la pregunta con la IA: ' + e.message);
@@ -1680,7 +1708,7 @@ async function sendTorneoCmd(cmd) {
                 }
             }
             await client.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-            await client.from('participantes').update({ puntaje: 0 }).neq('id', '00000000-0000-0000-0000-000000000000');
+            await client.from('participantes').update({ activo: false, puntaje: 0 }).neq('id', '00000000-0000-0000-0000-000000000000');
             await client.from('estado_juego').update({
                 pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60,
                 pregunta_custom_texto: null,
@@ -1701,13 +1729,45 @@ async function sendTorneoCmd(cmd) {
     }
 }
 
-function _actualizarFaseBanner(fase, pregId) {
+let remoteTimerInterval = null;
+
+function iniciarRemoteTimer(tiempoTotal, updatedAtStr, fase, pregId) {
+    clearInterval(remoteTimerInterval);
     const banner = document.getElementById('torneo-fase-banner');
     if (!banner) return;
-    const faseMap = { lobby: '🏠 Lobby', pregunta: `▶ Pregunta ${pregId}`, leaderboard: '🏆 Leaderboard' };
-    banner.textContent = 'Torneo: ' + (faseMap[fase] || fase);
-    banner.style.color     = fase === 'pregunta' ? '#e50914' : fase === 'leaderboard' ? '#f59e0b' : '#46d369';
-    banner.style.borderColor = fase === 'pregunta' ? 'rgba(229,9,20,0.3)' : fase === 'leaderboard' ? 'rgba(245,158,11,0.25)' : 'rgba(70,211,105,0.25)';
+
+    const tick = () => {
+        const ahora = new Date().getTime();
+        const updatedAt = updatedAtStr ? new Date(updatedAtStr).getTime() : ahora;
+        const transcurrido = Math.floor((ahora - updatedAt) / 1000);
+        const t = Math.max(0, tiempoTotal - transcurrido);
+
+        if (fase === 'pregunta') {
+            banner.textContent = `▶ Pregunta ${pregId} (${t}s restantes)`;
+            banner.style.color = t <= 10 ? '#e50914' : '#46d369';
+            banner.style.borderColor = t <= 10 ? 'rgba(229,9,20,0.3)' : 'rgba(70,211,105,0.25)';
+            if (t <= 0) {
+                clearInterval(remoteTimerInterval);
+            }
+        } else {
+            clearInterval(remoteTimerInterval);
+            const faseMap = { lobby: '🏠 Lobby', leaderboard: '🏆 Leaderboard' };
+            banner.textContent = 'Torneo: ' + (faseMap[fase] || fase);
+            banner.style.color = fase === 'leaderboard' ? '#f59e0b' : '#46d369';
+            banner.style.borderColor = fase === 'leaderboard' ? 'rgba(245,158,11,0.25)' : 'rgba(70,211,105,0.25)';
+        }
+    };
+    tick();
+    if (fase === 'pregunta') {
+        remoteTimerInterval = setInterval(tick, 1000);
+    } else {
+        const faseMap = { lobby: '🏠 Lobby', leaderboard: '🏆 Leaderboard' };
+        banner.style.borderColor = fase === 'leaderboard' ? 'rgba(245,158,11,0.25)' : 'rgba(70,211,105,0.25)';
+    }
+}
+
+function _actualizarFaseBanner(fase, pregId, tiempoTotal = 60, updatedAtStr = null) {
+    iniciarRemoteTimer(tiempoTotal, updatedAtStr, fase, pregId);
 }
 
 // Suscribirse a cambios del torneo para reflejar fase actual en el mando
@@ -1715,7 +1775,7 @@ client.channel('remote-torneo-estado')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'estado_juego' }, ({ new: payload }) => {
         _torneoFaseActual = payload.pantalla_actual;
         _torneoPreguntaId = payload.pregunta_actual_id || 1;
-        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId, payload.tiempo_restante || 60, payload.updated_at);
     })
     .subscribe();
 
@@ -1725,11 +1785,23 @@ client.channel('remote-torneo-estado')
     if (data) {
         _torneoFaseActual = data.pantalla_actual;
         _torneoPreguntaId = data.pregunta_actual_id || 1;
-        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId, data.tiempo_restante || 60, data.updated_at);
     }
     // Cargar alumnos al iniciar
     await remoteRecargarAlumnos();
 })();
+
+document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && client) {
+        const { data } = await client.from('estado_juego').select('*').eq('id', 'global').single();
+        if (data) {
+            _torneoFaseActual = data.pantalla_actual;
+            _torneoPreguntaId = data.pregunta_actual_id || 1;
+            _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId, data.tiempo_restante || 60, data.updated_at);
+        }
+        await remoteRecargarAlumnos();
+    }
+});
 
 // ── Pestaña Alumnos ──────────────────────────────────────────────────────────
 async function remoteRecargarAlumnos() {
@@ -1738,7 +1810,7 @@ async function remoteRecargarAlumnos() {
     list.innerHTML = '<div style="color:#6d6d6e;font-size:0.82rem;text-align:center;padding:16px;">Cargando...</div>';
 
     const { data } = await client.from('participantes')
-        .select('id, nombre, puntaje').order('puntaje', { ascending: false });
+        .select('id, nombre, puntaje').eq('activo', true).order('puntaje', { ascending: false });
 
     if (!data?.length) {
         list.innerHTML = '<div style="color:#6d6d6e;font-size:0.82rem;text-align:center;padding:16px;">Sin participantes aún.</div>';
@@ -1820,14 +1892,18 @@ async function adminLimpiarRespuestas() {
 }
 
 async function adminEliminarParticipantes() {
-    if (!confirm('¿Seguro que deseas eliminar a TODOS los participantes? Esto también eliminará sus respuestas y tendrán que volver a escanear el QR.')) return;
+    if (!confirm('¿Seguro que deseas vaciar a los participantes de la ronda? Sus nombres e ID seguirán registrados para que puedan unirse con un solo botón sin reescribir su nombre.')) return;
     try {
-        const { error } = await client.from('participantes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        const { error } = await client.from('participantes')
+            .update({ activo: false, puntaje: 0 })
+            .neq('id', '00000000-0000-0000-0000-000000000000');
         if (error) throw error;
-        alert('✅ Todos los participantes han sido eliminados.');
+        // Eliminar respuestas asociadas ya que se inicia una nueva ronda
+        await client.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        alert('✅ Todos los participantes han sido retirados de la ronda activa.');
         await remoteRecargarAlumnos();
     } catch (err) {
-        alert('❌ Error al eliminar participantes: ' + err.message);
+        alert('❌ Error al desactivar participantes: ' + err.message);
     }
 }
 
