@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planteo de Ecuaciones — Clase Magistral</title>
-    <meta name="description" content="Presentación interactiva de Planteo de Ecuaciones para clase magistral universitaria. Incluye ejemplos, taller con IA y modo presentador.">
-    <meta property="og:title" content="Planteo de Ecuaciones — Clase Magistral">
-    <meta property="og:description" content="Aprende a traducir el lenguaje cotidiano al lenguaje universal de las matemáticas.">
-    <meta property="og:type" content="website">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
-
+    <title>EDUFLIX — Corresponsabilidad Socioeducativa</title>
+    <meta name="description" content="Presentación interactiva sobre los roles de la familia y la escuela en la educación, estilo Netflix.">
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Lato:wght@400;700&family=Fira+Code&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- KaTeX -->
+    
+    <!-- KaTeX for math formulas -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -33,121 +29,65 @@
 
 <!-- NETFLIX INTRO SCREEN OVERLAY -->
 <div id="netflix-intro-overlay">
-    <!-- Click to play prompt -->
     <div id="intro-prompt-container">
-        <h2 style="font-family:'Poppins', sans-serif; font-size: 2.2rem; font-weight:800; color: #fff; margin-bottom: 24px; letter-spacing: 0.5px;">
-            MATHFLIX<span style="color:#e50914">.io</span>
+        <h2 style="font-family:'Poppins', sans-serif; font-size: 2.5rem; font-weight:800; color: #fff; margin-bottom: 24px; letter-spacing: -1px;">
+            EDUFLIX<span style="color:#e50914">.io</span>
         </h2>
         <button id="btn-start-intro" style="font-size: 1.15rem; padding: 14px 28px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; background: #e50914; color: white; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(229,9,20,0.4); transition: transform 0.2s, box-shadow 0.2s;">
             <i class="fa-solid fa-play"></i> INICIAR EXPOSICIÓN
         </button>
     </div>
-    <!-- The actual Netflix-like logo that will animate -->
     <div class="netflix-intro-wrapper" style="display: none;">
-        <h1 class="netflix-intro-logo" id="netflix-intro-logo-el">MATHFLIX</h1>
+        <h1 class="netflix-intro-logo" id="netflix-intro-logo-el">EDUFLIX</h1>
     </div>
 </div>
 
 <script>
-    // Audio synthesizer for Netflix "Tu-Dum"
     function playNetflixTudum() {
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if (!AudioContext) return;
             const ctx = new AudioContext();
-
-            // Master Gain
             const masterGain = ctx.createGain();
             masterGain.gain.setValueAtTime(0.7, ctx.currentTime);
             masterGain.connect(ctx.destination);
 
-            // Low Pass Filter for cinematic rumble
             const filter = ctx.createBiquadFilter();
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(140, ctx.currentTime);
             filter.connect(masterGain);
 
-            // --- FIRST THUD (t = 0.0s) ---
             const osc1 = ctx.createOscillator();
             const gain1 = ctx.createGain();
             osc1.type = 'triangle';
             osc1.frequency.setValueAtTime(95, ctx.currentTime);
             osc1.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.4);
-            
             gain1.gain.setValueAtTime(0.01, ctx.currentTime);
             gain1.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.04);
             gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
-
             osc1.connect(gain1);
             gain1.connect(filter);
 
-            // Pluck 1 (high metallic overtone)
-            const pluck1 = ctx.createOscillator();
-            const pluckGain1 = ctx.createGain();
-            pluck1.type = 'sine';
-            pluck1.frequency.setValueAtTime(190, ctx.currentTime);
-            
-            pluckGain1.gain.setValueAtTime(0.01, ctx.currentTime);
-            pluckGain1.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.02);
-            pluckGain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-
-            pluck1.connect(pluckGain1);
-            pluckGain1.connect(masterGain);
-
-            // --- SECOND THUD (t = 0.15s) ---
             const t2 = ctx.currentTime + 0.15;
             const osc2 = ctx.createOscillator();
             const gain2 = ctx.createGain();
             osc2.type = 'triangle';
             osc2.frequency.setValueAtTime(120, t2);
             osc2.frequency.exponentialRampToValueAtTime(55, t2 + 0.7);
-            
             gain2.gain.setValueAtTime(0.01, t2);
             gain2.gain.linearRampToValueAtTime(1.0, t2 + 0.04);
             gain2.gain.exponentialRampToValueAtTime(0.001, t2 + 1.4);
-
             osc2.connect(gain2);
             gain2.connect(filter);
 
-            // Pluck 2 (high sawtooth overtone)
-            const pluck2 = ctx.createOscillator();
-            const pluckGain2 = ctx.createGain();
-            pluck2.type = 'sawtooth';
-            pluck2.frequency.setValueAtTime(240, t2);
-            
-            pluckGain2.gain.setValueAtTime(0.01, t2);
-            pluckGain2.gain.linearRampToValueAtTime(0.3, t2 + 0.02);
-            pluckGain2.gain.exponentialRampToValueAtTime(0.001, t2 + 0.3);
-
-            pluck2.connect(pluckGain2);
-            pluckGain2.connect(masterGain);
-
-            // --- CINEMATIC LOW RUMBLE ---
-            const rumble = ctx.createOscillator();
-            const rumbleGain = ctx.createGain();
-            rumble.type = 'sine';
-            rumble.frequency.setValueAtTime(55, ctx.currentTime + 0.1);
-            
-            rumbleGain.gain.setValueAtTime(0.01, ctx.currentTime + 0.1);
-            rumbleGain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.4);
-            rumbleGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.0);
-
-            rumble.connect(rumbleGain);
-            rumbleGain.connect(filter);
-
-            // Start & Stop
-            osc1.start(); pluck1.start(); osc2.start(); pluck2.start(); rumble.start();
+            osc1.start(); osc2.start();
             osc1.stop(ctx.currentTime + 0.8);
-            pluck1.stop(ctx.currentTime + 0.2);
             osc2.stop(t2 + 1.5);
-            pluck2.stop(t2 + 0.4);
-            rumble.stop(ctx.currentTime + 2.2);
         } catch (e) {
             console.warn("Audio Context failed:", e);
         }
     }
 
-    // Logic to handle intro click and fade away
     document.addEventListener("DOMContentLoaded", () => {
         const btn = document.getElementById("btn-start-intro");
         const overlay = document.getElementById("netflix-intro-overlay");
@@ -157,32 +97,23 @@
 
         if (btn && overlay && prompt && wrapper && logo) {
             btn.addEventListener("click", () => {
-                // 1. Play real audio file (assets/tudum.mp3) or fallback to synthesized audio
                 let audioPlayed = false;
                 const audio = new Audio('assets/tudum.mp3');
-                
                 audio.play()
-                    .then(() => {
-                        audioPlayed = true;
-                    })
+                    .then(() => { audioPlayed = true; })
                     .catch(err => {
-                        console.warn("Could not play assets/tudum.mp3, falling back to Web Audio API synthesis:", err);
-                        if (!audioPlayed) {
-                            playNetflixTudum();
-                        }
+                        console.warn("Falling back to Web Audio API synthesis:", err);
+                        playNetflixTudum();
                     });
 
-                // 2. Switch prompt with animated logo
                 prompt.style.display = "none";
                 wrapper.style.display = "flex";
                 logo.classList.add("animate");
 
-                // 3. Fade out overlay after 3.0 seconds
                 setTimeout(() => {
                     overlay.classList.add("fade-out");
                 }, 3000);
 
-                // 4. Remove overlay completely after fade out completes (3.8 seconds)
                 setTimeout(() => {
                     overlay.style.display = "none";
                     overlay.remove();
@@ -198,29 +129,24 @@
 <!-- TOAST NOTIFICATIONS -->
 <div id="toast-container" role="status" aria-live="polite"></div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- PANTALLA DE SELECCIÓN DE PERFILES                                         -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div id="profile-screen" role="dialog" aria-label="Seleccionar perfil de estudiante">
-    <!-- Header: Co-branding UNHEVAL + ECUACIONES.io -->
+<!-- PANTALLA DE SELECCIÓN DE PERFILES -->
+<div id="profile-screen" role="dialog" aria-label="Seleccionar perfil de expositor">
     <header class="profile-screen-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin-bottom: 20px;">
         <div class="profile-uni-info" style="display: flex; align-items: center; gap: 14px;">
             <img src="assets/escudo_unheval.png" alt="Escudo UNHEVAL" class="uni-logo-img" style="height: 52px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));" onerror="this.style.display='none'; document.getElementById('uni-logo-fallback').style.display='flex';">
-            <img src="assets/logo_educacion_myf.png" alt="Logo Educación M&F" class="school-logo-img" style="height: 52px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));" onerror="this.style.display='none';">
             <div id="uni-logo-fallback" style="display: none; width: 44px; height: 44px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; align-items: center; justify-content: center; font-size: 1.3rem;">🏛️</div>
             <div class="profile-uni-text" style="display: flex; flex-direction: column; text-align: left;">
                 <span style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 800; color: #fff; letter-spacing: 0.5px;">UNHEVAL</span>
-                <span style="font-size: 0.72rem; color: var(--color-text-muted); font-weight: 600;">E.P. de Matemática y Física</span>
+                <span style="font-size: 0.72rem; color: var(--color-text-muted); font-weight: 600;">E.P. de Educación Secundaria</span>
             </div>
         </div>
         <div class="netflix-logo-top" style="position: static; font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--color-accent); letter-spacing: -1px; margin: 0;">
-            ECUACIONES<span style="color:#fff">.io</span>
+            EDUFLIX<span style="color:#fff">.io</span>
         </div>
     </header>
 
-    <!-- Center: Profile Selection -->
     <div class="profile-screen-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; width: 100%;">
-        <h1 class="profile-title" style="margin-bottom: var(--space-8);">¿Quién está aprendiendo hoy?</h1>
+        <h1 class="profile-title" style="margin-bottom: var(--space-8);">¿Quién expone hoy?</h1>
         <div class="profiles-grid" id="profiles-grid-container">
             <!-- Se genera dinámicamente desde JS -->
         </div>
@@ -229,65 +155,38 @@
         </button>
     </div>
 
-    <!-- Footer: Academic metadata -->
     <footer class="profile-screen-footer" style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; max-width: 1200px; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: var(--space-4);">
         <div class="profile-academic-meta" style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; justify-content: center;">
             <span style="font-size: 0.7rem; font-weight: 800; color: var(--color-neon-cyan); border: 1px solid rgba(0, 243, 255, 0.35); background: rgba(0, 243, 255, 0.05); padding: 3px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 8px rgba(0, 243, 255, 0.15);">Clase Magistral</span>
-            <span style="font-size: 0.82rem; color: var(--color-text-secondary); font-weight: 700;">Curso: Didáctica de la Matemática</span>
+            <span style="font-size: 0.82rem; color: var(--color-text-secondary); font-weight: 700;">Curso: Ética y Deontología Profesional</span>
             <span style="color: rgba(255,255,255,0.15);">|</span>
-            <span style="font-size: 0.82rem; color: var(--color-text-secondary); font-weight: 600;">Docente: Joel Cipriano Tarazona Bardales</span>
-            <span style="color: rgba(255,255,255,0.15);">|</span>
-            <span style="font-size: 0.82rem; color: var(--color-text-muted);">Semestre: 2026-I</span>
+            <span style="font-size: 0.82rem; color: var(--color-text-secondary); font-weight: 600;">Universidad Nacional Hermilio Valdizán</span>
         </div>
-        <div style="font-size: 0.65rem; color: var(--color-text-faint); font-family: var(--font-body); letter-spacing: 0.5px; margin-bottom: var(--space-4);">Universidad Nacional Hermilio Valdizán de Huánuco</div>
-        
-        <div class="custom-signature-footer" style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid rgba(255,255,255,0.03); width: 100%;">
-            <div class="icon-box">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 3C12 7.5 16.5 12 21 12C16.5 12 12 16.5 12 21C12 16.5 7.5 12 3 12C7.5 12 12 7.5 12 3Z" fill="#f59e0b"/>
-                    <circle cx="7" cy="17" r="1.5" fill="#f59e0b" opacity="0.8"/>
-                </svg>
-            </div>
-            <p class="main-text">
-                Sistema creado con <span class="heart">🧡</span> por <span class="creator-name">Pablito_DP y su grupo</span>
-            </p>
-            <p class="sub-text">
-                &copy; 2026 PABLITO_DP &mdash; Acceso Clasificado
-            </p>
-        </div>
+        <div style="font-size: 0.65rem; color: var(--color-text-faint); font-family: var(--font-body); letter-spacing: 0.5px; margin-bottom: var(--space-4);">Huánuco, Perú</div>
     </footer>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- APLICACIÓN PRINCIPAL                                                       -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- APLICACIÓN PRINCIPAL -->
 <div id="main-app">
 
     <!-- HEADER NETFLIX -->
     <header id="netflix-header" role="banner">
         <a href="#" class="header-logo" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
-            ECUACIONES<span>.io</span>
+            EDUFLIX<span>.io</span>
         </a>
 
         <nav class="header-nav" aria-label="Navegación principal">
             <a href="#browse-content" class="active">Inicio</a>
-            <a href="#row-fundamentos">Fundamentos</a>
-            <a href="#row-ejemplos">Ejemplos</a>
-            <a href="#row-retos">Retos UNHEVAL</a>
+            <a href="#row-fundamentos">Familia</a>
+            <a href="#row-ejemplos">Escuela</a>
+            <a href="#row-retos">Barreras y Alianzas</a>
             <a href="#ai-section">Taller IA</a>
-            <a href="#" onclick="openTorneoOverlay();return false;" style="color:#f59e0b;font-weight:700;">🏆 Torneo</a>
         </nav>
 
         <div class="header-right">
-            <i class="fa-solid fa-magnifying-glass" style="color:var(--color-text-muted);cursor:pointer;font-size:1rem;"></i>
             <div id="header-avatar" class="header-profile-mini-icon" style="background:rgba(229,9,20,0.15);" title="Perfil activo">
-                🎓
+                ⚖️
             </div>
-            <!-- Botón Mando Remoto -->
-            <button id="btn-remote" class="btn-remote" onclick="openQRModal()" aria-label="Abrir mando a distancia" title="Mando a distancia">
-                <i class="fa-solid fa-mobile-screen"></i>
-                <span class="pulse-dot" aria-hidden="true"></span>
-            </button>
             <button id="btn-presenter" onclick="startPresenterMode()" aria-label="Iniciar modo presentación" 
                     style="padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:4px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:border-color 0.2s;"
                     onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">
@@ -298,42 +197,29 @@
 
     <!-- HERO BANNER -->
     <section id="hero-banner">
-        <video class="hero-video-bg" src="assets/videos/CJEsybfPQSE.mp4" autoplay loop muted playsinline></video>
+        <video class="hero-video-bg" src="assets/videos/CN4n6Tfc5WI.mp4" autoplay loop muted playsinline></video>
         <div class="hero-bg"></div>
-
-        <!-- Floating slide cards decoration -->
-        <div class="hero-floating-slides" aria-hidden="true">
-            <div class="floating-card" style="background:linear-gradient(135deg,#1a0000,#2d0000);">
-                <span style="color:rgba(229,9,20,0.25);font-size:3rem;">∑</span>
-            </div>
-            <div class="floating-card" style="background:linear-gradient(135deg,#0d0221,#1a0030);">
-                <span style="color:rgba(99,102,241,0.25);font-size:2.5rem;">x²</span>
-            </div>
-            <div class="floating-card" style="background:linear-gradient(135deg,#002014,#001a10);">
-                <span style="color:rgba(16,185,129,0.25);font-size:2rem;">π</span>
-            </div>
-        </div>
 
         <div class="hero-content">
             <div class="hero-badge">
                 <i class="fa-solid fa-certificate"></i>
-                CLASE MAGISTRAL · ESCUELA PROFESIONAL DE MATEMÁTICA
+                COEDUCACIÓN • ESCUELA PROFESIONAL DE EDUCACIÓN SECUNDARIA
             </div>
-            <h1 class="hero-title">
-                El Arte de <span class="red">Plantear</span><br>Ecuaciones
+            <h1 class="hero-title" style="font-size: 3.5rem; line-height: 1.15;">
+                Corresponsabilidad<br><span class="red">Socioeducativa</span>
             </h1>
             <div class="hero-meta">
                 <span class="match">98% relevante</span>
-                <span class="year">2025</span>
+                <span class="year">2026</span>
                 <span class="rating">PG</span>
-                <span class="duration">7 secciones · Nivel Básico–UNHEVAL</span>
+                <span class="duration">15 diapositivas · Nivel UNHEVAL</span>
             </div>
             <p class="hero-description">
-                Aprende a traducir el lenguaje cotidiano al lenguaje universal de las matemáticas. Desde fundamentos hasta problemas de preselección UNHEVAL, con un taller inteligente impulsado por IA.
+                Un análisis profundo sobre las esferas de influencia recíprocas entre la familia y la escuela, los modelos teóricos de Joyce Epstein, las barreras críticas de Hornby & Lafaele y las estrategias de intervención para potenciar la educación de calidad.
             </p>
             <div class="hero-actions">
                 <button class="btn-play" onclick="startPresenterMode()" aria-label="Iniciar presentación en pantalla completa">
-                    <i class="fa-solid fa-play"></i> Reproducir
+                    <i class="fa-solid fa-play"></i> Reproducir Exposición
                 </button>
                 <a href="#row-fundamentos" class="btn-more-info">
                     <i class="fa-solid fa-circle-info"></i> Más información
@@ -345,10 +231,10 @@
     <!-- BROWSE CONTENT -->
     <main id="browse-content">
 
-        <!-- ── FILA 1: Fundamentos ───────────────────────────────────── -->
-        <section id="row-fundamentos" class="netflix-row row-theme-red reveal" aria-label="Sección Fundamentos">
+        <!-- ── FILA 1: Rol de la Familia ───────────────────────────────────── -->
+        <section id="row-fundamentos" class="netflix-row row-theme-red reveal" aria-label="Sección Familia">
             <div class="netflix-row-header">
-                <h2 class="netflix-row-title"><i class="fa-solid fa-graduation-cap" style="color:var(--color-accent);margin-right:8px;"></i>Lo Más Visto: Fundamentos</h2>
+                <h2 class="netflix-row-title"><i class="fa-solid fa-house-user" style="color:var(--color-accent);margin-right:8px;"></i>Lo Más Visto: Rol de la Familia</h2>
                 <span class="netflix-row-see-all">Explorar todo</span>
             </div>
             <div class="carousel-wrapper">
@@ -356,282 +242,334 @@
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
                 <div class="carousel-track" id="track-row-fundamentos">
-                    <!-- Card: ¿Qué es el Planteo? -->
-                    <div class="slide-card" onclick="openSlideModal('slide-planteo')" aria-label="Ver: ¿Qué es el Planteo?" data-yt-id="CJEsybfPQSE" data-yt-start="25">
+                    
+                    <!-- Card 1: Coresponsabilidad -->
+                    <div class="slide-card" onclick="openSlideModal('slide-coresponsabilidad')" aria-label="Ver: Coresponsabilidad Socioeducativa" data-yt-id="CN4n6Tfc5WI" data-yt-start="5">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#e50914;">🎓</div>
-                                <div class="slide-card-label">¿Qué significa<br>"Plantear"?</div>
-                                <div class="slide-card-math">Lenguaje Verbal → Ecuación</div>
+                                <div class="slide-card-icon" style="color:#e50914;">🌐</div>
+                                <div class="slide-card-label">Coresponsabilidad<br>Socioeducativa</div>
+                                <div class="slide-card-math">Evolución Familia-Escuela</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
                             <div class="slide-card-actions">
-                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-planteo')" aria-label="Abrir diapositiva">
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-coresponsabilidad')" aria-label="Abrir diapositiva">
                                     <i class="fa-solid fa-play"></i>
                                 </button>
-                                <button class="card-btn" aria-label="Más opciones"><i class="fa-solid fa-ellipsis"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
                             </div>
-                            <div class="slide-card-info-title">¿Qué es el Planteo?</div>
+                            <div class="slide-card-info-title">Evolución de Fronteras</div>
                             <div class="slide-card-info-tags">
-                                <span class="card-tag green">Básico</span>
+                                <span class="card-tag green">98% Match</span>
                                 <span class="card-tag">Introducción</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Card: Los 5 Pasos de Oro -->
-                    <div class="slide-card" onclick="openSlideModal('slide-pasos')" aria-label="Ver: Los 5 Pasos de Oro" data-yt-id="CJEsybfPQSE" data-yt-start="120">
+                    <!-- Card 2: Familia como Microsistema -->
+                    <div class="slide-card" onclick="openSlideModal('slide-familia-socializador')" aria-label="Ver: Familia como Microsistema" data-yt-id="CN4n6Tfc5WI" data-yt-start="35">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#e50914;">✅</div>
-                                <div class="slide-card-label">Los 5 Pasos<br>de Oro</div>
-                                <div class="slide-card-math">Identificar · Traducir · Igualar</div>
+                                <div class="slide-card-icon" style="color:#e50914;">👨‍👩‍👧‍👦</div>
+                                <div class="slide-card-label">Familia como<br>Microsistema</div>
+                                <div class="slide-card-math">Primer Nicho Socializador</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
                             <div class="slide-card-actions">
-                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-pasos')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
-                                <button class="card-btn" aria-label="Más opciones"><i class="fa-solid fa-ellipsis"></i></button>
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-familia-socializador')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
                             </div>
-                            <div class="slide-card-info-title">Los 5 Pasos de Oro</div>
+                            <div class="slide-card-info-title">La Cuna de la Afectividad</div>
                             <div class="slide-card-info-tags">
-                                <span class="card-tag green">Básico</span>
-                                <span class="card-tag">Metodología</span>
+                                <span class="card-tag green">Valores</span>
+                                <span class="card-tag">Socialización</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Card: Diccionario -->
-                    <div class="slide-card" onclick="openSlideModal('slide-diccionario')" aria-label="Ver: Diccionario Matemático" data-yt-id="CJEsybfPQSE" data-yt-start="320">
+                    <!-- Card 3: Esferas de Epstein -->
+                    <div class="slide-card" onclick="openSlideModal('slide-esferas-epstein')" aria-label="Ver: Esferas de Epstein" data-yt-id="CN4n6Tfc5WI" data-yt-start="70">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#e50914;">📖</div>
-                                <div class="slide-card-label">Diccionario<br>de Traducción</div>
-                                <div class="slide-card-math">+ ÷ = ×</div>
+                                <div class="slide-card-icon" style="color:#e50914;">📐</div>
+                                <div class="slide-card-label">Esferas de Epstein<br>6 Tipologías</div>
+                                <div class="slide-card-math">Involucramiento y Cuidado</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
                             <div class="slide-card-actions">
-                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-diccionario')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
-                                <button class="card-btn" aria-label="Más opciones"><i class="fa-solid fa-ellipsis"></i></button>
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-esferas-epstein')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
                             </div>
-                            <div class="slide-card-info-title">Diccionario de Traducción Rápida</div>
+                            <div class="slide-card-info-title">Las 6 Tipologías de Epstein</div>
                             <div class="slide-card-info-tags">
-                                <span class="card-tag green">Básico</span>
-                                <span class="card-tag">Referencia</span>
+                                <span class="card-tag green">Teoría</span>
+                                <span class="card-tag">Modelos</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Card: Errores Comunes -->
-                    <div class="slide-card" onclick="openSlideModal('slide-errores')" aria-label="Ver: Errores Comunes" data-yt-id="CN4n6Tfc5WI" data-yt-start="15">
+                    <!-- Card 4: Datos Epstein -->
+                    <div class="slide-card" onclick="openSlideModal('slide-epstein-datos')" aria-label="Ver: Datos Epstein" data-yt-id="CN4n6Tfc5WI" data-yt-start="100">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#e50914;">⚠️</div>
-                                <div class="slide-card-label">Errores<br>Comunes</div>
-                                <div class="slide-card-math">¡Evítalos!</div>
+                                <div class="slide-card-icon" style="color:#e50914;">📊</div>
+                                <div class="slide-card-label">Análisis de<br>Datos Epstein</div>
+                                <div class="slide-card-math">Variabilidad y Género</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
                             <div class="slide-card-actions">
-                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-errores')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
-                                <button class="card-btn" aria-label="Más opciones"><i class="fa-solid fa-ellipsis"></i></button>
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-epstein-datos')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
                             </div>
-                            <div class="slide-card-info-title">¡Cuidado! Errores Frecuentes</div>
+                            <div class="slide-card-info-title">Datos Cuantitativos de Epstein</div>
                             <div class="slide-card-info-tags">
-                                <span class="card-tag" style="color:#e50914;">Importante</span>
-                                <span class="card-tag">Advertencia</span>
+                                <span class="card-tag green">Estadística</span>
+                                <span class="card-tag">Género</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Card: Resumen Final -->
-                    <div class="slide-card" onclick="openSlideModal('slide-resumen')" aria-label="Ver: Resumen Final" data-yt-id="CJEsybfPQSE" data-yt-start="620">
+                    <!-- Card 5: Bentler EQS -->
+                    <div class="slide-card" onclick="openSlideModal('slide-bentler-eqs')" aria-label="Ver: Bentler EQS" data-yt-id="CN4n6Tfc5WI" data-yt-start="140">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#e50914;">🏆</div>
-                                <div class="slide-card-label">En<br>Resumen...</div>
-                                <div class="slide-card-math">Las 4 claves del éxito</div>
+                                <div class="slide-card-icon" style="color:#e50914;">📈</div>
+                                <div class="slide-card-label">Modelo EQS Bentler<br>Correlación Causal</div>
+                                <div class="slide-card-math">&gamma; = 0.560, p &lt; 0.001</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
                             <div class="slide-card-actions">
-                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-resumen')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
-                                <button class="card-btn" aria-label="Más opciones"><i class="fa-solid fa-ellipsis"></i></button>
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-bentler-eqs')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
                             </div>
-                            <div class="slide-card-info-title">En Resumen...</div>
+                            <div class="slide-card-info-title">Modelos Causales EQS</div>
                             <div class="slide-card-info-tags">
-                                <span class="card-tag green">Cierre</span>
-                                <span class="card-tag">Conclusiones</span>
+                                <span class="card-tag green">Ecuaciones</span>
+                                <span class="card-tag">Rendimiento</span>
                             </div>
                         </div>
                     </div>
+
                 </div>
-                <button class="carousel-btn next" aria-label="Siguiente" onclick="slideCarousel('row-fundamentos', 1)">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
+                <button class="carousel-btn next" aria-label="Siguiente" onclick="slideCarousel('row-fundamentos', 1)"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </section>
 
-        <!-- ── FILA 2: Ejemplos ──────────────────────────────────────── -->
-        <section id="row-ejemplos" class="netflix-row row-theme-blue reveal" aria-label="Sección Ejemplos Resueltos">
+        <!-- ── FILA 2: Rol de la Escuela ───────────────────────────────────── -->
+        <section id="row-ejemplos" class="netflix-row row-theme-blue reveal" aria-label="Sección Escuela">
             <div class="netflix-row-header">
-                <h2 class="netflix-row-title"><i class="fa-solid fa-terminal" style="color:#54b3d6;margin-right:8px;"></i>Ejemplos Recomendados</h2>
+                <h2 class="netflix-row-title"><i class="fa-solid fa-school" style="color:#54b3d6;margin-right:8px;"></i>Populares: Rol de la Escuela</h2>
                 <span class="netflix-row-see-all">Ver todos</span>
             </div>
             <div class="carousel-wrapper">
-                <button class="carousel-btn prev" aria-label="Anterior" onclick="slideCarousel('row-ejemplos', -1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="carousel-btn prev" aria-label="Anterior" onclick="slideCarousel('row-ejemplos', -1)">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
                 <div class="carousel-track" id="track-row-ejemplos">
-                    <div class="slide-card" onclick="openSlideModal('slide-ej1')" data-yt-id="F1d5vGkHlT8" data-yt-start="25">
+                    
+                    <!-- Card 6: Expectativas Pigmalion -->
+                    <div class="slide-card" onclick="openSlideModal('slide-pigmalion')" aria-label="Ver: Expectativas y Pigmalion" data-yt-id="F1d5vGkHlT8" data-yt-start="10">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#54b3d6;">1️⃣</div>
-                                <div class="slide-card-label">Suma de<br>Consecutivos</div>
-                                <div class="slide-card-math">x + (x+1) + (x+2) = 72</div>
+                                <div class="slide-card-icon" style="color:#54b3d6;">✨</div>
+                                <div class="slide-card-label">Expectativas y<br>Efecto Pigmalión</div>
+                                <div class="slide-card-math">94% Afecto e Impacto</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej1')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Ej. 1: Suma de Consecutivos</div>
-                            <div class="slide-card-info-tags"><span class="card-tag green">Básico</span><span class="card-tag">Aritmética</span></div>
+                            <div class="slide-card-actions">
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-pigmalion')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                            </div>
+                            <div class="slide-card-info-title">Confianza y Afecto Familiar</div>
+                            <div class="slide-card-info-tags">
+                                <span class="card-tag blue">94% Afecto</span>
+                                <span class="card-tag">Rendimiento</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="slide-card" onclick="openSlideModal('slide-ej2')" data-yt-id="kYJ53u0aJ8o" data-yt-start="40">
+
+                    <!-- Card 7: Intersubjetividad Escolar -->
+                    <div class="slide-card" onclick="openSlideModal('slide-escuela-intersubjetividad')" aria-label="Ver: Intersubjetividad Escolar" data-yt-id="F1d5vGkHlT8" data-yt-start="50">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#54b3d6;">2️⃣</div>
-                                <div class="slide-card-label">Operadores<br>Combinados</div>
-                                <div class="slide-card-math">2x + 5 = 21</div>
+                                <div class="slide-card-icon" style="color:#54b3d6;">🏫</div>
+                                <div class="slide-card-label">Intersubjetividad<br>Socialización Política</div>
+                                <div class="slide-card-math">Formación Cívica y Ética</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej2')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Ej. 2: Operadores Combinados</div>
-                            <div class="slide-card-info-tags"><span class="card-tag green">Básico</span><span class="card-tag">Álgebra</span></div>
+                            <div class="slide-card-actions">
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-escuela-intersubjetividad')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                            </div>
+                            <div class="slide-card-info-title">Escenario de Intersubjetividad</div>
+                            <div class="slide-card-info-tags">
+                                <span class="card-tag blue">Socialización</span>
+                                <span class="card-tag">Secundaria</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="slide-card" onclick="openSlideModal('slide-ej3')" data-yt-id="K3t1XN1gN7c" data-yt-start="35">
+
+                    <!-- Card 8: Acción de Habermas -->
+                    <div class="slide-card" onclick="openSlideModal('slide-habermas-civico')" aria-label="Ver: Acción de Habermas" data-yt-id="F1d5vGkHlT8" data-yt-start="85">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#54b3d6;">3️⃣</div>
-                                <div class="slide-card-label">Línea del Tiempo<br>(Edades)</div>
-                                <div class="slide-card-math">3x + 10 = 2(x + 10)</div>
+                                <div class="slide-card-icon" style="color:#54b3d6;">🗣️</div>
+                                <div class="slide-card-label">Acción Comunicativa<br>Jürgen Habermas</div>
+                                <div class="slide-card-math">Espacio Libre de Coerción</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej3')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Ej. 3: Edades (Línea Temporal)</div>
-                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#f59e0b;font-weight:700;">Intermedio</span><span class="card-tag">Edades</span></div>
+                            <div class="slide-card-actions">
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-habermas-civico')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                            </div>
+                            <div class="slide-card-info-title">El Modelo Comunicativo</div>
+                            <div class="slide-card-info-tags">
+                                <span class="card-tag blue">Filosofía</span>
+                                <span class="card-tag">Ciudadanía</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="slide-card" onclick="openSlideModal('slide-ej4')" data-yt-id="R9H7nJ7yU38" data-yt-start="20">
+
+                    <!-- Card 9: Inclusión de Sacristán -->
+                    <div class="slide-card" onclick="openSlideModal('slide-sacristan-inclusion')" aria-label="Ver: Inclusión de Sacristán" data-yt-id="F1d5vGkHlT8" data-yt-start="120">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#54b3d6;">4️⃣</div>
-                                <div class="slide-card-label">Modelado<br>Geométrico</div>
-                                <div class="slide-card-math">2(x) + 2(x+4) = 32</div>
+                                <div class="slide-card-icon" style="color:#54b3d6;">📖</div>
+                                <div class="slide-card-label">Inclusión Ciudadana<br>Gimeno Sacristán</div>
+                                <div class="slide-card-math">Cultura Política Activa</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej4')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Ej. 4: Modelado Geométrico</div>
-                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#f59e0b;font-weight:700;">Intermedio</span><span class="card-tag">Geometría</span></div>
+                            <div class="slide-card-actions">
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-sacristan-inclusion')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                            </div>
+                            <div class="slide-card-info-title">Inclusión Pública Activa</div>
+                            <div class="slide-card-info-tags">
+                                <span class="card-tag blue">Inclusión</span>
+                                <span class="card-tag">Sacristán</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="slide-card" onclick="openSlideModal('slide-ej5')" data-yt-id="F71H4y2t5aY" data-yt-start="20">
+
+                    <!-- Card 10: Estrategias Activas -->
+                    <div class="slide-card" onclick="openSlideModal('slide-estrategias-aula')" aria-label="Ver: Estrategias Activas" data-yt-id="F1d5vGkHlT8" data-yt-start="160">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#54b3d6;">5️⃣</div>
-                                <div class="slide-card-label">Reparto de<br>Cantidades</div>
-                                <div class="slide-card-math">x + (x+10) = 50</div>
+                                <div class="slide-card-icon" style="color:#54b3d6;">🤝</div>
+                                <div class="slide-card-label">Estrategias Activas<br>Didáctica en Aula</div>
+                                <div class="slide-card-math">Diálogo, Debates, Juegos</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej5')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Ej. 5: Reparto de Cantidades</div>
-                            <div class="slide-card-info-tags"><span class="card-tag green">Básico</span><span class="card-tag">Reparto</span></div>
-                        </div>
-                    </div>
-                    <div class="slide-card" onclick="openSlideModal('slide-ej6')">
-                        <div class="slide-card-thumb">
-                            <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#f59e0b;">6️⃣</div>
-                                <div class="slide-card-label">Reparto de Fondos<br>(Cuatro Socios)</div>
-                                <div class="slide-card-math">8x + 4000 = 20000</div>
+                            <div class="slide-card-actions">
+                                <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-estrategias-aula')" aria-label="Abrir diapositiva"><i class="fa-solid fa-play"></i></button>
+                                <button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                            </div>
+                            <div class="slide-card-info-title">Metodologías de Inclusión</div>
+                            <div class="slide-card-info-tags">
+                                <span class="card-tag blue">Práctico</span>
+                                <span class="card-tag">Aulas</span>
                             </div>
                         </div>
-                        <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej6')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Ej. 6: Reparto de Fondos (Socios)</div>
-                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#f59e0b;font-weight:700;">Intermedio</span><span class="card-tag">Reparto</span></div>
-                        </div>
                     </div>
-                    <div class="slide-card" onclick="openSlideModal('slide-ej7')">
-                        <div class="slide-card-thumb">
-                            <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#e50914;">7️⃣</div>
-                                <div class="slide-card-label">Reparto Equitativo<br>(Calculadora y Libros)</div>
-                                <div class="slide-card-math">4L + 17 = 2L + 27</div>
-                            </div>
-                        </div>
-                        <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej7')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Ej. 7: Distribución Equitativa</div>
-                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">Equidad</span></div>
-                        </div>
-                    </div>
+
                 </div>
                 <button class="carousel-btn next" aria-label="Siguiente" onclick="slideCarousel('row-ejemplos', 1)"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </section>
 
-        <!-- ── FILA 3: Retos UNHEVAL ─────────────────────────────────────── -->
-        <section id="row-retos" class="netflix-row row-theme-purple reveal" aria-label="Sección Retos de Alto Voltaje UNHEVAL">
+        <!-- ── FILA 3: Barreras y Estrategias ──────────────────────────────── -->
+        <section id="row-retos" class="netflix-row row-theme-purple reveal" aria-label="Sección Barreras y Alianzas">
             <div class="netflix-row-header">
-                <h2 class="netflix-row-title"><i class="fa-solid fa-star" style="color:#a78bfa;margin-right:8px;"></i>Retos de Alto Voltaje · Nivel UNHEVAL</h2>
+                <h2 class="netflix-row-title"><i class="fa-solid fa-triangle-exclamation" style="color:#a78bfa;margin-right:8px;"></i>Retos: Barreras y Alianzas Coeducativas</h2>
                 <span class="netflix-row-see-all">Ver retos</span>
             </div>
             <div class="carousel-wrapper">
                 <button class="carousel-btn prev" aria-label="Anterior" onclick="slideCarousel('row-retos', -1)"><i class="fa-solid fa-chevron-left"></i></button>
                 <div class="carousel-track" id="track-row-retos">
-                    <div class="slide-card" onclick="openSlideModal('slide-ej8')" data-yt-id="F71H4y2t5aY" data-yt-start="120">
+                    
+                    <!-- Card 11: Barreras de Hornby -->
+                    <div class="slide-card" onclick="openSlideModal('slide-barreras-fricciones')" data-yt-id="F71H4y2t5aY" data-yt-start="5">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#a78bfa;">⭐</div>
-                                <div class="slide-card-label">Reto UNHEVAL I<br>Edades en el Tiempo</div>
-                                <div class="slide-card-math">(A-a)/(B-a) = 5/4</div>
+                                <div class="slide-card-icon" style="color:#a78bfa;">⚠️</div>
+                                <div class="slide-card-label">Barreras de Hornby<br>& Lafaele</div>
+                                <div class="slide-card-math">Estructural vs Psicológica</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej8')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Reto UNHEVAL I: Edades en el Tiempo</div>
-                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">UNHEVAL</span></div>
+                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-barreras-fricciones')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
+                            <div class="slide-card-info-title">Fricciones y Conflictos</div>
+                            <div class="slide-card-info-tags"><span class="card-tag purple">49 Barreras</span><span class="card-tag">Relacional</span></div>
                         </div>
                     </div>
-                    <div class="slide-card" onclick="openSlideModal('slide-ej9')" data-yt-id="F71H4y2t5aY" data-yt-start="240">
+
+                    <!-- Card 12: Detalles de Barreras -->
+                    <div class="slide-card" onclick="openSlideModal('slide-barreras-detalles')" data-yt-id="F71H4y2t5aY" data-yt-start="45">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
-                                <div class="slide-card-icon" style="color:#a78bfa;">⭐⭐</div>
-                                <div class="slide-card-label">Reto UNHEVAL II<br>Modelado Diofántico</div>
-                                <div class="slide-card-math">3x + 2y = 50, y > 2x</div>
+                                <div class="slide-card-icon" style="color:#a78bfa;">🔍</div>
+                                <div class="slide-card-label">Socio-Profesionales<br>y Familiares</div>
+                                <div class="slide-card-math">Rigidez, Apatía, Horarios</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
-                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej9')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Reto UNHEVAL II: Modelado Diofántico</div>
-                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">Diofántico</span></div>
+                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-barreras-detalles')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
+                            <div class="slide-card-info-title">Barreras al Detalle</div>
+                            <div class="slide-card-info-tags"><span class="card-tag purple">Institucionales</span><span class="card-tag">Horarios</span></div>
                         </div>
                     </div>
+
+                    <!-- Card 13: Escuelas de Padres -->
+                    <div class="slide-card" onclick="openSlideModal('slide-estrategias-alianzas')" data-yt-id="F71H4y2t5aY" data-yt-start="90">
+                        <div class="slide-card-thumb">
+                            <div class="slide-card-thumb-inner">
+                                <div class="slide-card-icon" style="color:#a78bfa;">💡</div>
+                                <div class="slide-card-label">Escuelas de Padres<br>Programa CEMPA</div>
+                                <div class="slide-card-math">Talleres Activos y DAFO</div>
+                            </div>
+                        </div>
+                        <div class="slide-card-info">
+                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-estrategias-alianzas')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
+                            <div class="slide-card-info-title">Intervenciones Sistémicas</div>
+                            <div class="slide-card-info-tags"><span class="card-tag purple">CEMPA</span><span class="card-tag">Alianzas</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Card 14: Johns Hopkins / ABC -->
+                    <div class="slide-card" onclick="openSlideModal('slide-johns-hopkins-abc')" data-yt-id="F71H4y2t5aY" data-yt-start="145">
+                        <div class="slide-card-thumb">
+                            <div class="slide-card-thumb-inner">
+                                <div class="slide-card-icon" style="color:#a78bfa;">📋</div>
+                                <div class="slide-card-label">ABC de la Comunicación<br>Johns Hopkins</div>
+                                <div class="slide-card-math">Reducción del Ausentismo: -24%</div>
+                            </div>
+                        </div>
+                        <div class="slide-card-info">
+                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-johns-hopkins-abc')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
+                            <div class="slide-card-info-title">Johns Hopkins & Vidal Schmill</div>
+                            <div class="slide-card-info-tags"><span class="card-tag purple">-24% Absentismo</span><span class="card-tag">Canales</span></div>
+                        </div>
+                    </div>
+
                 </div>
                 <button class="carousel-btn next" aria-label="Siguiente" onclick="slideCarousel('row-retos', 1)"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </section>
 
         <!-- ── FILA 4: Taller IA ─────────────────────────────────────── -->
-        <section id="ai-section" class="reveal" aria-label="Taller Inteligente con IA">
+        <section id="ai-section" class="reveal" aria-label="Taller de Casos con IA">
             <div class="netflix-row-header" style="padding-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                <h2 class="netflix-row-title" style="margin: 0;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#46d369;margin-right:8px;"></i>✨ Taller Inteligente con IA</h2>
+                <h2 class="netflix-row-title" style="margin: 0;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#46d369;margin-right:8px;"></i>✨ Taller de Casos con IA</h2>
                 <span id="ai-status-badge" class="ai-status-badge offline"><i class="fa-solid fa-cloud-slash"></i> Offline (Simulación)</span>
             </div>
 
@@ -639,499 +577,178 @@
                 <!-- Panel Generador -->
                 <div class="ai-panel">
                     <div class="ai-panel-title" style="color:#46d369;">
-                        <i class="fa-solid fa-dice"></i> Generar Desafío IA
+                        <i class="fa-solid fa-dice"></i> Generar Cuestionario / Dilema Coeducativo
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
                         <div>
-                            <label for="select-diff" style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);display:block;margin-bottom:6px;font-weight:700;">Dificultad</label>
+                          <label for="select-diff" style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);display:block;margin-bottom:6px;font-weight:700;">Dificultad</label>
                             <select id="select-diff" class="ai-select" aria-label="Seleccionar dificultad">
-                                <option value="Básico">Básico (Fácil)</option>
-                                <option value="Intermedio">Intermedio</option>
-                                <option value="Avanzado">Avanzado</option>
+                                <option value="Básico">Fácil (Involucramiento)</option>
+                                <option value="Avanzado">Complejo (Choque de Roles)</option>
                             </select>
                         </div>
                         <div>
-                            <label for="select-topic" style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);display:block;margin-bottom:6px;font-weight:700;">Contexto</label>
+                          <label for="select-topic" style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);display:block;margin-bottom:6px;font-weight:700;">Tema</label>
                             <select id="select-topic" class="ai-select" aria-label="Seleccionar tema">
-                                <option value="Edades">Edades y Tiempo</option>
-                                <option value="Geometría">Geometría Plana</option>
-                                <option value="Móviles">Móviles (Velocidad)</option>
-                                <option value="Grifos">Grifos (Trabajo)</option>
+                                <option value="Crianza">Comunicación y Crianza</option>
+                                <option value="Barreras">Barreras y Horarios</option>
                             </select>
                         </div>
                     </div>
                     <div id="ai-problem-output" role="status" aria-live="polite" class="ai-output-box">
-                        Haz clic en "Generar" para obtener un desafío en tiempo real...
+                        Haz clic en "Generar" para obtener un caso de coresponsabilidad escolar...
                     </div>
                     <div style="display:flex;gap:8px;margin-top:12px;">
-                        <button onclick="generateAIProblem()" id="btn-generate-ai" class="btn-netflix-red" aria-label="Generar nuevo problema matemático con IA">
-                            <i class="fa-solid fa-sparkles"></i> Generar ✨
+                        <button onclick="generateAIProblem()" id="btn-generate-ai" class="btn-netflix-red" aria-label="Generar nuevo caso con IA">
+                            <i class="fa-solid fa-sparkles"></i> Generar Caso ✨
                         </button>
-                        <button onclick="toggleAISolution()" id="btn-reveal-solution" class="btn-netflix-grey" disabled aria-label="Revelar la solución paso a paso">
-                            <i class="fa-solid fa-eye"></i> Solución
+                        <button onclick="toggleAISolution()" id="btn-reveal-solution" class="btn-netflix-grey" disabled aria-label="Revelar análisis del caso">
+                            <i class="fa-solid fa-eye"></i> Ver Análisis
                         </button>
                     </div>
-                    <!-- Contenedor separado para la resolución paso a paso -->
                     <div id="ai-solution-output" role="status" aria-live="polite" class="ai-output-box" style="display: none; margin-top: 12px; min-height: 120px;"></div>
-
                 </div>
 
                 <!-- Panel Analizador -->
                 <div class="ai-panel">
-                    <div class="ai-panel-title" style="color:#54b3d6;">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Traductor a Lenguaje Formal
+                    <div class="ai-panel-title" style="color:#46d369;">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i> Analizar Caso Práctico
                     </div>
-                    <p style="font-size:0.75rem;color:var(--color-text-muted);margin-bottom:10px;">Ingresa cualquier problema verbal y el motor IA lo resolverá usando los <strong>5 Pasos de Oro</strong>:</p>
-                    <label for="user-problem-input" class="sr-only">Problema a resolver</label>
-                    <textarea id="user-problem-input" class="ai-textarea" rows="3"
-                        aria-label="Escribe un problema de matemáticas para resolver con IA"
-                        placeholder="Ej: El largo de una piscina excede al doble del ancho en 5 metros. Si el perímetro es de 70 m, halla sus dimensiones..."></textarea>
-                    <div id="ai-analysis-output" role="status" aria-live="polite" class="ai-output-box" style="margin-top:10px;min-height:100px;">
-                        El análisis paso a paso aparecerá aquí...
+                    <label for="user-problem-input" style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);display:block;margin-bottom:6px;font-weight:700;">Escribe un caso de conflicto Familia-Escuela:</label>
+                    <textarea id="user-problem-input" class="ai-textarea" placeholder="Ejemplo: Un padre trabaja de noche y duerme de día, por lo que nunca asiste a las citas del tutor..."></textarea>
+                    
+                    <div id="ai-analysis-output" role="status" aria-live="polite" class="ai-output-box" style="margin-top:12px;min-height:92px;">
+                        Escribe un conflicto para analizar qué barreras de Hornby u Epstein aplican...
                     </div>
-                    <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:8px;align-items:center;">
-                        <button class="speaker-btn" style="margin-left:0; width: 36px; height: 36px;" onclick="speakText(document.getElementById('user-problem-input').value)" title="Escuchar enunciado">
-                            <i class="fa-solid fa-volume-high"></i>
-                        </button>
-                        <button onclick="analyzeUserProblem()" id="btn-analyze-ai" class="btn-netflix-red" aria-label="Analizar y resolver el problema ingresado">
-                            <i class="fa-solid fa-brain"></i> Resolver con IA ✨
-                        </button>
-                    </div>
+                    
+                    <button onclick="analyzeUserProblem()" id="btn-analyze-ai" class="btn-netflix-red" style="margin-top:12px;width:100%;" aria-label="Analizar el caso ingresado">
+                        <i class="fa-solid fa-brain"></i> Analizar Caso con IA
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- FOOTER -->
-        <footer id="browse-footer" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-            <div class="custom-signature-footer" style="width: 100%; margin-top: 0; padding-top: 0;">
-                <div class="icon-box">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 3C12 7.5 16.5 12 21 12C16.5 12 12 16.5 12 21C12 16.5 7.5 12 3 12C7.5 12 12 7.5 12 3Z" fill="#f59e0b"/>
-                        <circle cx="7" cy="17" r="1.5" fill="#f59e0b" opacity="0.8"/>
-                    </svg>
-                </div>
-                <p class="main-text">
-                    Sistema creado con <span class="heart">🧡</span> por <span class="creator-name">Pablito_DP y su grupo</span>
-                </p>
-                <p class="sub-text">
-                    &copy; 2026 PABLITO_DP &mdash; Acceso Clasificado
-                </p>
+    </main>
+
+    <!-- FOOTER GENERAL -->
+    <footer id="main-footer">
+        <p>&copy; 2026 EDUFLIX — Exposición Académica UNHEVAL. Todos los derechos reservados.</p>
+        <p>Inspirado en Netflix. Basado en el PDF de Coresponsabilidad Socioeducativa.</p>
+    </footer>
+
+</div>
+
+<!-- DETALLE DIAPOSITIVA (SLIDE MODAL) -->
+<div id="slide-modal" class="modal-overlay" onclick="closeSlideModal(event)" role="dialog" aria-modal="true" aria-label="Detalle de la sección">
+    <div class="modal-container">
+        <button class="modal-close" onclick="closeSlideModal()" aria-label="Cerrar modal">&times;</button>
+        <div id="modal-content">
+            <!-- Cargado dinámicamente desde JS -->
+        </div>
+    </div>
+</div>
+
+<!-- QR MODAL (Mando a Distancia) -->
+<div id="qr-modal" class="modal-overlay" onclick="closeQRModal(event)" role="dialog" aria-modal="true" aria-label="Mando a distancia">
+    <div class="modal-container" style="max-width: 400px; text-align: center; padding: 30px; background: #181818; border: 1px solid rgba(255,255,255,0.1);">
+        <button class="modal-close" onclick="closeQRModal()">&times;</button>
+        <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 12px;">Mando a Distancia</h3>
+        <p style="font-size: 0.82rem; color: var(--color-text-secondary); margin-bottom: 20px;">Escanea este código con tu celular para controlar la exposición en tiempo real desde tu móvil.</p>
+        <div style="background: white; padding: 16px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 20px rgba(0,0,0,0.5); margin-bottom: 20px;">
+            <!-- QR Placeholder (Balanza de la Justicia) -->
+            <div style="width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; font-size: 6rem; background: #f3f4f6; color: #111;">⚖️</div>
+        </div>
+        <div style="font-size: 0.72rem; color: var(--color-text-muted);">
+            Desarrollado para la clase de Ética de la UNHEVAL.
+        </div>
+    </div>
+</div>
+
+<!-- PRESENTER MODE OVERLAY (FULL SCREEN SLIDESHOW) -->
+<div id="presenter-overlay" role="dialog" aria-modal="true" aria-label="Modo presentación en pantalla completa">
+    <div class="presenter-container">
+        
+        <!-- Header Presentador -->
+        <header class="presenter-header">
+            <div class="ps-logo">EDUFLIX <span>Exposición</span></div>
+            <div class="ps-controls-top">
+                <button class="ps-btn-nav" onclick="presenterPrev()" title="Anterior (Flecha izquierda)"><i class="fa-solid fa-arrow-left"></i></button>
+                <span class="ps-page-indicator" id="presenter-page-indicator">0 / 0</span>
+                <button class="ps-btn-nav" onclick="presenterNext()" title="Siguiente (Flecha derecha / Espacio)"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+            <button class="ps-btn-close" onclick="exitPresenterMode()" title="Salir del modo presentación (Escape)"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+
+        <!-- Slide View (Cards Stack) -->
+        <div class="presenter-slide-view" id="presenter-slide-view">
+            <!-- Generado dinámicamente desde JS -->
+        </div>
+
+        {/* Presenter progress bar */}
+        <div class="ps-progress-container" aria-hidden="true">
+            <div class="ps-progress-bar" id="presenter-progress-bar"></div>
+        </div>
+
+        <!-- Footer Presentador / Atajos -->
+        <footer class="presenter-footer">
+            <div style="font-size: 0.72rem; color: var(--color-text-muted);">Universidad Nacional Hermilio Valdizán (UNHEVAL)</div>
+            <div class="ps-shortcuts">
+                <span><kbd>←</kbd> / <kbd>→</kbd> Navegar</span>
+                <span><kbd>Esc</kbd> Salir</span>
             </div>
         </footer>
 
-    </main>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- MODAL DE DIAPOSITIVA                                                       -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div id="slide-modal" role="dialog" aria-modal="true" aria-label="Contenido de la diapositiva" onclick="closeSlideModal(event)">
-    <div class="modal-box" id="modal-box">
-        <button class="modal-close" onclick="closeSlideModal()" aria-label="Cerrar modal">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-        <div id="modal-content"><!-- Contenido inyectado por JS --></div>
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- MODO PRESENTADOR FULLSCREEN                                                -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div id="presenter-overlay" role="dialog" aria-modal="true" aria-label="Modo presentación">
-    <div class="presenter-slide-view" id="presenter-slide-view">
-        <!-- Todas las diapositivas se renderizan aquí en orden vertical por JS -->
-    </div>
-    <div class="presenter-bar" role="toolbar" aria-label="Controles de la presentación">
-        <button class="pbar-btn exit" onclick="exitPresenterMode()" aria-label="Salir del modo presentación">
-            <i class="fa-solid fa-compress"></i> Salir
-        </button>
-        <button class="pbar-btn" onclick="presenterPrev()" aria-label="Diapositiva anterior">
-            <i class="fa-solid fa-chevron-left"></i> Anterior
-        </button>
-        <span class="pbar-indicator" id="pbar-indicator"></span>
-        <button class="pbar-btn" onclick="presenterNext()" aria-label="Diapositiva siguiente">
-            Siguiente <i class="fa-solid fa-chevron-right"></i>
-        </button>
-    </div>
-</div>
-
-<!-- QR MODAL — MANDO A DISTANCIA -->
-<div id="qr-modal" role="dialog" aria-modal="true" aria-label="Mando a distancia" onclick="if(event.target===this)closeQRModal()">
-    <div class="qr-box">
-        <button class="qr-close" onclick="closeQRModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
-        <div class="qr-title">📱 Mando a Distancia</div>
-        <div class="qr-subtitle">Escanea el código QR con tu celular para controlar la presentación de forma inalámbrica.</div>
-        <div class="qr-img-wrapper">
-            <img id="qr-img" src="" alt="Código QR del mando remoto" width="200" height="200">
-        </div>
-        <div class="qr-url" id="qr-url-text">Cargando URL...</div>
-        <ul class="qr-steps">
-            <li><span>1</span> Abre la cámara de tu celular</li>
-            <li><span>2</span> Apunta al código QR de arriba</li>
-            <li><span>3</span> Toca el link que aparece</li>
-            <li><span>4</span> ¡Listo! Controla las diapositivas desde tu celular</li>
-        </ul>
-        <button onclick="regenerarRemoteKey()" style="
-            margin-top: 14px;
-            width: 100%;
-            padding: 10px 16px;
-            background: rgba(229,9,20,0.15);
-            border: 1px solid rgba(229,9,20,0.35);
-            color: #e50914;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        " onmouseover="this.style.background='rgba(229,9,20,0.25)'" onmouseout="this.style.background='rgba(229,9,20,0.15)'">
-            <i class="fa-solid fa-arrows-rotate"></i> Regenerar Acceso / Desvincular Mando
-        </button>
-    </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- TORNEO EN VIVO — OVERLAY PANTALLA GRANDE                                   -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div id="tournament-overlay" role="dialog" aria-modal="true" aria-label="Torneo en Vivo" style="
-    display:none; position:fixed; inset:0; z-index:900;
-    background:#0a0a0a;
-    flex-direction:column;
-    font-family:'Poppins',sans-serif;
-">
-    <!-- Barra superior del torneo -->
-    <div id="torneo-topbar" style="
-        display:flex; align-items:center; justify-content:space-between;
-        padding:14px 32px; background:rgba(0,0,0,0.6);
-        backdrop-filter:blur(12px); border-bottom:1px solid rgba(255,255,255,0.07);
-    ">
-        <div style="font-size:1.4rem; font-weight:800; color:#e50914;">MATH<span style="color:#fff">-FLIX</span> <span style="font-size:0.75rem;color:#f59e0b;font-weight:700;letter-spacing:2px;">TORNEO EN VIVO</span></div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <!-- Controles del profesor -->
-            <button onclick="abrirHistorialRondas()" style="padding:7px 14px;background:rgba(84,179,214,0.12);border:1px solid rgba(84,179,214,0.3);color:#54b3d6;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F4CB; Rondas</button>
-            <button onclick="torneoSetPantalla('lobby')"    id="tc-lobby"    style="padding:7px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F3E0; Lobby</button>
-            <button onclick="torneoSetPantalla('pregunta')" id="tc-pregunta" style="padding:7px 14px;background:rgba(229,9,20,0.15);border:1px solid rgba(229,9,20,0.35);color:#e50914;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x25B6; Pregunta</button>
-            <button onclick="torneoSetPantalla('leaderboard')" id="tc-lb"   style="padding:7px 14px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F3C6; Ranking</button>
-            <button onclick="torneoSiguientePregunta()" style="padding:7px 14px;background:rgba(84,179,214,0.12);border:1px solid rgba(84,179,214,0.3);color:#54b3d6;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x23ED; Siguiente</button>
-            <button onclick="torneoReset()" style="padding:7px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#6d6d6e;border-radius:8px;font-size:0.72rem;cursor:pointer;">&#x21BA; Reset</button>
-            <!-- Exportación de reportes PDF de la ronda activa -->
-            <button onclick="descargarRondaCompletaPDF('alfabetico')" style="padding:7px 14px;background:rgba(70,211,105,0.15);border:1px solid rgba(70,211,105,0.35);color:#46d369;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;" title="Descargar respuestas de la ronda en orden alfabético A-Z">
-                <i class="fa-solid fa-file-pdf"></i> Ronda A-Z
-            </button>
-            <button onclick="descargarRondaCompletaPDF('puntaje')" style="padding:7px 14px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);color:#f59e0b;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;" title="Descargar respuestas de la ronda ordenadas por puntaje">
-                <i class="fa-solid fa-file-pdf"></i> Ronda Puntaje
-            </button>
-            <button onclick="closeTorneoOverlay()" style="padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#b3b3b3;border-radius:8px;font-size:0.75rem;cursor:pointer;"><i class="fa-solid fa-xmark"></i> Cerrar</button>
-        </div>
-    </div>
-
-    <!-- Área de contenido del torneo -->
-    <div id="torneo-content" style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-
-        <!-- PANEL LOBBY -->
-        <div id="torneo-panel-lobby" style="display:none;flex-direction:column;align-items:center;gap:32px;padding:40px 32px;text-align:center;width:100%;max-width:1100px;">
-            <div style="font-size:1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e50914;">Esperando participantes...</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;width:100%;align-items:start;">
-                <!-- QR -->
-                <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
-                    <div style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#b3b3b3;">Escanea para unirte</div>
-                    <div id="torneo-qr-wrapper" style="background:#fff;padding:16px;border-radius:12px;box-shadow:0 0 40px rgba(229,9,20,0.2);">
-                        <img id="torneo-qr-img" src="" alt="QR Torneo" width="220" height="220">
-                    </div>
-                    <div id="torneo-qr-url" style="font-size:0.65rem;color:#6d6d6e;word-break:break-all;max-width:260px;"></div>
-                </div>
-                <!-- Lista de participantes -->
-                <div style="display:flex;flex-direction:column;gap:12px;">
-                    <div style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#b3b3b3;">Participantes conectados (<span id="torneo-count">0</span>)</div>
-                    <div id="torneo-participantes-grid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-start;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PANEL PREGUNTA -->
-        <div id="torneo-panel-pregunta" style="display:none;flex-direction:column;align-items:center;gap:24px;padding:32px;width:100%;max-width:900px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-                <div id="torneo-p-badge" style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e50914;background:rgba(229,9,20,0.12);border:1px solid rgba(229,9,20,0.25);padding:6px 14px;border-radius:20px;">Pregunta 1</div>
-                <div style="display:flex;gap:20px;align-items:center;">
-                    <div style="text-align:center;">
-                        <div style="font-size:0.6rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:1px;">Respuestas</div>
-                        <div id="torneo-resp-count" style="font-size:1.4rem;font-weight:800;color:#46d369;">0</div>
-                    </div>
-                    <div id="torneo-timer" style="font-size:3rem;font-weight:800;color:#46d369;font-variant-numeric:tabular-nums;min-width:80px;text-align:center;">60</div>
-                </div>
-            </div>
-            <!-- Enunciado -->
-            <div style="width:100%;background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;">
-                <div style="font-size:0.65rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Enunciado</div>
-                <div id="torneo-p-texto" style="font-size:1.3rem;color:#e5e5e5;line-height:1.7;font-weight:500;"></div>
-            </div>
-            <!-- Barra de progreso -->
-            <div style="width:100%;">
-                <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:#6d6d6e;margin-bottom:6px;">
-                    <span>Progreso de entregas</span>
-                    <span id="torneo-prog-text">0 de 0 alumnos</span>
-                </div>
-                <div style="width:100%;height:6px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                    <div id="torneo-prog-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#e50914,#f59e0b);border-radius:99px;transition:width 0.5s ease;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PANEL LEADERBOARD -->
-        <div id="torneo-panel-leaderboard" style="display:none;flex-direction:column;align-items:center;gap:20px;padding:32px;width:100%;max-width:700px;">
-            <div style="font-size:0.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#f59e0b;">🏆 Tabla de Posiciones</div>
-            <div id="torneo-leaderboard-list" style="width:100%;display:flex;flex-direction:column;gap:10px;"></div>
-        </div>
-
-    </div><!-- /torneo-content -->
-</div><!-- /tournament-overlay -->
-
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- MODAL: DETALLE DE SOLUCIÓN DEL ALUMNO                                   -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div id="torneo-detalle-alumno-modal" onclick="if(event.target===this)cerrarDetalleAlumnoModal()" style="
-    display:none; position:fixed; inset:0; z-index:9100;
-    background:rgba(0,0,0,0.88); backdrop-filter:blur(10px);
-    align-items:center; justify-content:center; padding:20px;
-">
-    <div style="
-        background:#141414; border:1px solid rgba(255,255,255,0.1);
-        border-radius:20px; width:100%; max-width:900px;
-        max-height:90vh; overflow:auto;
-        display:flex; flex-direction:column;
-        box-shadow:0 30px 80px rgba(0,0,0,0.7);
-        animation:torneoFadeIn 0.3s ease;
-    ">
-        <!-- Header del modal -->
-        <div style="
-            display:flex; align-items:center; justify-content:space-between;
-            padding:20px 28px 0; flex-shrink:0;
-        ">
-            <div>
-                <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e50914;">
-                    Solución del Alumno
-                </div>
-                <div id="tdm-nombre" style="font-size:1.1rem;font-weight:800;color:#fff;margin-top:4px;"></div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;">
-                <button onclick="descargarAlumnoPDFActual()" style="
-                    background:rgba(70,211,105,0.15); border:1px solid rgba(70,211,105,0.3);
-                    color:#46d369; border-radius:8px; padding:7px 14px;
-                    font-size:0.78rem; font-weight:700; cursor:pointer;
-                    display:flex;align-items:center;gap:6px;
-                "><i class="fa-solid fa-file-pdf"></i> Pregunta PDF</button>
-                <button onclick="descargarAlumnoBloquePDF(1)" style="
-                    background:rgba(84,179,214,0.15); border:1px solid rgba(84,179,214,0.3);
-                    color:#54b3d6; border-radius:8px; padding:7px 12px;
-                    font-size:0.78rem; font-weight:700; cursor:pointer;
-                    display:flex;align-items:center;gap:4px;
-                "><i class="fa-solid fa-file-pdf"></i> Bloque 1</button>
-                <button onclick="descargarAlumnoBloquePDF(2)" style="
-                    background:rgba(84,179,214,0.15); border:1px solid rgba(84,179,214,0.3);
-                    color:#54b3d6; border-radius:8px; padding:7px 12px;
-                    font-size:0.78rem; font-weight:700; cursor:pointer;
-                    display:flex;align-items:center;gap:4px;
-                "><i class="fa-solid fa-file-pdf"></i> Bloque 2</button>
-                <button onclick="descargarAlumnoBloquePDF(3)" style="
-                    background:rgba(84,179,214,0.15); border:1px solid rgba(84,179,214,0.3);
-                    color:#54b3d6; border-radius:8px; padding:7px 12px;
-                    font-size:0.78rem; font-weight:700; cursor:pointer;
-                    display:flex;align-items:center;gap:4px;
-                "><i class="fa-solid fa-file-pdf"></i> Bloque 3</button>
-                <button onclick="editarPuntajeAlumnoManual()" style="
-                    background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3);
-                    color:#f59e0b; border-radius:8px; padding:7px 14px;
-                    font-size:0.78rem; font-weight:700; cursor:pointer;
-                    display:flex;align-items:center;gap:6px;
-                "><i class="fa-solid fa-pen"></i> Editar Nota</button>
-                <button onclick="cerrarDetalleAlumnoModal()" style="
-                    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
-                    color:#b3b3b3; border-radius:8px; padding:7px 14px;
-                    font-size:0.82rem; cursor:pointer;
-                "><i class="fa-solid fa-xmark"></i> Cerrar</button>
-            </div>
-        </div>
-
-        <!-- Contenedor de Pestañas (Preguntas respondidas) -->
-        <div id="tdm-tabs-container" style="
-            display: flex; gap: 8px; padding: 12px 28px;
-            background: rgba(255,255,255,0.02);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            overflow-x: auto; white-space: nowrap;
-        ">
-            <!-- Pestañas dinámicas -->
-        </div>
-
-        <!-- Cuerpo del modal -->
-        <div id="tdm-details-body" style="display:flex;flex-wrap:wrap;gap:24px;padding:24px 28px 28px;">
-            <!-- Columna izquierda: Imagen manuscrita -->
-            <div style="flex:1;min-width:220px;max-width:420px;">
-                <div style="font-size:0.6rem;color:#6d6d6e;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">
-                    Foto de la Solución
-                </div>
-                <div style="
-                    background:#1a1a1a; border:1px solid rgba(255,255,255,0.08);
-                    border-radius:12px; overflow:hidden; min-height:180px;
-                    display:flex;align-items:center;justify-content:center;
-                ">
-                    <img id="tdm-foto" src="" alt="Solución manuscrita"
-                         style="width:100%;height:auto;display:block;border-radius:0;"
-                         onerror="this.style.display='none'">
-                </div>
-            </div>
-
-            <!-- Columna derecha: Detalles de la evaluación -->
-            <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:16px;">
-
-                <!-- Puntaje badge -->
-                <div style="display:flex;align-items:center;gap:16px;">
-                    <div id="tdm-puntaje" style="
-                        font-size:3.5rem;font-weight:800;min-width:80px;text-align:center;
-                        color:#46d369;
-                    ">—</div>
-                    <div>
-                        <div style="font-size:0.6rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:1px;">Puntaje</div>
-                        <div id="tdm-pregunta-label" style="font-size:0.78rem;color:#b3b3b3;font-weight:600;margin-top:4px;"></div>
-                    </div>
-                </div>
-
-                <!-- Transcripción limpia de la IA -->
-                <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;">
-                    <div style="font-size:0.6rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
-                        <i class="fa-solid fa-magnifying-glass" style="color:#54b3d6;margin-right:5px;"></i>
-                        Lo que leyó la IA (Transcripción)
-                    </div>
-                    <div id="tdm-transcripcion" style="font-size:0.82rem;color:#e5e5e5;line-height:1.7;font-family:'Fira Code',monospace;word-break:break-word;">
-                        —
-                    </div>
-                </div>
-
-                <!-- Feedback -->
-                <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;">
-                    <div style="font-size:0.6rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
-                        <i class="fa-solid fa-comment-dots" style="color:#f59e0b;margin-right:5px;"></i>
-                        Feedback del Profesor IA
-                    </div>
-                    <div id="tdm-feedback" style="font-size:0.85rem;color:#b3b3b3;line-height:1.7; white-space: pre-wrap;">
-                        —
-                    </div>
-                </div>
-
-                <!-- Resolución Oficial en Modal -->
-                <div id="tdm-resolucion-oficial-box" style="background:rgba(167,139,250,0.03);border:1px solid rgba(167,139,250,0.15);border-radius:12px;padding:16px;display:none;">
-                    <div style="font-size:0.6rem;color:#a78bfa;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
-                        <i class="fa-solid fa-lightbulb" style="color:#a78bfa;margin-right:5px;"></i>
-                        Resolución Oficial Esperada
-                    </div>
-                    <div id="tdm-resolucion-oficial-content" style="font-size:0.82rem;color:#e5e5e5;line-height:1.6;max-height:150px;overflow-y:auto;">
-                        —
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Vista vacía si no hay respuestas -->
-        <div id="tdm-empty-state" style="display:none; flex-direction:column; align-items:center; justify-content:center; padding:60px 28px; text-align:center; color:#888;">
-            <i class="fa-solid fa-folder-open" style="font-size:3rem; color:#444; margin-bottom:16px;"></i>
-            <div style="font-size:1.1rem; font-weight:700; color:#fff;">Sin respuestas aún</div>
-            <div style="font-size:0.85rem; margin-top:8px; color:#888;">Este alumno no ha enviado respuestas evaluadas en este torneo.</div>
-        </div>
-    </div>
-</div>
-<style>
-@keyframes torneoFadeIn { from{ opacity:0; transform:scale(0.96) translateY(10px); } to{ opacity:1; transform:none; } }
-</style>
-
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- MODAL: HISTORIAL DE RONDAS                                               -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div id="torneo-historial-modal" onclick="if(event.target===this)cerrarHistorialRondas()" style="
-    display:none; position:fixed; inset:0; z-index:9200;
-    background:rgba(0,0,0,0.88); backdrop-filter:blur(10px);
-    align-items:center; justify-content:center; padding:20px;
-">
-    <div style="
-        background:#141414; border:1px solid rgba(255,255,255,0.1);
-        border-radius:20px; width:100%; max-width:680px;
-        max-height:80vh; overflow:auto;
-        display:flex; flex-direction:column;
-        box-shadow:0 30px 80px rgba(0,0,0,0.7);
-        animation:torneoFadeIn 0.3s ease;
-    ">
-        <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 28px 0;flex-shrink:0;">
-            <div>
-                <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#54b3d6;">Historial</div>
-                <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-top:4px;">&#x1F4CB; Rondas Archivadas</div>
-            </div>
-            <button onclick="cerrarHistorialRondas()" style="
-                background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
-                color:#b3b3b3;border-radius:8px;padding:7px 14px;font-size:0.82rem;cursor:pointer;
-            "><i class="fa-solid fa-xmark"></i> Cerrar</button>
-        </div>
-        <!-- Lista -->
-        <div id="historial-rondas-list" style="display:flex;flex-direction:column;gap:10px;padding:20px 28px 28px;"></div>
-    </div>
-</div>
-
-<!-- GESTIONAR PERFILES MODAL -->
-<div id="profile-manage-modal" role="dialog" aria-modal="true" aria-label="Gestionar Perfiles" onclick="if(event.target===this)closeProfileManageModal()">
-    <div class="profile-manage-box">
-        <button class="profile-manage-close" onclick="closeProfileManageModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
-        <div class="profile-manage-title">👥 Gestionar Perfiles</div>
+<!-- MANAGE PROFILES MODAL -->
+<div id="profile-manage-modal" class="modal-overlay" onclick="if(event.target===this) closeProfileManageModal()" role="dialog" aria-modal="true" aria-label="Gestionar perfiles de expositores">
+    <div class="modal-container" style="max-width: 480px; background: #181818; border: 1px solid rgba(255,255,255,0.1); padding: var(--space-6);">
+        <button class="modal-close" onclick="closeProfileManageModal()">&times;</button>
         
+        <!-- List View -->
         <div id="profile-list-view">
+            <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 20px;">Administrar Perfiles</h3>
             <div class="profile-manage-list" id="profile-manage-list">
-                <!-- Se genera dinámicamente desde JS -->
+                <!-- Se genera dinámicamente -->
             </div>
-            <button class="btn-profile-add" onclick="showAddProfileForm()">
+            <button class="btn-netflix-red" onclick="showAddProfileForm()" style="width: 100%; margin-top: 20px; justify-content: center; padding: 12px;">
                 <i class="fa-solid fa-plus"></i> Añadir Perfil
             </button>
         </div>
 
+        <!-- Form View -->
         <div id="profile-form-view" style="display: none;">
-            <h3 id="profile-form-title" style="margin-bottom: 16px; font-size: 1rem; font-family: var(--font-heading);">Añadir Perfil</h3>
+            <h3 id="profile-form-title" style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 20px;">Añadir Perfil</h3>
             <div style="display: flex; flex-direction: column; gap: 16px;">
                 <div>
-                    <label for="profile-input-name" style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:6px; font-weight: 600; text-transform: uppercase;">Nombre</label>
-                    <input type="text" id="profile-input-name" class="ai-select" style="margin-bottom:0;" placeholder="Nombre del estudiante">
+                    <label for="profile-input-name" style="font-size: 0.72rem; text-transform: uppercase; color: var(--color-text-faint); font-weight: 700; display: block; margin-bottom: 6px;">Nombre del Expositor</label>
+                    <input type="text" id="profile-input-name" class="ai-textarea" style="height: 42px; padding: 0 12px;" placeholder="Ej: Deyvis..." max="20">
                 </div>
                 <div>
-                    <label style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:6px; font-weight: 600; text-transform: uppercase;">Avatar / Icono</label>
-                    <div class="avatar-choices" id="avatar-choices" style="display:flex; gap:8px;">
-                        <span class="avatar-choice-item active" onclick="selectAvatarChoice(this)">🎓</span>
-                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">📐</span>
-                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">∑</span>
-                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">🔍</span>
-                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">🧪</span>
-                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">💡</span>
+                    <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--color-text-faint); font-weight: 700; display: block; margin-bottom: 8px;">Seleccionar Icono / Avatar</span>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;" id="avatar-choices-container">
+                        <!-- Generado dinámicamente -->
                     </div>
                 </div>
                 <div>
-                    <label style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:6px; font-weight: 600; text-transform: uppercase;">Color de Acento</label>
-                    <div class="color-choices" id="color-choices" style="display:flex; gap:12px;">
-                        <span class="color-choice-item active" style="background:#e50914;" data-color="#e50914" onclick="selectColorChoice(this)"></span>
-                        <span class="color-choice-item" style="background:#6366f1;" data-color="#6366f1" onclick="selectColorChoice(this)"></span>
-                        <span class="color-choice-item" style="background:#10b981;" data-color="#10b981" onclick="selectColorChoice(this)"></span>
-                        <span class="color-choice-item" style="background:#f59e0b;" data-color="#f59e0b" onclick="selectColorChoice(this)"></span>
-                        <span class="color-choice-item" style="background:#a78bfa;" data-color="#a78bfa" onclick="selectColorChoice(this)"></span>
-                        <span class="color-choice-item" style="background:#e02424;" data-color="#e02424" onclick="selectColorChoice(this)"></span>
+                    <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--color-text-faint); font-weight: 700; display: block; margin-bottom: 8px;">Color del Perfil</span>
+                    <div style="display: flex; gap: 10px;" id="color-choices-container">
+                        <!-- Generado dinámicamente -->
                     </div>
                 </div>
-                <div style="display:flex; gap:12px; margin-top:12px;">
-                    <button class="btn-netflix-red" onclick="saveProfileForm()" style="flex:1; justify-content:center; padding: 10px;">Guardar</button>
-                    <button class="btn-netflix-grey" onclick="cancelProfileForm()" style="flex:1; justify-content:center; padding: 10px;">Cancelar</button>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn-netflix-red" onclick="saveProfileForm()" style="flex: 1; justify-content: center; padding: 10px;">Guardar</button>
+                    <button class="btn-netflix-grey" onclick="cancelProfileForm()" style="flex: 1; justify-content: center; padding: 10px;">Cancelar</button>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- SCRIPTS -->
+<!-- LIBRARIES -->
 <script src="app.js"></script>
+
 </body>
 </html>

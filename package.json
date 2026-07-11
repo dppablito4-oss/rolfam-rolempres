@@ -1,0 +1,10 @@
+{
+  "name": "rolfam-rolempres",
+  "version": "1.0.0",
+  "description": "EDUFLIX: Plataforma de presentación interactiva sobre Corresponsabilidad Socioeducativa",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server -p 5173 -c-1",
+    "start": "npx http-server -p 5173 -c-1"
+  }
+}
