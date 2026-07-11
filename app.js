@@ -1370,7 +1370,39 @@ function initRealtimeUplink() {
         });
 }
 
+// ── QR Modal ──────────────────────────────────────────────────────────────────
+function openQRModal() {
+    const base = window.location.origin + window.location.pathname.replace(/[^\/]*$/, '');
+    const remoteURL = base + 'remote.html';
+    const encoded = encodeURIComponent(remoteURL);
+    const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=141414&bgcolor=ffffff&data=${encoded}`;
+
+    const qrImg = document.getElementById('qr-img');
+    const qrUrlText = document.getElementById('qr-url-text');
+    if (qrImg) qrImg.src = qrAPI;
+    if (qrUrlText) {
+        qrUrlText.textContent = remoteURL;
+    }
+
+    const modal = document.getElementById('qr-modal');
+    if (modal) {
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeQRModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const modal = document.getElementById('qr-modal');
+    if (modal) {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+}
+
 // ── Bindings ──────────────────────────────────────────────────────────────
+window.openQRModal = openQRModal;
+window.closeQRModal = closeQRModal;
 window.generateAIProblem = generateAIProblem;
 window.toggleAISolution = toggleAISolution;
 window.analyzeUserProblem = analyzeUserProblem;
