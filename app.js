@@ -906,7 +906,7 @@ function _presenterRenderAll() {
 function _presenterScrollTo(idx) {
     const card = document.getElementById(`ps-card-${idx}`);
     if (!card) return;
-    card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    card.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
     document.querySelectorAll('.presenter-slide-card').forEach((el, i) => {
         el.classList.toggle('ps-active', i === idx);
     });

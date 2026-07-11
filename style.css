@@ -979,6 +979,14 @@ body {
 
 #presenter-overlay.active { display: flex; }
 
+.presenter-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
 /* ── Scroll container for all slides ─────────────────────────────────────── */
 .presenter-slide-view {
     flex: 1;
