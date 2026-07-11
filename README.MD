@@ -1,23 +1,19 @@
-# ECUACIONES.io 🎓
+# EDUFLIX.io ⚖️
 
-Plataforma interactiva estilo Netflix para la enseñanza y el aprendizaje del **Planteo de Ecuaciones**. Desarrollada para una clase magistral universitaria, esta herramienta combina un diseño atractivo con metodologías sólidas y asistencia de Inteligencia Artificial.
+Plataforma interactiva estilo Netflix para la exposición sobre **Corresponsabilidad Socioeducativa: Familia y Escuela**. Desarrollada para una clase magistral universitaria en la UNHEVAL, esta herramienta combina un diseño atractivo con metodologías sólidas de involucramiento parental y dinámicas interactivas.
 
 ## Características 🚀
 
-- **Interfaz "Netflix-style"**: Navegación fluida y atractiva que invita al estudiante a explorar.
-- **Modo Presentador**: Herramienta de pantalla completa para exponer las diapositivas con atajos de teclado.
-- **Mando a Distancia (QR)**: Controla la presentación desde tu teléfono móvil utilizando tecnología en tiempo real (Supabase Realtime).
-- **Taller Inteligente con IA**: 
-  - **Generador de Desafíos**: Crea nuevos problemas matemáticos adaptativos usando IA.
-  - **Traductor a Lenguaje Formal**: Ingresa un enunciado y obtén el análisis de los *5 Pasos de Oro*.
-- **Cero dependencias pesadas**: Frontend Vanilla HTML/CSS/JS optimizado. Renderizado de fórmulas matemáticas de alta velocidad con KaTeX.
+- **Interfaz "Netflix-style"**: Navegación fluida y atractiva con filas temáticas (Familia, Escuela, Barreras y Alianzas).
+- **Modo Presentador**: Herramienta de pantalla completa para exponer las diapositivas con notas del expositor, atajos de teclado y barra de progreso.
+- **Puntero Láser Virtual**: Señala elementos en el proyector en tiempo real siguiendo el cursor.
+- **Taller de Casos con IA**: 
+  - **Generador de Conflictos**: Crea nuevos desafíos de dilemas coeducativos reales para debatir en el aula.
+  - **Analizador de Casos**: Ingresa un caso práctico y obtén el análisis de barreras de Hornby u Epstein aplicadas.
+- **Sonidos cinemáticos**: Efecto de sonido sintetizado "Tu-Dum" al iniciar la presentación.
 
 ## Despliegue y Configuración ⚙️
 
 El proyecto está diseñado para ser servido estáticamente en GitHub Pages.
-1. Haz un fork o clona el repositorio.
-2. Sirve los archivos estáticos desde la raíz (por ejemplo, con Live Server o desplegando en GitHub Pages).
-3. **Backend / IA**: El sistema de Inteligencia Artificial depende de Supabase Edge Functions. Si deseas habilitarlo, despliega las funciones ubicadas en `supabase/functions/` y configura el secreto `DEEPSEEK_API_KEY` o `OPENAI_API_KEY` en tu proyecto de Supabase.
-
-> [!NOTE]
-> Si el backend de IA no está disponible, la aplicación hará *fallback* automáticamente a un sistema de simulación local interactivo.
+1. La configuración del subdominio personalizado está definida en el archivo `CNAME`.
+2. Sirve los archivos estáticos desde la raíz (ejecutando `npm run dev`).
