@@ -26,7 +26,7 @@ const SLIDES_DATA = {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;">
                 <div>
                     <p style="font-size:1.05rem;color:var(--color-text-secondary);margin-bottom:20px;">
-                        Tradicionalmente, la socialización se dividía: el hogar asumía la **socialización primaria** (modales y valores básicos) y la escuela la **instrucción cognitiva** y transmisión de saberes abstractos.
+                        Tradicionalmente, la socialización se dividía: el hogar asumía la <strong>socialización primaria</strong> (modales y valores básicos) y la escuela la <strong>instrucción cognitiva</strong> y transmisión de saberes abstractos.
                     </p>
                     <div class="modal-math-box" style="text-align:center;">
                         <span style="font-size:1.1rem;font-weight:700;">Hogar (Afecto y Socialización Primaria)</span><br>
@@ -37,7 +37,7 @@ const SLIDES_DATA = {
                 <div style="background:rgba(229,9,20,0.04);border-radius:12px;padding:24px;border:1px solid rgba(229,9,20,0.1);">
                     <h4 style="color:var(--color-accent);font-family:var(--font-heading);font-weight:700;margin-bottom:12px;">Transición Paradigmática</h4>
                     <p style="color:var(--color-text-muted);font-size:0.85rem;line-height:1.6;">
-                        Las transformaciones demográficas, inserción laboral de la mujer y el ingreso temprano escolar desarticularon la rigidez de fronteras. Hoy, la pedagogía defiende una **alianza estratégica** donde ambos son corresponsables.
+                        Las transformaciones demográficas, inserción laboral de la mujer y el ingreso temprano escolar desarticularon la rigidez de fronteras. Hoy, la pedagogía defiende una <strong>alianza estratégica</strong> donde ambos son corresponsables.
                     </p>
                 </div>
             </div>`
@@ -52,7 +52,7 @@ const SLIDES_DATA = {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
                 <div>
                     <p style="font-size:1rem;color:var(--color-text-secondary);line-height:1.6;">
-                        Es un sistema biopsicosocial complejo donde se configuran los primeros vínculos afectivos. Funciona como un **refugio emocional** y un **faro moral** que amortigua las tensiones escolares.
+                        Es un sistema biopsicosocial complejo donde se configuran los primeros vínculos afectivos. Funciona como un <strong>refugio emocional</strong> y un <strong>faro moral</strong> que amortigua las tensiones escolares.
                     </p>
                     <ul style="list-style:none;padding:0;margin-top:16px;display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:var(--color-text-muted);">
                         <li>✓ Asimilación de pautas de convivencia.</li>
@@ -76,7 +76,7 @@ const SLIDES_DATA = {
         description: 'La teoría de esferas superpuestas de Joyce Epstein y las 6 tipologías de involucramiento.',
         content: `
             <p style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:18px;">
-                El estudiante está en el centro de un tejido relacional conformado por la familia, la escuela y la comunidad. Estas esferas cooperan bajo el **principio de cuidado mutuo** mediante seis tipologías de prácticas:
+                El estudiante está en el centro de un tejido relacional conformado por la familia, la escuela y la comunidad. Estas esferas cooperan bajo el <strong>principio de cuidado mutuo</strong> mediante seis tipologías de prácticas:
             </p>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:0.8rem;">
                 <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;">
@@ -155,7 +155,7 @@ const SLIDES_DATA = {
                 <div style="background:rgba(70,211,105,0.04);border-radius:10px;padding:16px;border:1px solid rgba(70,211,105,0.15);font-size:0.85rem;">
                     <h5 style="color:#46d369;font-weight:700;margin-bottom:8px;">Canalización del Involucramiento</h5>
                     <p style="color:var(--color-text-muted);line-height:1.5;">
-                        Las variables socioeconómicas no inciden **directamente** en el logro del alumno, sino que se canalizan **indirectamente** a través del nivel de involucramiento parental:
+                        Las variables socioeconómicas no inciden <strong>directamente</strong> en el logro del alumno, sino que se canalizan <strong>indirectamente</strong> a través del nivel de involucramiento parental:
                         <strong style="color:#fff;display:block;margin-top:6px;text-align:center;font-size:1.1rem;">$\\gamma = 0.069, p < 0.05$</strong>
                     </p>
                 </div>
@@ -234,7 +234,7 @@ const SLIDES_DATA = {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center;">
                 <div>
                     <p style="font-size:0.95rem;color:var(--color-text-secondary);line-height:1.65;">
-                        Gimeno Sacristán (2001) postula que la educación formal actúa como el mecanismo principal de inclusión en las sociedades modernas; carecer de ella equivale a quedar **excluido de la participación pública activa**.
+                        Gimeno Sacristán (2001) postula que la educación formal actúa como el mecanismo principal de inclusión en las sociedades modernas; carecer de ella equivale a quedar <strong>excluido de la participación pública activa</strong>.
                     </p>
                 </div>
                 <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:20px;">
@@ -279,7 +279,7 @@ const SLIDES_DATA = {
         description: 'La existencia de 49 barreras concretas según Hornby y Lafaele (2011).',
         content: `
             <p style="font-size:0.95rem;color:var(--color-text-secondary);margin-bottom:16px;">
-                La relación familia-escuela se enfrenta a obstáculos de naturaleza **estructural** (tiempo, dinero, recursos) y **psicológica** (prejuicios, temores, creencias):
+                La relación familia-escuela se enfrenta a obstáculos de naturaleza <strong>estructural</strong> (tiempo, dinero, recursos) y <strong>psicológica</strong> (prejuicios, temores, creencias):
             </p>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:0.75rem;text-align:center;">
                 <div style="background:rgba(229,9,20,0.06);border:1px solid rgba(229,9,20,0.15);border-radius:8px;padding:12px;">
@@ -321,9 +321,9 @@ const SLIDES_DATA = {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>**Socio-profesionales**</td><td>Falta de capacitación para cooperar, apatía o prejuicios de clase.</td><td>Se percibe la implicación familiar como intrusión a la autonomía.</td><td>Familias pierden confianza y toman posturas defensivas.</td></tr>
-                    <tr><td>**Institucionales**</td><td>Reglamentos que prohíben acceso, rigidez de horarios de atención.</td><td>Predominio de un esquema burocrático y asimetría de poder.</td><td>Incomunicación del colegio con el entorno social.</td></tr>
-                    <tr><td>**Sociofamiliares**</td><td>Jornadas laborales extensas, temores a la incompetencia curricular.</td><td>Desajuste estructural de horarios laborales actuales.</td><td>Fatiga y delegación del menor en cuidadores informales.</td></tr>
+                    <tr><td><strong>Socio-profesionales</strong></td><td>Falta de capacitación para cooperar, apatía o prejuicios de clase.</td><td>Se percibe la implicación familiar como intrusión a la autonomía.</td><td>Familias pierden confianza y toman posturas defensivas.</td></tr>
+                    <tr><td><strong>Institucionales</strong></td><td>Reglamentos que prohíben acceso, rigidez de horarios de atención.</td><td>Predominio de un esquema burocrático y asimetría de poder.</td><td>Incomunicación del colegio con el entorno social.</td></tr>
+                    <tr><td><strong>Sociofamiliares</strong></td><td>Jornadas laborales extensas, temores a la incompetencia curricular.</td><td>Desajuste estructural de horarios laborales actuales.</td><td>Fatiga y delegación del menor en cuidadores informales.</td></tr>
                 </tbody>
             </table>`
     },
@@ -367,7 +367,7 @@ const SLIDES_DATA = {
                 <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:18px;">
                     <h5 style="color:#a78bfa;font-weight:700;margin-bottom:8px;font-size:0.85rem;">ABC de Vidal Schmill</h5>
                     <p style="font-size:0.75rem;color:var(--color-text-muted);line-height:1.5;">
-                        Garantizar un **Lenguaje Sencillo** traduciendo jergas pedagógicas complejas a boletines con gráficos para evitar la marginación de los padres.
+                        Garantizar un <strong>Lenguaje Sencillo</strong> traduciendo jergas pedagógicas complejas a boletines con gráficos para evitar la marginación de los padres.
                     </p>
                 </div>
             </div>`
@@ -429,7 +429,7 @@ const MOCK_PROBLEMS = {
     'Crianza': {
         'Básico': {
             problem: "Caso 1: En un centro escolar, la profesora nota que un niño de 8 años se queda dormido sistemáticamente en las primeras clases. Al comunicarse con el hogar, descubre que la madre trabaja en el mercado nocturno de Huánuco y el padre no supervisa las rutinas de sueño del menor, aduciendo que 'cuidar el sueño es asunto de la madre'. ¿Qué tipología de Epstein se ve vulnerada y qué acción inmediata se debe tomar?",
-            solution: `<p><span class="modal-step-pill">1. Identificación</span> Se vulnera la **Crianza (Tipo 1)** de Epstein, que exige la provisión de rutinas estables de sueño e higiene en el hogar de forma equitativa.</p>
+            solution: `<p><span class="modal-step-pill">1. Identificación</span> Se vulnera la <strong>Crianza (Tipo 1)</strong> de Epstein, que exige la provisión de rutinas estables de sueño e higiene en el hogar de forma equitativa.</p>
                        <p style="margin-top:8px;"><span class="modal-step-pill">2. Análisis</span> El desajuste de roles por género (el padre delega la responsabilidad) genera fatiga extrema en el estudiante, afectando su desempeño cognitivo inicial.</p>
                        <p style="margin-top:8px;"><span class="modal-step-pill">3. Recomendación</span> Implementar una sesión de orientación familiar desde el Departamento Psicológico escolar para involucrar corresponsablemente al padre en las rutinas de cuidado.</p>`,
             answer: "Crianza"
@@ -445,14 +445,14 @@ const MOCK_PROBLEMS = {
     'Barreras': {
         'Básico': {
             problem: "Caso 3: Los profesores de un colegio consideran que las familias rurales de Huánuco son 'apáticas' y 'no tienen las capacidades cognitivas' para ayudar a sus hijos con las tareas curriculares de ciencia. Por ende, los docentes no envían guías de trabajo a casa. ¿Qué barrera clasificada por Hornby y Lafaele (2011) se está manifestando aquí?",
-            solution: `<p><span class="modal-step-pill">1. Identificación</span> Se trata de una **Barrera Socio-profesional del Profesorado**.</p>
+            solution: `<p><span class="modal-step-pill">1. Identificación</span> Se trata de una <strong>Barrera Socio-profesional del Profesorado</strong>.</p>
                        <p style="margin-top:8px;"><span class="modal-step-pill">2. Detalle</span> Se manifiesta una actitud prejuiciosa y estereotipada del profesor que desvaloriza las habilidades parentales y la diversidad cultural de la comunidad rural.</p>
                        <p style="margin-top:8px;"><span class="modal-step-pill">3. Solución</span> Capacitación docente en competencias de inclusión, valoración cultural y diseño de tareas participativas adaptadas al entorno rural.</p>`,
             answer: "Socio-profesional"
         },
         'Avanzado': {
             problem: "Caso 4: Un centro educativo impone un horario único de atención de padres de 10:00 a 11:30 a.m. los días martes. Quienes no asistan a las citas del tutor reciben una amonestación económica. El 60% de los padres trabaja en el sector informal o comercial y no puede abandonar sus puestos en ese horario. ¿Cómo se clasifica esta barrera y cómo se puede superar según los informes de Johns Hopkins?",
-            solution: `<p><span class="modal-step-pill">1. Clasificación</span> Es una **Barrera Institucional y Escolar** (puertas cerradas y asimetría de horarios).</p>
+            solution: `<p><span class="modal-step-pill">1. Clasificación</span> Es una <strong>Barrera Institucional y Escolar</strong> (puertas cerradas y asimetría de horarios).</p>
                        <p style="margin-top:8px;"><span class="modal-step-pill">2. Impacto</span> Consolida una barrera burocrática y punitiva que en lugar de invitar, aleja y genera rechazo familiar hacia la institución escolar.</p>
                        <p style="margin-top:8px;"><span class="modal-step-pill">3. Corrección</span> Reconfigurar los canales: usar encuestas en línea, programar reuniones virtuales asincrónicas y buzones virtuales de sugerencias (reducción demostrada del ausentismo en un 24%).</p>`,
             answer: "Institucional"
@@ -500,7 +500,19 @@ async function initProfiles() {
             if (seedErr) throw seedErr;
             localProfilesCache = seeded;
         } else {
-            localProfilesCache = data;
+            // Si existen perfiles pero tienen los nombres antiguos de matemáticas, los actualizamos automáticamente
+            const hasOldMathProfiles = data.some(p => p.name.includes("Joel") || p.name.includes("James") || p.name.includes("Deyvis"));
+            if (hasOldMathProfiles) {
+                for (let i = 0; i < Math.min(data.length, DEFAULT_PROFILES.length); i++) {
+                    const p = data[i];
+                    const def = DEFAULT_PROFILES[i];
+                    await supabaseClient.from('perfiles').update({ name: def.name, avatar: def.avatar, color: def.color }).eq('id', p.id);
+                }
+                const { data: reloaded } = await supabaseClient.from('perfiles').select('*').order('id', { ascending: true });
+                localProfilesCache = reloaded || DEFAULT_PROFILES;
+            } else {
+                localProfilesCache = data;
+            }
         }
     } catch (err) {
         console.error("Error cargando perfiles de Supabase:", err);
