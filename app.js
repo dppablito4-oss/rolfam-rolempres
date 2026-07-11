@@ -882,20 +882,76 @@ function exitPresenterMode() {
 }
 
 const SLIDE_MEDIA_MAP = {
-    'slide-coresponsabilidad': { name: 'Escudo de la UNHEVAL o Banner de Coeducación', path: 'assets/images/slides/coresponsabilidad.png' },
-    'slide-familia-socializador': { name: 'Diagrama de la Familia como Microsistema', path: 'assets/images/slides/familia_microsistema.png' },
-    'slide-esferas-epstein': { name: 'Esferas Superpuestas de Influencia (Epstein)', path: 'assets/images/slides/esferas_epstein.png' },
-    'slide-epstein-datos': { name: 'Gráfico Estadístico de Participación de Padres', path: 'assets/images/slides/datos_epstein.png' },
-    'slide-bentler-eqs': { name: 'Modelo de Ecuaciones Estructurales EQS', path: 'assets/images/slides/modelo_eqs.png' },
-    'slide-pigmalion': { name: 'Infografía del Efecto Pigmalión / Rosenthal', path: 'assets/images/slides/efecto_pigmalion.png' },
-    'slide-escuela-intersubjetividad': { name: 'Diagrama de Interacción Escuela-Comunidad', path: 'assets/images/slides/escuela_intersubjetividad.png' },
-    'slide-habermas-civico': { name: 'Acción Comunicativa y Diálogo Democrático', path: 'assets/images/slides/accion_comunicativa.png' },
-    'slide-sacristan-inclusion': { name: 'Inclusión Ciudadana y Participación en el Aula', path: 'assets/images/slides/inclusion_sacristan.png' },
-    'slide-estrategias-aula': { name: 'Infografía de Métodos Didácticos Activos', path: 'assets/images/slides/estrategias_aula.png' },
-    'slide-barreras-fricciones': { name: 'Esquema de Barreras Relacionales de Hornby', path: 'assets/images/slides/barreras_relacionales.png' },
-    'slide-barreras-detalles': { name: 'Tabla de Barreras Estructurales al Detalle', path: 'assets/images/slides/desafios_detalle.png' },
-    'slide-estrategias-alianzas': { name: 'Modelo de Alianzas Familia-Escuela (CEMPA)', path: 'assets/images/slides/estrategias_alianzas.png' },
-    'slide-johns-hopkins-abc': { name: 'Infografía de Canales Digitales vs Ausentismo', path: 'assets/images/slides/johns_hopkins_abc.png' }
+    'slide-coresponsabilidad': { 
+        name: 'Escudo de la UNHEVAL o Banner de Coeducación', 
+        path: 'assets/images/slides/coresponsabilidad.png',
+        unsplash: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-familia-socializador': { 
+        name: 'Diagrama de la Familia como Microsistema', 
+        path: 'assets/images/slides/familia_microsistema.png',
+        unsplash: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-esferas-epstein': { 
+        name: 'Esferas Superpuestas de Influencia (Epstein)', 
+        path: 'assets/images/slides/esferas_epstein.png',
+        unsplash: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-epstein-datos': { 
+        name: 'Gráfico Estadístico de Participación de Padres', 
+        path: 'assets/images/slides/datos_epstein.png',
+        unsplash: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-bentler-eqs': { 
+        name: 'Modelo de Ecuaciones Estructurales EQS', 
+        path: 'assets/images/slides/modelo_eqs.png',
+        unsplash: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-pigmalion': { 
+        name: 'Infografía del Efecto Pigmalión / Rosenthal', 
+        path: 'assets/images/slides/efecto_pigmalion.png',
+        unsplash: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-escuela-intersubjetividad': { 
+        name: 'Diagrama de Interacción Escuela-Comunidad', 
+        path: 'assets/images/slides/escuela_intersubjetividad.png',
+        unsplash: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-habermas-civico': { 
+        name: 'Acción Comunicativa y Diálogo Democrático', 
+        path: 'assets/images/slides/accion_comunicativa.png',
+        unsplash: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-sacristan-inclusion': { 
+        name: 'Inclusión Ciudadana y Participación en el Aula', 
+        path: 'assets/images/slides/inclusion_sacristan.png',
+        unsplash: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-estrategias-aula': { 
+        name: 'Infografía de Métodos Didácticos Activos', 
+        path: 'assets/images/slides/estrategias_aula.png',
+        unsplash: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-barreras-fricciones': { 
+        name: 'Esquema de Barreras Relacionales de Hornby', 
+        path: 'assets/images/slides/barreras_relacionales.png',
+        unsplash: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-barreras-detalles': { 
+        name: 'Tabla de Barreras Estructurales al Detalle', 
+        path: 'assets/images/slides/desafios_detalle.png',
+        unsplash: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-estrategias-alianzas': { 
+        name: 'Modelo de Alianzas Familia-Escuela (CEMPA)', 
+        path: 'assets/images/slides/estrategias_alianzas.png',
+        unsplash: 'https://images.unsplash.com/photo-1521791136368-1a8b27502444?auto=format&fit=crop&w=800&q=80'
+    },
+    'slide-johns-hopkins-abc': { 
+        name: 'Infografía de Canales Digitales vs Ausentismo', 
+        path: 'assets/images/slides/johns_hopkins_abc.png',
+        unsplash: 'https://images.unsplash.com/photo-1516246843873-9d12356b6ffd?auto=format&fit=crop&w=800&q=80'
+    }
 };
 
 function _presenterRenderAll() {
@@ -914,20 +970,20 @@ function _presenterRenderAll() {
             </div>`;
         }
 
-        const media = SLIDE_MEDIA_MAP[slideId] || { name: 'Ilustración del Tema', path: `assets/images/slides/${slideId}.png` };
+        const media = SLIDE_MEDIA_MAP[slideId] || { name: 'Ilustración del Tema', path: `assets/images/slides/${slideId}.png`, unsplash: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80' };
 
-        // Renderizado del bloque de Media a la derecha
+        // Renderizado del bloque de Media a la derecha con auto-fallback a Unsplash
         const mediaHtml = `
         <div class="presenter-media-container" style="width:100%; display:flex; align-items:center; justify-content:center; box-sizing:border-box;">
             <div class="presenter-media-box" style="display:flex; flex-direction:column; align-items:center; justify-content:center; border:2px dashed rgba(255,255,255,0.12); background:rgba(255,255,255,0.02); border-radius:16px; min-height:360px; width:100%; text-align:center; padding:24px; position:relative; box-sizing:border-box; overflow:hidden; transition:border-color 0.3s, background-color 0.3s;" onmouseover="this.style.borderColor='rgba(229,9,20,0.5)'; this.style.backgroundColor='rgba(229,9,20,0.01)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.backgroundColor='rgba(255,255,255,0.02)';">
-                <!-- Check if the image source exists or let it display with a fallback placeholder -->
-                <img src="${media.path}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width:100%; height:340px; object-fit:cover; border-radius:10px; display:block;" alt="${media.name}">
+                <!-- Intenta cargar local, si falla intenta Unsplash, si falla oculta e informa -->
+                <img src="${media.path}" onerror="if(this.src!=='${media.unsplash}'){ this.src='${media.unsplash}'; } else { this.style.display='none'; this.nextElementSibling.style.display='flex'; }" style="width:100%; height:340px; object-fit:cover; border-radius:10px; display:block;" alt="${media.name}">
                 <div class="media-fallback" style="display:none; flex-direction:column; align-items:center; justify-content:center; padding:10px;">
                     <div style="font-size:3.2rem; margin-bottom:14px; opacity:0.85;">🖼️</div>
                     <div style="font-size:1rem; font-weight:700; color:#fff; margin-bottom:8px; font-family:var(--font-heading);">Recuadro de Apoyo Visual</div>
                     <div style="font-size:0.85rem; color:#a3a3a3; font-weight:600; margin-bottom:6px;">${media.name}</div>
                     <div style="font-size:0.75rem; color:var(--color-text-muted); line-height:1.4; max-width:280px; margin:0 auto;">
-                        Coloca un archivo (.png, .jpg, .gif o video) en:<br>
+                        Carga una imagen, GIF o video en:<br>
                         <code style="background:rgba(0,0,0,0.4); padding:4px 8px; border-radius:4px; font-family:var(--font-mono); color:var(--color-accent); font-size:0.72rem; display:inline-block; margin-top:6px; word-break:break-all;">${media.path}</code>
                     </div>
                 </div>
