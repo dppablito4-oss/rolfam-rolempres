@@ -755,6 +755,7 @@ function selectProfile(name, avatarSrc, accentColor) {
     setTimeout(() => {
         profileScreen.style.display = 'none';
         mainApp.classList.add('visible');
+        initScrollReveal();
         renderAllMath();
         initCardPreviews();
         initCardBackgrounds();
@@ -1400,10 +1401,32 @@ window.initCardBackgrounds = initCardBackgrounds;
 window.initRealtimeUplink = initRealtimeUplink;
 window.playSound = playSound;
 
+// ── Scroll Reveal ─────────────────────────────────────────────────────────────
+function initScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+// ── Header scroll effect ──────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+    const header = document.getElementById('netflix-header');
+    if (header) {
+        header.classList.toggle('scrolled', window.scrollY > 80);
+    }
+});
+
+window.initScrollReveal = initScrollReveal;
+
 // Page initialization
 document.addEventListener('DOMContentLoaded', () => {
     initProfiles();
     renderAllMath();
     initRealtimeUplink();
 });
+
 
