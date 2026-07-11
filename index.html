@@ -672,16 +672,10 @@
 <div id="presenter-overlay" role="dialog" aria-modal="true" aria-label="Modo presentación en pantalla completa">
     <div class="presenter-container">
         
-        <!-- Header Presentador -->
-        <header class="presenter-header">
-            <div class="ps-logo">EDUFLIX <span>Exposición</span></div>
-            <div class="ps-controls-top">
-                <button class="ps-btn-nav" onclick="presenterPrev()" title="Anterior (Flecha izquierda)"><i class="fa-solid fa-arrow-left"></i></button>
-                <span class="ps-page-indicator" id="presenter-page-indicator">0 / 0</span>
-                <button class="ps-btn-nav" onclick="presenterNext()" title="Siguiente (Flecha derecha / Espacio)"><i class="fa-solid fa-arrow-right"></i></button>
-            </div>
-            <button class="ps-btn-close" onclick="exitPresenterMode()" title="Salir del modo presentación (Escape)"><i class="fa-solid fa-xmark"></i></button>
-        </header>
+        <!-- Floating close button top right -->
+        <button class="presenter-close-btn" onclick="exitPresenterMode()" title="Salir del modo presentación (Esc)" style="position:fixed; top:24px; right:24px; z-index:10005; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); color:#fff; width:40px; height:40px; border-radius:50%; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s, transform 0.2s;" onmouseover="this.style.background='rgba(229,9,20,0.95)'; this.style.borderColor='transparent'; this.style.transform='scale(1.08)'" onmouseout="this.style.background='rgba(0,0,0,0.6)'; this.style.borderColor='rgba(255,255,255,0.2)'; this.style.transform='scale(1)'">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
 
         <!-- Slide View (Cards Stack) -->
         <div class="presenter-slide-view" id="presenter-slide-view">
@@ -693,14 +687,27 @@
             <div class="ps-progress-bar" id="presenter-progress-bar"></div>
         </div>
 
-        <!-- Footer Presentador / Atajos -->
-        <footer class="presenter-footer">
-            <div style="font-size: 0.72rem; color: var(--color-text-muted);">Universidad Nacional Hermilio Valdizán (UNHEVAL)</div>
-            <div class="ps-shortcuts">
-                <span><kbd>←</kbd> / <kbd>→</kbd> Navegar</span>
-                <span><kbd>Esc</kbd> Salir</span>
+        <!-- Bottom presenter control bar -->
+        <div class="presenter-bar" style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:0.8rem; color:var(--color-text-muted); font-weight:600; font-family:var(--font-heading);">
+                🏫 UNHEVAL &middot; Educación Secundaria
             </div>
-        </footer>
+            <div style="display:flex; align-items:center; gap:16px;">
+                <button class="btn pbar-btn" onclick="presenterPrev()" title="Anterior (←)" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; padding:8px 16px; border-radius:6px; font-size:0.85rem; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                    <i class="fa-solid fa-chevron-left"></i> Anterior
+                </button>
+                <span id="presenter-page-indicator" class="pbar-indicator" style="font-weight:800; font-size:1.05rem; color:#fff; min-width:80px; text-align:center; background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:20px; border:1px solid rgba(255,255,255,0.08);">
+                    1 / 15
+                </span>
+                <button class="btn pbar-btn" onclick="presenterNext()" title="Siguiente (→ / Espacio)" style="background:var(--color-accent); border:none; color:#fff; padding:8px 16px; border-radius:6px; font-size:0.85rem; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; transition:background 0.2s;" onmouseover="this.style.background='#ff1f3b'" onmouseout="this.style.background='var(--color-accent)'">
+                    Siguiente <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+            <div style="font-size:0.75rem; color:var(--color-text-muted); display:flex; gap:12px; font-weight:500;">
+                <span><kbd style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(255,255,255,0.15);">←</kbd> <kbd style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(255,255,255,0.15);">→</kbd> Navegar</span>
+                <span><kbd style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(255,255,255,0.15);">Esc</kbd> Salir</span>
+            </div>
+        </div>
 
         <!-- Virtual laser pointer -->
         <div id="virtual-laser" style="position:fixed;width:18px;height:18px;border-radius:50%;background:rgba(229,9,20,0.85);box-shadow:0 0 14px 6px rgba(229,9,20,0.5);pointer-events:none;z-index:10010;opacity:0;transform:translate(-50%,-50%);transition:opacity 0.3s;top:50%;left:50%;"></div>

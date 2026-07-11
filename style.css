@@ -1071,11 +1071,11 @@ body {
     padding: 12px 24px;
 }
 
-/* Hide horizontal next/prev and indicators since they are vertical now */
+/* Show horizontal next/prev and indicators as they are styled dynamically in index.html */
 .presenter-bar .pbar-btn:not(.exit),
 .presenter-bar #pbar-indicator,
 .presenter-bar .pbar-indicator {
-    display: none !important;
+    display: flex !important;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ */

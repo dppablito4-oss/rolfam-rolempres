@@ -881,6 +881,23 @@ function exitPresenterMode() {
     stopEndingCountdown();
 }
 
+const SLIDE_MEDIA_MAP = {
+    'slide-coresponsabilidad': { name: 'Escudo de la UNHEVAL o Banner de Coeducación', path: 'assets/images/slides/coresponsabilidad.png' },
+    'slide-familia-socializador': { name: 'Diagrama de la Familia como Microsistema', path: 'assets/images/slides/familia_microsistema.png' },
+    'slide-esferas-epstein': { name: 'Esferas Superpuestas de Influencia (Epstein)', path: 'assets/images/slides/esferas_epstein.png' },
+    'slide-epstein-datos': { name: 'Gráfico Estadístico de Participación de Padres', path: 'assets/images/slides/datos_epstein.png' },
+    'slide-bentler-eqs': { name: 'Modelo de Ecuaciones Estructurales EQS', path: 'assets/images/slides/modelo_eqs.png' },
+    'slide-pigmalion': { name: 'Infografía del Efecto Pigmalión / Rosenthal', path: 'assets/images/slides/efecto_pigmalion.png' },
+    'slide-escuela-intersubjetividad': { name: 'Diagrama de Interacción Escuela-Comunidad', path: 'assets/images/slides/escuela_intersubjetividad.png' },
+    'slide-habermas-civico': { name: 'Acción Comunicativa y Diálogo Democrático', path: 'assets/images/slides/accion_comunicativa.png' },
+    'slide-sacristan-inclusion': { name: 'Inclusión Ciudadana y Participación en el Aula', path: 'assets/images/slides/inclusion_sacristan.png' },
+    'slide-estrategias-aula': { name: 'Infografía de Métodos Didácticos Activos', path: 'assets/images/slides/estrategias_aula.png' },
+    'slide-barreras-fricciones': { name: 'Esquema de Barreras Relacionales de Hornby', path: 'assets/images/slides/barreras_relacionales.png' },
+    'slide-barreras-detalles': { name: 'Tabla de Barreras Estructurales al Detalle', path: 'assets/images/slides/desafios_detalle.png' },
+    'slide-estrategias-alianzas': { name: 'Modelo de Alianzas Familia-Escuela (CEMPA)', path: 'assets/images/slides/estrategias_alianzas.png' },
+    'slide-johns-hopkins-abc': { name: 'Infografía de Canales Digitales vs Ausentismo', path: 'assets/images/slides/johns_hopkins_abc.png' }
+};
+
 function _presenterRenderAll() {
     const view = document.getElementById('presenter-slide-view');
     if (!view) return;
@@ -888,14 +905,50 @@ function _presenterRenderAll() {
     view.innerHTML = PRESENTER_SLIDES.map((slideId, i) => {
         const data = SLIDES_DATA[slideId];
         if (!data) return '';
+
+        // Diapositiva final de créditos (ya tiene su propia estructura)
+        if (slideId === 'slide-fin') {
+            return `
+            <div class="presenter-slide-card${i === presenterIndex ? ' ps-active' : ''}" id="ps-card-${i}" data-ps-index="${i}">
+                <div style="font-size:1.1rem; line-height:1.8; width:100%;">${data.content}</div>
+            </div>`;
+        }
+
+        const media = SLIDE_MEDIA_MAP[slideId] || { name: 'Ilustración del Tema', path: `assets/images/slides/${slideId}.png` };
+
+        // Renderizado del bloque de Media a la derecha
+        const mediaHtml = `
+        <div class="presenter-media-container" style="width:100%; display:flex; align-items:center; justify-content:center; box-sizing:border-box;">
+            <div class="presenter-media-box" style="display:flex; flex-direction:column; align-items:center; justify-content:center; border:2px dashed rgba(255,255,255,0.12); background:rgba(255,255,255,0.02); border-radius:16px; min-height:360px; width:100%; text-align:center; padding:24px; position:relative; box-sizing:border-box; overflow:hidden; transition:border-color 0.3s, background-color 0.3s;" onmouseover="this.style.borderColor='rgba(229,9,20,0.5)'; this.style.backgroundColor='rgba(229,9,20,0.01)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.backgroundColor='rgba(255,255,255,0.02)';">
+                <!-- Check if the image source exists or let it display with a fallback placeholder -->
+                <img src="${media.path}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width:100%; height:340px; object-fit:cover; border-radius:10px; display:block;" alt="${media.name}">
+                <div class="media-fallback" style="display:none; flex-direction:column; align-items:center; justify-content:center; padding:10px;">
+                    <div style="font-size:3.2rem; margin-bottom:14px; opacity:0.85;">🖼️</div>
+                    <div style="font-size:1rem; font-weight:700; color:#fff; margin-bottom:8px; font-family:var(--font-heading);">Recuadro de Apoyo Visual</div>
+                    <div style="font-size:0.85rem; color:#a3a3a3; font-weight:600; margin-bottom:6px;">${media.name}</div>
+                    <div style="font-size:0.75rem; color:var(--color-text-muted); line-height:1.4; max-width:280px; margin:0 auto;">
+                        Coloca un archivo (.png, .jpg, .gif o video) en:<br>
+                        <code style="background:rgba(0,0,0,0.4); padding:4px 8px; border-radius:4px; font-family:var(--font-mono); color:var(--color-accent); font-size:0.72rem; display:inline-block; margin-top:6px; word-break:break-all;">${media.path}</code>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        // Renderizado del card completo (2 columnas)
         return `
         <div class="presenter-slide-card${i === presenterIndex ? ' ps-active' : ''}" id="ps-card-${i}" data-ps-index="${i}">
-            <div class="ps-badge"><i class="fa-solid fa-bookmark"></i> ${i + 1} / ${PRESENTER_SLIDES.length}</div>
-            <h2 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:2px solid var(--color-accent);">
-                <span>${data.icon}</span> ${data.title}
-            </h2>
-            <p style="font-size:1rem;color:var(--color-text-muted);margin-bottom:24px;">${data.description}</p>
-            <div style="font-size:1.05rem;line-height:1.8;">${data.content}</div>
+            <div class="presenter-slide-grid" style="display:grid; grid-template-columns: 1.15fr 1fr; gap:48px; align-items:center; width:100%;">
+                <div class="presenter-slide-text-content">
+                    <h2 style="font-family:var(--font-heading); font-size:2.8rem; font-weight:900; margin-bottom:16px; display:flex; align-items:center; gap:14px; padding-bottom:14px; border-bottom:2px solid var(--color-accent); color:#fff; text-shadow:0 0 12px rgba(229,9,20,0.35); letter-spacing:-0.5px;">
+                        <span style="background:rgba(229,9,20,0.1); width:50px; height:50px; display:inline-flex; align-items:center; justify-content:center; border-radius:10px; border:1px solid rgba(229,9,20,0.25); font-size:2rem;">${data.icon}</span> ${data.title}
+                    </h2>
+                    <p style="font-size:1.3rem; color:var(--color-text-secondary); margin-bottom:28px; line-height:1.6; font-weight:600; border-left:4px solid var(--color-neon-cyan); padding-left:16px;">${data.description}</p>
+                    <div class="slide-main-body" style="font-size:1.25rem; line-height:1.9; color:rgba(255,255,255,0.9); font-weight:400;">
+                        ${data.content}
+                    </div>
+                </div>
+                ${mediaHtml}
+            </div>
         </div>`;
     }).join('');
 
