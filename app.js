@@ -385,10 +385,10 @@ const SLIDES_DATA = {
                         <h3 class="credits-logo" style="font-family:'Poppins', sans-serif;font-weight:900;letter-spacing:-1px;color:#e50914;font-size:2rem;margin-bottom:12px;">EDU<span style="color:#fff;">FLIX</span></h3>
                         <p class="credits-title" style="font-size:0.95rem;color:#e5e5e5;font-weight:700;margin-bottom:18px;">Exposición: Corresponsabilidad Socioeducativa</p>
                         <div class="credits-roll">
-                            <div class="credit-row"><span class="credit-label">Expositores:</span> <span class="credit-value">Pablo Claudio, Samuel</span></div>
+                            <div class="credit-row"><span class="credit-label">Expositor:</span> <span class="credit-value">Pablo Claudio, Samuel</span></div>
+                            <div class="credit-row"><span class="credit-label">Docente:</span> <span class="credit-value">CAMPOS MEZA SEBASTIAN</span></div>
                             <div class="credit-row"><span class="credit-label">Institución:</span> <span class="credit-value">UNHEVAL (Huánuco)</span></div>
                             <div class="credit-row"><span class="credit-label">Facultad:</span> <span class="credit-value">Educación Secundaria</span></div>
-                            <div class="credit-row"><span class="credit-label">Presentador:</span> <span class="credit-value">Eduflix Presenter 2.0</span></div>
                         </div>
                         <div class="thanks-message">⚖️ ¡Muchas gracias por su atención! ⚖️</div>
                     </div>
@@ -469,9 +469,7 @@ let lastExpectedAnswer = '';
 
 // ── Profiles Management & Selection ──────────────────────────────────────────
 const DEFAULT_PROFILES = [
-    { name: 'Pablo Claudio', avatar: '⚖️', color: '#e50914' },
-    { name: 'Samuel', avatar: '🎓', color: '#6366f1' },
-    { name: 'Público General', avatar: '👥', color: '#10b981' }
+    { name: 'Pablo Claudio, Samuel', avatar: '⚖️', color: '#e50914' }
 ];
 
 let currentEditingProfileIndex = null;
@@ -500,16 +498,19 @@ async function initProfiles() {
             if (seedErr) throw seedErr;
             localProfilesCache = seeded;
         } else {
-            // Si existen perfiles pero tienen los nombres antiguos de matemáticas, los actualizamos automáticamente
-            const hasOldMathProfiles = data.some(p => p.name.includes("Joel") || p.name.includes("James") || p.name.includes("Deyvis"));
-            if (hasOldMathProfiles) {
-                for (let i = 0; i < Math.min(data.length, DEFAULT_PROFILES.length); i++) {
-                    const p = data[i];
-                    const def = DEFAULT_PROFILES[i];
-                    await supabaseClient.from('perfiles').update({ name: def.name, avatar: def.avatar, color: def.color }).eq('id', p.id);
+            // Si existen perfiles pero son los antiguos, limpiamos y re-sembramos el único perfil individual
+            const hasOldProfiles = data.some(p => 
+                p.name.includes("Joel") || p.name.includes("James") || p.name.includes("Deyvis") || 
+                p.name === "Samuel" || p.name === "Pablo Claudio" || p.name === "Público General"
+            );
+            if (hasOldProfiles || data.length > 1) {
+                // Eliminar perfiles antiguos en la base de datos
+                for (const p of data) {
+                    await supabaseClient.from('perfiles').delete().eq('id', p.id);
                 }
-                const { data: reloaded } = await supabaseClient.from('perfiles').select('*').order('id', { ascending: true });
-                localProfilesCache = reloaded || DEFAULT_PROFILES;
+                // Sembrar el perfil único de Pablo Claudio, Samuel
+                const { data: seeded } = await supabaseClient.from('perfiles').insert(DEFAULT_PROFILES).select();
+                localProfilesCache = seeded || DEFAULT_PROFILES;
             } else {
                 localProfilesCache = data;
             }

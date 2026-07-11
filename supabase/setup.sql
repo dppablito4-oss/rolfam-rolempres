@@ -70,8 +70,7 @@ END $$;
 -- 4. Semilla de perfiles de expositores con tus nombres
 INSERT INTO public.perfiles (id, name, avatar, color)
 VALUES 
-    (1, 'Pablo Claudio', '⚖️', '#e50914'),
-    (2, 'Samuel', '🎓', '#6366f1'),
-    (3, 'Público General', '👥', '#10b981')
+    (1, 'Pablo Claudio, Samuel', '⚖️', '#e50914')
 ON CONFLICT (id) DO UPDATE 
 SET name = EXCLUDED.name, avatar = EXCLUDED.avatar, color = EXCLUDED.color;
+
