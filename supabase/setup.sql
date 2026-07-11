@@ -1,184 +1,77 @@
 -- ═══════════════════════════════════════════════════════════════════════════
--- ECUACIONES.io — Script SQL para Supabase
--- Pega esto en: Supabase Dashboard → SQL Editor → New Query → Run
+-- EDUFLIX — Script SQL de Inicialización para Supabase
+-- Pega este script completo en: Supabase Dashboard → SQL Editor → New Query → Run
 -- ═══════════════════════════════════════════════════════════════════════════
 
--- ── TABLA ORIGINAL: retos/análisis generados por IA ─────────────────────────
-CREATE TABLE IF NOT EXISTS public.exposicion_retos (
-    id           uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
-    topic        text        NOT NULL DEFAULT 'General',
-    difficulty   text        NOT NULL DEFAULT 'Básico',
-    problem_text text        NOT NULL,
-    solution_html text,
-    created_at   timestamptz DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_exposicion_retos_created
-    ON public.exposicion_retos (created_at DESC);
-
-ALTER TABLE public.exposicion_retos ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Lectura pública de retos" ON public.exposicion_retos;
-CREATE POLICY "Lectura pública de retos"
-    ON public.exposicion_retos FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Inserción anónima de retos" ON public.exposicion_retos;
-CREATE POLICY "Inserción anónima de retos"
-    ON public.exposicion_retos FOR INSERT WITH CHECK (true);
-
-
--- ═══════════════════════════════════════════════════════════════════════════
--- TORNEO EN VIVO "MATH-FLIX" — Tablas adicionales
--- ═══════════════════════════════════════════════════════════════════════════
-
--- 1. Tabla de Estado del Juego (controla la pantalla global proyectada)
-CREATE TABLE IF NOT EXISTS public.estado_juego (
-    id                     TEXT PRIMARY KEY DEFAULT 'global',
-    pantalla_actual        TEXT NOT NULL DEFAULT 'lobby', -- 'lobby' | 'pregunta' | 'leaderboard'
-    pregunta_actual_id     INT  DEFAULT 1,
-    tiempo_restante        INT  DEFAULT 60,
-    pregunta_custom_texto  TEXT,
-    bloque_activo          INT  DEFAULT 0,
-    updated_at             TIMESTAMPTZ DEFAULT NOW()
-);
-
-ALTER TABLE public.estado_juego ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Lectura pública estado_juego" ON public.estado_juego;
-CREATE POLICY "Lectura pública estado_juego"    ON public.estado_juego FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Actualización anónima estado" ON public.estado_juego;
-CREATE POLICY "Actualización anónima estado"    ON public.estado_juego FOR UPDATE USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Inserción anónima estado" ON public.estado_juego;
-CREATE POLICY "Inserción anónima estado"        ON public.estado_juego FOR INSERT WITH CHECK (true);
-
--- 2. Tabla de Participantes (alumnos que escanean el QR)
-CREATE TABLE IF NOT EXISTS public.participantes (
-    id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    nombre      TEXT        NOT NULL UNIQUE,
-    puntaje     INT         DEFAULT 0,
+-- 1. Tabla de perfiles de expositores
+CREATE TABLE IF NOT EXISTS public.perfiles (
+    id          SERIAL PRIMARY KEY,
+    name        TEXT NOT NULL,
+    avatar      TEXT NOT NULL DEFAULT '🎓',
+    color       TEXT NOT NULL DEFAULT '#e50914',
     created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE public.participantes ENABLE ROW LEVEL SECURITY;
+-- Habilitar Seguridad RLS
+ALTER TABLE public.perfiles ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Lectura pública participantes" ON public.participantes;
-CREATE POLICY "Lectura pública participantes"   ON public.participantes FOR SELECT USING (true);
+-- Políticas de Seguridad para Perfiles (Acceso libre para simulación interactiva)
+DROP POLICY IF EXISTS "Lectura pública perfiles" ON public.perfiles;
+CREATE POLICY "Lectura pública perfiles" ON public.perfiles FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Inserción anónima participantes" ON public.participantes;
-CREATE POLICY "Inserción anónima participantes" ON public.participantes FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Inserción pública perfiles" ON public.perfiles;
+CREATE POLICY "Inserción pública perfiles" ON public.perfiles FOR INSERT WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Actualización anónima puntajes" ON public.participantes;
-CREATE POLICY "Actualización anónima puntajes"  ON public.participantes FOR UPDATE USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Actualización pública perfiles" ON public.perfiles;
+CREATE POLICY "Actualización pública perfiles" ON public.perfiles FOR UPDATE USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Eliminación pública participantes" ON public.participantes;
-CREATE POLICY "Eliminación pública participantes" ON public.participantes FOR DELETE USING (true);
+DROP POLICY IF EXISTS "Eliminación pública perfiles" ON public.perfiles;
+CREATE POLICY "Eliminación pública perfiles" ON public.perfiles FOR DELETE USING (true);
 
--- 3. Tabla de Respuestas enviadas (fotos + calificación de OpenAI)
-CREATE TABLE IF NOT EXISTS public.respuestas (
-    id                    UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    participante_id       UUID        REFERENCES public.participantes(id) ON DELETE CASCADE,
-    pregunta_id           INT         NOT NULL,
-    url_foto              TEXT        NOT NULL,
-    puntaje_asignado      INT         DEFAULT 0,
-    feedback              TEXT,
-    transcripcion_interna TEXT,
-    procesado             BOOLEAN     DEFAULT FALSE,
-    created_at            TIMESTAMPTZ DEFAULT NOW(),
-    CONSTRAINT unique_participante_pregunta UNIQUE (participante_id, pregunta_id)
+
+-- 2. Tabla de retos y casos analizados
+CREATE TABLE IF NOT EXISTS public.exposicion_retos (
+    id           UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    topic        TEXT NOT NULL DEFAULT 'General',
+    difficulty   TEXT NOT NULL DEFAULT 'Básico',
+    problem_text TEXT NOT NULL,
+    solution_html TEXT,
+    created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE public.respuestas ENABLE ROW LEVEL SECURITY;
+-- Habilitar Seguridad RLS
+ALTER TABLE public.exposicion_retos ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Lectura pública respuestas" ON public.respuestas;
-CREATE POLICY "Lectura pública respuestas"   ON public.respuestas FOR SELECT USING (true);
+-- Políticas de Seguridad para retos/casos
+DROP POLICY IF EXISTS "Lectura pública de retos" ON public.exposicion_retos;
+CREATE POLICY "Lectura pública de retos" ON public.exposicion_retos FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Inserción anónima respuestas" ON public.respuestas;
-CREATE POLICY "Inserción anónima respuestas" ON public.respuestas FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Inserción anónima de retos" ON public.exposicion_retos;
+CREATE POLICY "Inserción anónima de retos" ON public.exposicion_retos FOR INSERT WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Actualización respuestas" ON public.respuestas;
-CREATE POLICY "Actualización respuestas"     ON public.respuestas FOR UPDATE USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Eliminación pública respuestas" ON public.respuestas;
-CREATE POLICY "Eliminación pública respuestas" ON public.respuestas FOR DELETE USING (true);
-
--- 4. Habilitar Realtime para las tablas críticas del torneo (idempotente)
+-- 3. Habilitar Realtime para permitir el control remoto y actualización de perfiles
 DO $$
 BEGIN
+    -- Habilitar realtime en perfiles
     IF NOT EXISTS (
         SELECT 1 FROM pg_publication_rel pr
         JOIN pg_publication p ON p.oid = pr.prpubid
         JOIN pg_class c ON c.oid = pr.prrelid
         WHERE p.pubname = 'supabase_realtime' 
-          AND c.relname = 'estado_juego' 
+          AND c.relname = 'perfiles' 
           AND c.relnamespace = 'public'::regnamespace
     ) THEN
-        ALTER PUBLICATION supabase_realtime ADD TABLE public.estado_juego;
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_publication_rel pr
-        JOIN pg_publication p ON p.oid = pr.prpubid
-        JOIN pg_class c ON c.oid = pr.prrelid
-        WHERE p.pubname = 'supabase_realtime' 
-          AND c.relname = 'participantes' 
-          AND c.relnamespace = 'public'::regnamespace
-    ) THEN
-        ALTER PUBLICATION supabase_realtime ADD TABLE public.participantes;
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_publication_rel pr
-        JOIN pg_publication p ON p.oid = pr.prpubid
-        JOIN pg_class c ON c.oid = pr.prrelid
-        WHERE p.pubname = 'supabase_realtime' 
-          AND c.relname = 'respuestas' 
-          AND c.relnamespace = 'public'::regnamespace
-    ) THEN
-        ALTER PUBLICATION supabase_realtime ADD TABLE public.respuestas;
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.perfiles;
     END IF;
 END $$;
 
--- 5. Insertar estado inicial del juego (idempotente)
-INSERT INTO public.estado_juego (id, pantalla_actual, pregunta_actual_id, tiempo_restante)
-VALUES ('global', 'lobby', 1, 60)
-ON CONFLICT (id) DO NOTHING;
 
--- 6. RPC: Suma de puntaje atómica (evita condiciones de carrera)
-CREATE OR REPLACE FUNCTION public.sumar_puntaje_alumno(alumno_id UUID, puntos INT)
-RETURNS void AS $$
-BEGIN
-    UPDATE public.participantes
-    SET puntaje = puntaje + puntos
-    WHERE id = alumno_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 7. Crear bucket de almacenamiento para exámenes (fotos) y configurar políticas públicas
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('examenes', 'examenes', true)
-ON CONFLICT (id) DO NOTHING;
-
-DROP POLICY IF EXISTS "Acceso público de lectura a exámenes" ON storage.objects;
-CREATE POLICY "Acceso público de lectura a exámenes"
-    ON storage.objects FOR SELECT USING (bucket_id = 'examenes');
-
-DROP POLICY IF EXISTS "Inserción pública anónima de exámenes" ON storage.objects;
-CREATE POLICY "Inserción pública anónima de exámenes"
-    ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'examenes');
-
-DROP POLICY IF EXISTS "Actualización pública anónima de exámenes" ON storage.objects;
-CREATE POLICY "Actualización pública anónima de exámenes"
-    ON storage.objects FOR UPDATE USING (bucket_id = 'examenes') WITH CHECK (bucket_id = 'examenes');
-
-DROP POLICY IF EXISTS "Eliminación pública de exámenes" ON storage.objects;
-CREATE POLICY "Eliminación pública de exámenes"
-    ON storage.objects FOR DELETE USING (bucket_id = 'examenes');
-
--- ──────────────────────────────────────────────────────────────────────────────
--- VERIFICACIÓN:
--- SELECT * FROM public.estado_juego;
--- SELECT * FROM public.participantes ORDER BY puntaje DESC;
--- SELECT * FROM public.respuestas   ORDER BY created_at DESC LIMIT 20;
--- ──────────────────────────────────────────────────────────────────────────────
+-- 4. Semilla de perfiles de expositores con tus nombres
+INSERT INTO public.perfiles (id, name, avatar, color)
+VALUES 
+    (1, 'Pablo Claudio', '⚖️', '#e50914'),
+    (2, 'Samuel', '🎓', '#6366f1'),
+    (3, 'Público General', '👥', '#10b981')
+ON CONFLICT (id) DO UPDATE 
+SET name = EXCLUDED.name, avatar = EXCLUDED.avatar, color = EXCLUDED.color;

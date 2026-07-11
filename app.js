@@ -2,14 +2,17 @@
 // EDUFLIX.IO — LÓGICA DE LA APLICACIÓN ESTILO NETFLIX (EXPOSICIÓN ÉTICA)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ── Supabase Configuration (Simulación offline por defecto para estabilidad) ──────
+// ── Supabase Configuration ──────────────────────────────────────────────────
 const SUPABASE_CONFIG = {
-    url: null, 
-    anonKey: null,
-    useEdgeFunctions: false
+    url: "https://dyuadrzdrphzywbnxnhz.supabase.co",
+    anonKey: "sb_publishable_rCwOvgVa1kGlO5PFAa8tRg_E1KIWKWX",
+    useEdgeFunctions: true
 };
 
-const supabaseClient = null;
+const supabaseClient = (typeof window !== 'undefined' && window.supabase && SUPABASE_CONFIG.url)
+    ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey)
+    : null;
+
 
 // ── Slide Data (contenido de cada diapositiva para modal y presentador) ─────
 const SLIDES_DATA = {
@@ -382,7 +385,7 @@ const SLIDES_DATA = {
                         <h3 class="credits-logo" style="font-family:'Poppins', sans-serif;font-weight:900;letter-spacing:-1px;color:#e50914;font-size:2rem;margin-bottom:12px;">EDU<span style="color:#fff;">FLIX</span></h3>
                         <p class="credits-title" style="font-size:0.95rem;color:#e5e5e5;font-weight:700;margin-bottom:18px;">Exposición: Corresponsabilidad Socioeducativa</p>
                         <div class="credits-roll">
-                            <div class="credit-row"><span class="credit-label">Expositor:</span> <span class="credit-value">Pablito_DP</span></div>
+                            <div class="credit-row"><span class="credit-label">Expositores:</span> <span class="credit-value">Pablo Claudio, Samuel</span></div>
                             <div class="credit-row"><span class="credit-label">Institución:</span> <span class="credit-value">UNHEVAL (Huánuco)</span></div>
                             <div class="credit-row"><span class="credit-label">Facultad:</span> <span class="credit-value">Educación Secundaria</span></div>
                             <div class="credit-row"><span class="credit-label">Presentador:</span> <span class="credit-value">Eduflix Presenter 2.0</span></div>
@@ -466,8 +469,8 @@ let lastExpectedAnswer = '';
 
 // ── Profiles Management & Selection ──────────────────────────────────────────
 const DEFAULT_PROFILES = [
-    { name: 'Expositor UNHEVAL', avatar: '⚖️', color: '#e50914' },
-    { name: 'Invitado Docente', avatar: '🎓', color: '#6366f1' },
+    { name: 'Pablo Claudio', avatar: '⚖️', color: '#e50914' },
+    { name: 'Samuel', avatar: '🎓', color: '#6366f1' },
     { name: 'Público General', avatar: '👥', color: '#10b981' }
 ];
 
@@ -475,13 +478,55 @@ let currentEditingProfileIndex = null;
 let localProfilesCache = [];
 
 async function initProfiles() {
-    let profiles = localStorage.getItem('eduflix_profiles');
-    if (!profiles) {
-        profiles = JSON.stringify(DEFAULT_PROFILES);
-        localStorage.setItem('eduflix_profiles', profiles);
+    if (!supabaseClient) {
+        let profiles = localStorage.getItem('eduflix_profiles');
+        if (!profiles) {
+            profiles = JSON.stringify(DEFAULT_PROFILES);
+            localStorage.setItem('eduflix_profiles', profiles);
+        }
+        localProfilesCache = JSON.parse(profiles);
+        renderProfiles();
+        return;
     }
-    localProfilesCache = JSON.parse(profiles);
+
+    try {
+        // Carga de perfiles desde Supabase
+        const { data, error } = await supabaseClient.from('perfiles').select('*').order('id', { ascending: true });
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            // Semilla Supabase con DEFAULT_PROFILES
+            const { data: seeded, error: seedErr } = await supabaseClient.from('perfiles').insert(DEFAULT_PROFILES).select();
+            if (seedErr) throw seedErr;
+            localProfilesCache = seeded;
+        } else {
+            localProfilesCache = data;
+        }
+    } catch (err) {
+        console.error("Error cargando perfiles de Supabase:", err);
+        let profiles = localStorage.getItem('eduflix_profiles');
+        localProfilesCache = profiles ? JSON.parse(profiles) : DEFAULT_PROFILES;
+    }
+
     renderProfiles();
+
+    // Suscripción Realtime en perfiles
+    supabaseClient.channel('realtime-perfiles')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'perfiles' }, async () => {
+            try {
+                const { data: updatedData } = await supabaseClient.from('perfiles').select('*').order('id', { ascending: true });
+                if (updatedData) {
+                    localProfilesCache = updatedData;
+                    renderProfiles();
+                    if (document.getElementById('profile-manage-modal')?.classList.contains('open')) {
+                        renderProfileManageList();
+                    }
+                }
+            } catch (err) {
+                console.error("Error recargando perfiles en evento realtime:", err);
+            }
+        })
+        .subscribe();
 }
 
 function getProfiles() {
@@ -611,30 +656,67 @@ function selectColorChoice(c) {
     renderColorChoices(c);
 }
 
-function saveProfileForm() {
+async function saveProfileForm() {
     const name = document.getElementById('profile-input-name').value.trim();
     if (!name) { showToast('Por favor, ingresa un nombre.', 'warning'); return; }
 
     const profiles = getProfiles();
-    if (currentEditingProfileIndex === null) {
-        // Add
-        profiles.push({ name, avatar: selectedAvatar, color: selectedColor });
-    } else {
-        // Edit
-        profiles[currentEditingProfileIndex] = { name, avatar: selectedAvatar, color: selectedColor };
+
+    try {
+        if (currentEditingProfileIndex === null) {
+            if (supabaseClient) {
+                const { data, error } = await supabaseClient.from('perfiles').insert({ name: name, avatar: selectedAvatar, color: selectedColor }).select();
+                if (error) throw error;
+                if (data && data[0]) {
+                    localProfilesCache.push(data[0]);
+                }
+            } else {
+                profiles.push({ name, avatar: selectedAvatar, color: selectedColor });
+                saveProfiles(profiles);
+            }
+            showToast(`Perfil "${name}" creado exitosamente.`, 'success');
+        } else {
+            const profileToEdit = profiles[currentEditingProfileIndex];
+            if (supabaseClient && profileToEdit.id) {
+                const { error } = await supabaseClient.from('perfiles').update({ name: name, avatar: selectedAvatar, color: selectedColor }).eq('id', profileToEdit.id);
+                if (error) throw error;
+                localProfilesCache[currentEditingProfileIndex] = { ...profileToEdit, name, avatar: selectedAvatar, color: selectedColor };
+            } else {
+                profiles[currentEditingProfileIndex] = { name, avatar: selectedAvatar, color: selectedColor };
+                saveProfiles(profiles);
+            }
+            showToast(`Perfil "${name}" actualizado.`, 'success');
+        }
+    } catch (err) {
+        console.error("Error saving profile to Supabase:", err);
+        showToast("Error al guardar perfil: " + err.message, "error");
+        return;
     }
-    saveProfiles(profiles);
-    showToast('Perfil guardado.', 'success');
-    openProfileManageModal();
+
+    renderProfileManageList();
+    cancelProfileForm();
 }
 
-function deleteProfile(idx) {
+async function deleteProfile(idx) {
     const profiles = getProfiles();
-    const name = profiles[idx].name;
+    const profileToDelete = profiles[idx];
+    const name = profileToDelete.name;
     if (confirm(`¿Estás seguro de eliminar el perfil de ${name}?`)) {
-        profiles.splice(idx, 1);
-        saveProfiles(profiles);
-        showToast('Perfil eliminado.', 'info');
+        try {
+            if (supabaseClient && profileToDelete.id) {
+                const { error } = await supabaseClient.from('perfiles').delete().eq('id', profileToDelete.id);
+                if (error) throw error;
+                localProfilesCache.splice(idx, 1);
+            } else {
+                profiles.splice(idx, 1);
+                saveProfiles(profiles);
+            }
+            showToast(`Perfil "${name}" eliminado.`, 'info');
+        } catch (err) {
+            console.error("Error deleting profile from Supabase:", err);
+            showToast("Error al eliminar perfil: " + err.message, "error");
+            return;
+        }
         renderProfileManageList();
     }
 }
@@ -1179,6 +1261,101 @@ function initCardBackgrounds() {
     });
 }
 
+// ── PlaySound Helper (Synthesized via Web Audio API) ──────────────────────────
+function playSound(type = 'click') {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'click') {
+            osc.frequency.setValueAtTime(800, ctx.currentTime);
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.06);
+        } else if (type === 'bell') {
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.08); // A5
+            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.45);
+        }
+    } catch (e) {
+        console.warn("Sound playback failed:", e);
+    }
+}
+
+// ── Supabase Realtime (Virtual Laser Pointer + Remote Commands) ──────────────────────
+function initRealtimeUplink() {
+    if (!supabaseClient) return;
+
+    const laser = document.getElementById('virtual-laser');
+    let laserX = window.innerWidth / 2, laserY = window.innerHeight / 2;
+    let hideTimeout;
+
+    supabaseClient.channel('presentation-rolfam-rolempres')
+        .on('broadcast', { event: 'laser-move' }, ({ payload }) => {
+            if (!laser) return;
+            laser.style.opacity = '1';
+            laserX = Math.max(0, Math.min(laserX + payload.dx * window.innerWidth * 2, window.innerWidth));
+            laserY = Math.max(0, Math.min(laserY + payload.dy * window.innerHeight * 2, window.innerHeight));
+            laser.style.left = `${laserX}px`;
+            laser.style.top = `${laserY}px`;
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => { laser.style.opacity = '0'; }, 1500);
+        })
+        .on('broadcast', { event: 'laser-absolute' }, ({ payload }) => {
+            if (!laser) return;
+            laser.style.opacity = '1';
+            laserX = payload.x * window.innerWidth;
+            laserY = payload.y * window.innerHeight;
+            laser.style.left = `${laserX}px`;
+            laser.style.top = `${laserY}px`;
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => { laser.style.opacity = '0'; }, 1500);
+        })
+        .on('broadcast', { event: 'laser-click' }, () => {
+            const el = document.elementFromPoint(laserX, laserY);
+            if (el) {
+                el.click();
+                if (typeof el.focus === 'function') {
+                    el.focus();
+                }
+            }
+        })
+        .on('broadcast', { event: 'scroll' }, ({ payload }) => {
+            const slideView = document.querySelector('.presenter-slide-view');
+            if (slideView && document.getElementById('presenter-overlay').classList.contains('active')) {
+                slideView.scrollBy(0, payload.dy);
+            } else {
+                window.scrollBy(0, payload.dy);
+            }
+        })
+        .on('broadcast', { event: 'navigate' }, ({ payload }) => {
+            if (document.getElementById('presenter-overlay').classList.contains('active')) {
+                if (payload.direction === 'next') presenterNext();
+                else presenterPrev();
+            }
+        })
+        .on('broadcast', { event: 'start-presentation' }, () => {
+            startPresenterMode();
+            showToast('▶️ Presentación iniciada desde el mando remoto', 'success');
+        })
+        .on('broadcast', { event: 'exit-presentation' }, () => {
+            exitPresenterMode();
+            showToast('⏹️ Presentación detenida desde el mando remoto', 'info');
+        })
+        .subscribe((status) => {
+            if (status === 'SUBSCRIBED') showToast('🔗 Mando remoto listo', 'success');
+        });
+}
+
 // ── Bindings ──────────────────────────────────────────────────────────────
 window.generateAIProblem = generateAIProblem;
 window.toggleAISolution = toggleAISolution;
@@ -1207,9 +1384,13 @@ window.cancelProfileForm = cancelProfileForm;
 window.checkTallerAnswer = checkTallerAnswer;
 window.speakText = speakText;
 window.initCardBackgrounds = initCardBackgrounds;
+window.initRealtimeUplink = initRealtimeUplink;
+window.playSound = playSound;
 
 // Page initialization
 document.addEventListener('DOMContentLoaded', () => {
     initProfiles();
     renderAllMath();
+    initRealtimeUplink();
 });
+
